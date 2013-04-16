@@ -64,6 +64,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Ionic.Zlib.dll</HintPath>
     </Reference>
+    <Reference Include="log4net">
+      <HintPath>..\packages\log4net.2.0.0\lib\net40-full\log4net.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.4.5.8\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -349,9 +352,7 @@
     <EmbeddedResource Include="realm\worlds\tutorial.wmap" />
     <EmbeddedResource Include="realm\worlds\vault.wmap" />
     <EmbeddedResource Include="realm\worlds\world1.wmap" />
-    <EmbeddedResource Include="realm\worlds\gauntlet.wmap">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </EmbeddedResource>
+    <EmbeddedResource Include="realm\worlds\gauntlet.wmap" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
