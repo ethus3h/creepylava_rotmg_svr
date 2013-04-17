@@ -24,7 +24,8 @@ namespace wServer.networking
         class ReceiveToken
         {
             public int Length;
-            public Packet Packet;
+            public PacketID ID;
+            public byte[] PacketBody;
         }
         enum SendState
         {
@@ -67,7 +68,7 @@ namespace wServer.networking
             send.UserToken = new SendToken();
             send.SetBuffer(sendBuff = new byte[BUFFER_SIZE], 0, BUFFER_SIZE);
 
-            var receive = new SocketAsyncEventArgs();
+            receive = new SocketAsyncEventArgs();
             receive.Completed += ReceiveCompleted;
             receive.UserToken = new ReceiveToken();
             receive.SetBuffer(receiveBuff = new byte[BUFFER_SIZE], 0, BUFFER_SIZE);
@@ -90,76 +91,69 @@ namespace wServer.networking
             parent.Disconnect();
         }
 
+        //It is said that ReceiveAsync/SendAsync never returns false unless error
+        //So...let's just treat it as always true
+
         void ReceiveCompleted(object sender, SocketAsyncEventArgs e)
         {
             try
             {
-                bool repeat;
-                do
+                if (e.SocketError != SocketError.Success)
+                    throw new SocketException((int)e.SocketError);
+
+                switch (receiveState)
                 {
-                    repeat = false;
+                    case ReceiveState.ReceivingHdr:
+                        if (e.BytesTransferred < 5)
+                        {
+                            parent.Disconnect();
+                            return;
+                        }
 
-                    if (e.SocketError != SocketError.Success)
-                        throw new SocketException((int)e.SocketError);
+                        if (e.Buffer[0] == 0x3c && e.Buffer[1] == 0x70 &&
+                            e.Buffer[2] == 0x6f && e.Buffer[3] == 0x6c && e.Buffer[4] == 0x69)
+                        {
+                            ProcessPolicyFile();
+                            return;
+                        }
 
-                    switch (receiveState)
-                    {
-                        case ReceiveState.ReceivingHdr:
-                            if (e.BytesTransferred < 5)
-                            {
-                                parent.Disconnect();
-                                return;
-                            }
+                        var len = (e.UserToken as ReceiveToken).Length =
+                            IPAddress.NetworkToHostOrder(BitConverter.ToInt32(e.Buffer, 0)) - 5;
+                        if (len < 0 || len > BUFFER_SIZE)
+                            throw new InternalBufferOverflowException();
+                        (e.UserToken as ReceiveToken).PacketBody = new byte[len];
+                        (e.UserToken as ReceiveToken).ID = (PacketID)e.Buffer[4];
 
-                            if (e.Buffer[0] == 0x3c && e.Buffer[1] == 0x70 &&
-                                e.Buffer[2] == 0x6f && e.Buffer[3] == 0x6c && e.Buffer[4] == 0x69)
-                            {
-                                ProcessPolicyFile();
-                                return;
-                            }
+                        receiveState = ReceiveState.ReceivingBody;
+                        e.SetBuffer(0, len);
+                        skt.ReceiveAsync(e);
 
-                            var len = (e.UserToken as ReceiveToken).Length =
-                                IPAddress.NetworkToHostOrder(BitConverter.ToInt32(e.Buffer, 0)) - 5;
-                            if (len < 0 || len > BUFFER_SIZE)
-                                throw new InternalBufferOverflowException();
-                            (e.UserToken as ReceiveToken).Packet = Packet.Packets[(PacketID)e.Buffer[4]].CreateInstance();
+                        break;
+                    case ReceiveState.ReceivingBody:
+                        if (e.BytesTransferred < (e.UserToken as ReceiveToken).Length)
+                        {
+                            parent.Disconnect();
+                            return;
+                        }
 
-                            receiveState = ReceiveState.ReceivingBody;
-                            e.SetBuffer(0, len);
-                            if (!skt.ReceiveAsync(e))
-                            {
-                                repeat = true;
-                                continue;
-                            }
-                            break;
-                        case ReceiveState.ReceivingBody:
-                            if (e.BytesTransferred < (e.UserToken as ReceiveToken).Length)
-                            {
-                                parent.Disconnect();
-                                return;
-                            }
+                        var body = (e.UserToken as ReceiveToken).PacketBody;
+                        var id = (e.UserToken as ReceiveToken).ID;
+                        Buffer.BlockCopy(e.Buffer, 0, body, 0, body.Length);
+                        //pkt.Read(parent, e.Buffer, 0, (e.UserToken as ReceiveToken).Length);
 
-                            var pkt = (e.UserToken as ReceiveToken).Packet;
-                            pkt.Read(parent, e.Buffer, 0, (e.UserToken as ReceiveToken).Length);
+                        receiveState = ReceiveState.Processing;
+                        bool cont = OnPacketReceived(id, body);
 
-                            receiveState = ReceiveState.Processing;
-                            bool cont = OnPacketReceived(pkt);
-
-                            if (cont && skt.Connected)
-                            {
-                                receiveState = ReceiveState.ReceivingHdr;
-                                e.SetBuffer(0, 5);
-                                if (!skt.ReceiveAsync(e))
-                                {
-                                    repeat = true;
-                                    continue;
-                                }
-                            }
-                            break;
-                        default:
-                            throw new InvalidOperationException(e.LastOperation.ToString());
-                    }
-                } while (repeat);
+                        if (cont && skt.Connected)
+                        {
+                            receiveState = ReceiveState.ReceivingHdr;
+                            e.SetBuffer(0, 5);
+                            skt.ReceiveAsync(e);
+                        }
+                        break;
+                    default:
+                        throw new InvalidOperationException(e.LastOperation.ToString());
+                }
             }
             catch (Exception ex)
             {
@@ -171,40 +165,29 @@ namespace wServer.networking
         {
             try
             {
-                bool repeat;
-                do
+                int len;
+                switch (sendState)
                 {
-                    repeat = false;
+                    case SendState.Ready:
+                        len = (e.UserToken as SendToken).Packet.Write(parent, sendBuff, 0);
 
-                    if (e.SocketError != SocketError.Success)
-                        throw new SocketException((int)e.SocketError);
+                        sendState = SendState.Sending;
+                        e.SetBuffer(0, len);
+                        skt.SendAsync(e);
+                        break;
+                    case SendState.Sending:
+                        (e.UserToken as SendToken).Packet = null;
 
-                    switch (sendState)
-                    {
-                        case SendState.Ready:
-                            var len = (e.UserToken as SendToken).Packet.Write(parent, sendBuff, 0);
+                        if (CanSendPacket(e, true))
+                        {
+                            len = (e.UserToken as SendToken).Packet.Write(parent, sendBuff, 0);
 
                             sendState = SendState.Sending;
-                            e.SetBuffer(sendBuff, 0, len);
-                            if (!skt.SendAsync(e))
-                            {
-                                repeat = true;
-                                continue;
-                            }
-                            break;
-                        case SendState.Sending:
-                            (e.UserToken as SendToken).Packet = null;
-
-                            if (CanSendPacket(e, true))
-                            {
-                                repeat = true;
-                                continue;
-                            }
-                            break;
-                        default:
-                            throw new InvalidOperationException(e.LastOperation.ToString());
-                    }
-                } while (repeat);
+                            e.SetBuffer(0, len);
+                            skt.SendAsync(e);
+                        }
+                        break;
+                }
             }
             catch (Exception ex)
             {
@@ -217,11 +200,11 @@ namespace wServer.networking
         {
             parent.Disconnect();
         }
-        bool OnPacketReceived(Packet pkt)
+        bool OnPacketReceived(PacketID id, byte[] pkt)
         {
             if (parent.IsReady())
             {
-                parent.Manager.Network.AddPendingPacket(parent, pkt);
+                parent.Manager.Network.AddPendingPacket(parent, id, pkt);
                 return true;
             }
             else

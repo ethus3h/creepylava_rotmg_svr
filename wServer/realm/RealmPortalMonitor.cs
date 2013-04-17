@@ -17,6 +17,7 @@ namespace wServer.realm
 
         public RealmPortalMonitor(RealmManager manager)
         {
+            this.manager = manager;
             this.nexus = manager.Worlds[World.NEXUS_ID] as Nexus;
             lock (worldLock)
                 foreach (var i in manager.Worlds)

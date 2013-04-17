@@ -8,7 +8,7 @@ using wServer.networking;
 
 namespace wServer.realm
 {
-    using Work = Tuple<Client, Packet>;
+    using Work = Tuple<Client, PacketID, byte[]>;
     public class NetworkTicker //Sync network processing
     {
         public RealmManager Manager { get; private set; }
@@ -17,33 +17,38 @@ namespace wServer.realm
             this.Manager = manager;
         }
 
-        public void AddPendingPacket(Client client, Packet packet)
+        public void AddPendingPacket(Client client, PacketID id, byte[] packet)
         {
-            pendings.Add(new Tuple<Client, Packet>(client, packet));
+            pendings.Enqueue(new Work(client, id, packet));
         }
-        static BlockingCollection<Work> pendings =
-           new BlockingCollection<Work>(new ConcurrentQueue<Work>());
+        static ConcurrentQueue<Work> pendings = new ConcurrentQueue<Work>();
+        static SpinWait loopLock = new SpinWait();
 
 
         public void TickLoop()
         {
-            Tuple<Client, Packet> work;
+            Work work;
             while (true)
             {
-                work = pendings.Take();
-                if (pendings.Count > 0)
-                    Console.WriteLine(pendings.Count);
-                if (work.Item1.Stage == ProtocalStage.Disconnected)
+                loopLock.Reset();
+                while (pendings.TryDequeue(out work))
                 {
-                    Client client;
-                    Manager.Clients.TryRemove(work.Item1.Account.AccountId, out client);
-                    continue;
+                    if (work.Item1.Stage == ProtocalStage.Disconnected)
+                    {
+                        Client client;
+                        Manager.Clients.TryRemove(work.Item1.Account.AccountId, out client);
+                        continue;
+                    }
+                    try
+                    {
+                        Packet packet = Packet.Packets[work.Item2].CreateInstance();
+                        packet.Read(work.Item1, work.Item3, 0, work.Item3.Length);
+                        work.Item1.ProcessPacket(packet);
+                    }
+                    catch { }
                 }
-                try
-                {
-                    work.Item1.ProcessPacket(work.Item2);
-                }
-                catch { }
+                while (pendings.Count == 0)
+                    loopLock.SpinOnce();
             }
         }
     }
