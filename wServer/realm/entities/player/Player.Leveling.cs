@@ -5,6 +5,7 @@ using System.Text;
 using wServer.networking.svrPackets;
 using System.Xml;
 using System.Xml.Linq;
+using wServer.logic;
 
 namespace wServer.realm.entities
 {
@@ -173,12 +174,12 @@ namespace wServer.realm.entities
                     newGoal = GetFameGoal(Fame);
                 if (newGoal > FameGoal)
                 {
-                    Owner.BroadcastPacket(new NotificationPacket()
+                    BroadcastSync(new NotificationPacket()
                     {
                         ObjectId = Id,
                         Color = new ARGB(0xFF00FF00),
                         Text = "Class Quest Complete!"
-                    }, null);
+                    }, p => BehaviorUtils.Dist(this, p) < 25);
                     Stars = GetStars();
                 }
                 FameGoal = newGoal;
@@ -220,12 +221,12 @@ namespace wServer.realm.entities
         public bool EnemyKilled(Enemy enemy, int exp, bool killer)
         {
             if (enemy == questEntity)
-                Owner.BroadcastPacket(new NotificationPacket()
+                BroadcastSync(new NotificationPacket()
                 {
                     ObjectId = Id,
                     Color = new ARGB(0xFF00FF00),
                     Text = "Quest Complete!"
-                }, null);
+                }, p => BehaviorUtils.Dist(this, p) < 25);
             if (exp != 0)
             {
                 Experience += exp;

@@ -234,7 +234,7 @@ namespace wServer.realm.entities
                                 TargetId = Id,
                                 Color = new ARGB(0xFFFF00AA)
                             };
-                            Owner.BroadcastPackets(batch, null);
+                            BroadcastSync(batch, p => BehaviorUtils.Dist(this, p) < 25);
                         } break;
                     case ActivateEffects.Shoot:
                         {
@@ -262,7 +262,7 @@ namespace wServer.realm.entities
                                 Boost[idx] -= s;
                                 UpdateCount++;
                             }));
-                            Owner.BroadcastPacket(new ShowEffectPacket()
+                            BroadcastSync(new ShowEffectPacket()
                             {
                                 EffectType = EffectType.Potion,
                                 TargetId = Id,
@@ -294,13 +294,13 @@ namespace wServer.realm.entities
                                     player.UpdateCount++;
                                 }));
                             });
-                            Owner.BroadcastPacket(new ShowEffectPacket()
+                            BroadcastSync(new ShowEffectPacket()
                             {
                                 EffectType = EffectType.AreaBlast,
                                 TargetId = Id,
                                 Color = new ARGB(0xffffffff),
                                 PosA = new Position() { X = eff.Range / 2 }
-                            }, null);
+                            }, p => BehaviorUtils.Dist(this, p) < 25);
                         } break;
                     case ActivateEffects.ConditionEffectSelf:
                         {
@@ -309,13 +309,13 @@ namespace wServer.realm.entities
                                 Effect = eff.ConditionEffect.Value,
                                 DurationMS = eff.DurationMS
                             });
-                            Owner.BroadcastPacket(new ShowEffectPacket()
+                            BroadcastSync(new ShowEffectPacket()
                             {
                                 EffectType = EffectType.AreaBlast,
                                 TargetId = Id,
                                 Color = new ARGB(0xffffffff),
                                 PosA = new Position() { X = 1 }
-                            }, null);
+                            }, p => BehaviorUtils.Dist(this, p) < 25);
                         } break;
                     case ActivateEffects.ConditionEffectAura:
                         {
@@ -330,19 +330,19 @@ namespace wServer.realm.entities
                             uint color = 0xffffffff;
                             if (eff.ConditionEffect.Value == ConditionEffectIndex.Damaging)
                                 color = 0xffff0000;
-                            Owner.BroadcastPacket(new ShowEffectPacket()
+                            BroadcastSync(new ShowEffectPacket()
                             {
                                 EffectType = EffectType.AreaBlast,
                                 TargetId = Id,
                                 Color = new ARGB(color),
                                 PosA = new Position() { X = eff.Range / 2 }
-                            }, null);
+                            }, p => BehaviorUtils.Dist(this, p) < 25);
                         } break;
                     case ActivateEffects.Heal:
                         {
                             List<Packet> pkts = new List<Packet>();
                             ActivateHealHp(this, eff.Amount, pkts);
-                            Owner.BroadcastPackets(pkts, null);
+                            BroadcastSync(pkts, p => BehaviorUtils.Dist(this, p) < 25);
                         } break;
                     case ActivateEffects.HealNova:
                         {
@@ -358,13 +358,13 @@ namespace wServer.realm.entities
                                 Color = new ARGB(0xffffffff),
                                 PosA = new Position() { X = eff.Range / 2 }
                             });
-                            Owner.BroadcastPackets(pkts, null);
+                            BroadcastSync(pkts, p => BehaviorUtils.Dist(this, p) < 25);
                         } break;
                     case ActivateEffects.Magic:
                         {
                             List<Packet> pkts = new List<Packet>();
                             ActivateHealMp(this, eff.Amount, pkts);
-                            Owner.BroadcastPackets(pkts, null);
+                            BroadcastSync(pkts, p => BehaviorUtils.Dist(this, p) < 25);
                         } break;
                     case ActivateEffects.MagicNova:
                         {
@@ -380,13 +380,13 @@ namespace wServer.realm.entities
                                 Color = new ARGB(0xffffffff),
                                 PosA = new Position() { X = eff.Range / 2 }
                             });
-                            Owner.BroadcastPackets(pkts, null);
+                            BroadcastSync(pkts, p => BehaviorUtils.Dist(this, p) < 25);
                         } break;
                     case ActivateEffects.Teleport:
                         {
                             Move(target.X, target.Y);
                             UpdateCount++;
-                            Owner.BroadcastPackets(new Packet[]
+                            BroadcastSync(new Packet[]
                             {
                                 new GotoPacket()
                                 {
@@ -408,7 +408,7 @@ namespace wServer.realm.entities
                                     },
                                     Color = new ARGB(0xFFFFFFFF)
                                 }
-                            }, null);
+                            }, p => BehaviorUtils.Dist(this, p) < 25);
                         } break;
                     case ActivateEffects.VampireBlast:
                         {
@@ -458,17 +458,17 @@ namespace wServer.realm.entities
                                 });
                             }
 
-                            Owner.BroadcastPackets(pkts, null);
+                            BroadcastSync(pkts, p => BehaviorUtils.Dist(this, p) < 25);
                         } break;
                     case ActivateEffects.Trap:
                         {
-                            Owner.BroadcastPacket(new ShowEffectPacket()
+                            BroadcastSync(new ShowEffectPacket()
                             {
                                 EffectType = EffectType.Throw,
                                 Color = new ARGB(0xff9000ff),
                                 TargetId = Id,
                                 PosA = target
-                            }, null);
+                            }, p => BehaviorUtils.Dist(this, p) < 25);
                             Owner.Timers.Add(new WorldTimer(1500, (world, t) =>
                             {
                                 Trap trap = new Trap(
@@ -536,7 +536,7 @@ namespace wServer.realm.entities
                                     });
                                 }
                             });
-                            Owner.BroadcastPackets(pkts, null);
+                            BroadcastSync(pkts, p => BehaviorUtils.Dist(this, p) < 25);
                         } break;
                     case ActivateEffects.Decoy:
                         {
@@ -602,17 +602,17 @@ namespace wServer.realm.entities
                                     PosB = new Position() { X = 350 }
                                 });
                             }
-                            Owner.BroadcastPackets(pkts, null);
+                            BroadcastSync(pkts, p => BehaviorUtils.Dist(this, p) < 25);
                         } break;
                     case ActivateEffects.PoisonGrenade:
                         {
-                            Owner.BroadcastPacket(new ShowEffectPacket()
+                            BroadcastSync(new ShowEffectPacket()
                             {
                                 EffectType = EffectType.Throw,
                                 Color = new ARGB(0xffddff00),
                                 TargetId = Id,
                                 PosA = target
-                            }, null);
+                            }, p => BehaviorUtils.Dist(this, p) < 25);
                             Placeholder x = new Placeholder(1500);
                             x.Move(target.X, target.Y);
                             Owner.EnterWorld(x);
@@ -636,24 +636,24 @@ namespace wServer.realm.entities
                             {
                                 ApplyConditionEffect(NegativeEffs);
                             });
-                            Owner.BroadcastPacket(new ShowEffectPacket()
+                            BroadcastSync(new ShowEffectPacket()
                             {
                                 EffectType = EffectType.AreaBlast,
                                 TargetId = Id,
                                 Color = new ARGB(0xffffffff),
                                 PosA = new Position() { X = eff.Range / 2 }
-                            }, null);
+                            }, p => BehaviorUtils.Dist(this, p) < 25);
                         } break;
                     case ActivateEffects.RemoveNegativeConditionsSelf:
                         {
                             ApplyConditionEffect(NegativeEffs);
-                            Owner.BroadcastPacket(new ShowEffectPacket()
+                            BroadcastSync(new ShowEffectPacket()
                             {
                                 EffectType = EffectType.AreaBlast,
                                 TargetId = Id,
                                 Color = new ARGB(0xffffffff),
                                 PosA = new Position() { X = 1 }
-                            }, null);
+                            }, p => BehaviorUtils.Dist(this, p) < 25);
                         } break;
                     case ActivateEffects.IncrementStat:
                         {

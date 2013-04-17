@@ -338,6 +338,7 @@ namespace wServer.realm.entities
 
         public void Move(RealmTime time, MovePacket pkt)
         {
+            Flush();
             if (pkt.Position.X == -1 || pkt.Position.Y == -1) return;
 
             double newX = X; double newY = Y;

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using wServer.networking.svrPackets;
 using wServer.networking.cliPackets;
+using wServer.logic;
 
 namespace wServer.realm.entities
 {
@@ -11,7 +12,6 @@ namespace wServer.realm.entities
     {
         public void PlayerShoot(RealmTime time, PlayerShootPacket pkt)
         {
-            // System.Diagnostics.Debug.WriteLine(pkt.Position);
             Item item = XmlDatas.ItemDescs[pkt.ContainerType];
             var prjDesc = item.Projectiles[0]; //Assume only one
             projectileId = pkt.BulletId;
@@ -19,13 +19,13 @@ namespace wServer.realm.entities
                 (int)statsMgr.GetAttackDamage(prjDesc.MinDamage, prjDesc.MaxDamage),
                 pkt.Time + tickMapping, pkt.Position, pkt.Angle);
             Owner.EnterWorld(prj);
-            Owner.BroadcastPacket(new AllyShootPacket()
+            BroadcastSync(new AllyShootPacket()
             {
                 OwnerId = Id,
                 Angle = pkt.Angle,
                 ContainerType = pkt.ContainerType,
                 BulletId = pkt.BulletId
-            }, this);
+            }, p => p != this && BehaviorUtils.Dist(this, p) < 25);
             fames.Shoot(prj);
         }
 
