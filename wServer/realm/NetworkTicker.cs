@@ -30,9 +30,11 @@ namespace wServer.realm
             Work work;
             while (true)
             {
+                if (Manager.Terminating) return;
                 loopLock.Reset();
                 while (pendings.TryDequeue(out work))
                 {
+                    if (Manager.Terminating) return;
                     if (work.Item1.Stage == ProtocalStage.Disconnected)
                     {
                         Client client;
@@ -47,7 +49,7 @@ namespace wServer.realm
                     }
                     catch { }
                 }
-                while (pendings.Count == 0)
+                while (pendings.Count == 0 && !Manager.Terminating)
                     loopLock.SpinOnce();
             }
         }

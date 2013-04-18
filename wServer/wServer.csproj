@@ -383,6 +383,9 @@
     <EmbeddedResource Include="realm\worlds\vault.wmap" />
     <EmbeddedResource Include="realm\worlds\world1.wmap" />
     <EmbeddedResource Include="realm\worlds\gauntlet.wmap" />
+    <None Include="wServer.cfg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

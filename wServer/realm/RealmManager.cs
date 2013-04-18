@@ -54,7 +54,7 @@ namespace wServer.realm
             //AddWorld(new GameWorld(1, "Medusa", true));
         }
 
-        public const int MAX_CLIENT = 100;
+        public int MAX_CLIENT = Program.Settings.GetValue<int>("maxClient", "100");
 
         int nextWorldId = 0;
         public readonly ConcurrentDictionary<int, World> Worlds = new ConcurrentDictionary<int, World>();
@@ -110,12 +110,11 @@ namespace wServer.realm
         Thread logic;
         public LogicTicker Logic { get; private set; }
 
-        Database db;
         public Database Database { get; private set; }
 
         public void Initialize()
         {
-            Database = new Database();
+            Database = new Database(Program.Settings.GetValue("conn"));
             Network = new NetworkTicker(this);
             Logic = new LogicTicker(this);
             network = new Thread(Network.TickLoop)
@@ -131,6 +130,13 @@ namespace wServer.realm
             //Start logic loop first
             logic.Start();
             network.Start();
+        }
+
+        public bool Terminating { get; private set; }
+        public void Terminate()
+        {
+            Terminating = true;
+            Database.Dispose();
         }
     }
 }

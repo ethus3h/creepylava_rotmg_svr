@@ -21,7 +21,7 @@ namespace server.account
             using (StreamReader rdr = new StreamReader(context.Request.InputStream))
                 query = HttpUtility.ParseQueryString(rdr.ReadToEnd());
 
-            using (var db = new Database())
+            using (var db = new Database(Program.Settings.GetValue("conn")))
             {
                 var acc = db.Verify(query["guid"], query["password"]);
                 if (acc == null)

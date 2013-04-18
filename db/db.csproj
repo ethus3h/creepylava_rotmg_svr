@@ -82,6 +82,7 @@
     <Compile Include="Models.cs" />
     <Compile Include="NReader.cs" />
     <Compile Include="NWriter.cs" />
+    <Compile Include="SimpleSettings.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="WeakDictionary.cs" />

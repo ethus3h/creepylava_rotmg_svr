@@ -10,8 +10,8 @@ namespace wServer.realm
 {
     public class LogicTicker
     {
-        public const int TPS = 20;
-        public const int MsPT = 1000 / TPS;
+        public int TPS;
+        public int MsPT;
 
         public RealmManager Manager { get; private set; }
         public LogicTicker(RealmManager manager)
@@ -20,6 +20,9 @@ namespace wServer.realm
             pendings = new ConcurrentQueue<Action<RealmTime>>[5];
             for (int i = 0; i < 5; i++)
                 pendings[i] = new ConcurrentQueue<Action<RealmTime>>();
+
+            TPS = Program.Settings.GetValue<int>("tps", "20");
+            MsPT = 1000 / TPS;
         }
 
         public void AddPendingAction(Action<RealmTime> callback)
@@ -45,6 +48,8 @@ namespace wServer.realm
             long xa = 0;
             do
             {
+                if (Manager.Terminating) return;
+
                 long times = dt / MsPT;
                 dt -= times * MsPT;
                 times++;

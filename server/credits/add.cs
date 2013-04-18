@@ -13,7 +13,7 @@ namespace server.credits
         public void HandleRequest(HttpListenerContext context)
         {
             string status;
-            using (var db = new Database())
+            using (var db = new Database(Program.Settings.GetValue("conn")))
             {
                 var query = HttpUtility.ParseQueryString(context.Request.Url.Query);
 

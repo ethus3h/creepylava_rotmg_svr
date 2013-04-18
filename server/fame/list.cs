@@ -51,7 +51,7 @@ namespace server.fame
 
                 doc.AppendChild(root);
 
-                using (var db = new Database())
+                using (var db = new Database(Program.Settings.GetValue("conn")))
                 {
                     var cmd = db.CreateQuery();
                     cmd.CommandText = @"SELECT accId, chrId, name, charType, tex1, tex2, items, totalFame 

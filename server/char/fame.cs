@@ -20,7 +20,7 @@ namespace server.@char
             NameValueCollection query;
             using (StreamReader rdr = new StreamReader(context.Request.InputStream))
                 query = HttpUtility.ParseQueryString(rdr.ReadToEnd());
-            using (var db = new Database())
+            using (var db = new Database(Program.Settings.GetValue("conn")))
             {
                 var acc = db.GetAccount(int.Parse(query["accountId"]));
                 var chr = db.LoadCharacter(acc, int.Parse(query["charId"]));

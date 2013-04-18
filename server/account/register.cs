@@ -55,7 +55,7 @@ namespace server.account
             using (StreamReader rdr = new StreamReader(context.Request.InputStream))
                 query = HttpUtility.ParseQueryString(rdr.ReadToEnd());
 
-            using (var db = new Database())
+            using (var db = new Database(Program.Settings.GetValue("conn")))
             {
                 byte[] status;
                 if (!IsValidEmail(query["newGUID"]))

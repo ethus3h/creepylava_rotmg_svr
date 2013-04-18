@@ -28,6 +28,7 @@ namespace wServer
 
         void Listen(IAsyncResult ar)
         {
+            if (!Socket.Connected) return;
             var cliSkt = Socket.EndAccept(ar);
             Socket.BeginAccept(Listen, null);
             if (cliSkt != null)
@@ -39,8 +40,6 @@ namespace wServer
 
         public void Stop()
         {
-            Console.WriteLine("Terminating...");
-            Socket.Shutdown(SocketShutdown.Both);
             foreach (var i in Manager.Clients.Values.ToArray())
                 i.Disconnect();
             Socket.Close();

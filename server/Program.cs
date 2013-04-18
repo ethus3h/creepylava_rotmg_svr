@@ -5,6 +5,7 @@ using System.Text;
 using System.Net;
 using System.Threading;
 using System.IO;
+using db;
 
 namespace server
 {
@@ -17,54 +18,56 @@ namespace server
         static readonly object queueLock = new object();
         static readonly ManualResetEvent queueReady = new ManualResetEvent(false);
 
-        const int port = 8888;
+        internal static SimpleSettings Settings;
 
         static void Main(string[] args)
         {
-            listener = new HttpListener();
-            listener.Prefixes.Add("http://*:" + port + "/");
-            listener.Start();
+            using (Settings = new SimpleSettings("server"))
+            {
+                int port = Settings.GetValue<int>("port", "8888");
 
-            listen = new Thread(ListenerCallback);
-            listen.Start();
-            for (var i = 0; i < workers.Length; i++)
-            {
-                workers[i] = new Thread(Worker);
-                workers[i].Start();
-            }
-            Console.CancelKeyPress += (sender, e) =>
-            {
+                listener = new HttpListener();
+                listener.Prefixes.Add("http://*:" + port + "/");
+                listener.Start();
+
+                listener.BeginGetContext(ListenerCallback, null);
+                for (var i = 0; i < workers.Length; i++)
+                {
+                    workers[i] = new Thread(Worker);
+                    workers[i].Start();
+                }
+                Console.CancelKeyPress += (sender, e) => e.Cancel = true;
+                Console.WriteLine("Listening at port " + port + "...");
+
+                while (Console.ReadKey(true).Key != ConsoleKey.Escape) ;
+
                 Console.WriteLine("Terminating...");
+                terminating = true;
                 listener.Stop();
+                queueReady.Set();
                 while (contextQueue.Count > 0)
                     Thread.Sleep(100);
-                Environment.Exit(0);
-            };
-            Console.WriteLine("Listening at port " + port + "...");
-            Thread.CurrentThread.Join();
-        }
-
-        static void ListenerCallback()
-        {
-            try
-            {
-                do
-                {
-                    var context = listener.GetContext();
-                    lock (queueLock)
-                    {
-                        contextQueue.Enqueue(context);
-                        queueReady.Set();
-                    }
-                } while (true);
             }
-            catch { }
         }
 
+        static void ListenerCallback(IAsyncResult ar)
+        {
+            if (!listener.IsListening) return;
+            var context = listener.EndGetContext(ar);
+            listener.BeginGetContext(ListenerCallback, null);
+            lock (queueLock)
+            {
+                contextQueue.Enqueue(context);
+                queueReady.Set();
+            }
+        }
+
+        static bool terminating = false;
         static void Worker()
         {
             while (queueReady.WaitOne())
             {
+                if (terminating) return;
                 HttpListenerContext context;
                 lock (queueLock)
                 {

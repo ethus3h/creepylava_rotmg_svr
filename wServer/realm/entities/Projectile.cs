@@ -101,8 +101,8 @@ namespace wServer.realm.entities
                 return;
             }
             long counter = time.thisTickTimes;
-            while (counter > LogicTicker.MsPT && TickCore(elapsedTicks - counter, time))
-                counter -= LogicTicker.MsPT;
+            while (counter > Manager.Logic.MsPT && TickCore(elapsedTicks - counter, time))
+                counter -= Manager.Logic.MsPT;
             if (Owner != null)
                 TickCore(elapsedTicks, time);
 

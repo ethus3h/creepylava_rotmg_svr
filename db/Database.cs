@@ -13,9 +13,9 @@ namespace db
     public class Database : IDisposable
     {
         MySqlConnection con;
-        public Database()
+        public Database(string connStr)
         {
-            con = new MySqlConnection("Server=127.0.0.1;Database=rotmg;uid=enduser;password=eewbyjGzYTC7jpEs");
+            con = new MySqlConnection(connStr);
             con.Open();
         }
 

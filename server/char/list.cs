@@ -15,13 +15,35 @@ namespace server.@char
 {
     class list : IRequestHandler
     {
+        Lazy<List<ServerItem>> svrList;
+        public list()
+        {
+            svrList = new Lazy<List<ServerItem>>(GetServerList, true);
+        }
+        List<ServerItem> GetServerList()
+        {
+            var ret = new List<ServerItem>();
+            int num = Program.Settings.GetValue<int>("svrNum");
+            for (int i = 0; i < num; i++)
+                ret.Add(new ServerItem()
+                {
+                    Name = Program.Settings.GetValue("svr" + i + "Name"),
+                    Lat = Program.Settings.GetValue<int>("svr" + i + "Lat", "0"),
+                    Long = Program.Settings.GetValue<int>("svr" + i + "Long", "0"),
+                    DNS = Program.Settings.GetValue("svr" + i + "Adr", "127.0.0.1"),
+                    Usage = 0.2,
+                    AdminOnly = Program.Settings.GetValue<bool>("svr" + i + "Admin", "false")
+                });
+            return ret;
+        }
+
         public void HandleRequest(HttpListenerContext context)
         {
             NameValueCollection query;
             using (StreamReader rdr = new StreamReader(context.Request.InputStream))
                 query = HttpUtility.ParseQueryString(rdr.ReadToEnd());
 
-            using (var db = new Database())
+            using (var db = new Database(Program.Settings.GetValue("conn")))
             {
 
                 Chars chrs = new Chars()
@@ -30,18 +52,7 @@ namespace server.@char
                     NextCharId = 2,
                     MaxNumChars = 1,
                     Account = db.Verify(query["guid"], query["password"]),
-                    Servers = new List<ServerItem>()
-                    {
-                        new ServerItem()
-                        {
-                            Name = "Oshyu",
-                            Lat = 22.28,
-                            Long = 114.16,
-                            DNS = "127.0.0.1",
-                            Usage = 0.2,
-                            AdminOnly = false
-                        }
-                    }
+                    Servers = GetServerList()
                 };
                 if (chrs.Account != null)
                 {
