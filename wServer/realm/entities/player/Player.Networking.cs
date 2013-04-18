@@ -10,7 +10,7 @@ namespace wServer.realm.entities
     {
         Queue<Tuple<Packet, Predicate<Player>>> pendingPackets = new Queue<Tuple<Packet, Predicate<Player>>>();
 
-        void Flush()
+        internal void Flush()
         {
             foreach (var i in Owner.Players.Values)
                 foreach (var j in pendingPackets)
@@ -19,20 +19,20 @@ namespace wServer.realm.entities
             pendingPackets.Clear();
         }
 
-        void BroadcastSync(Packet packet)   //sync at Move
+        public void BroadcastSync(Packet packet)   //sync at Move
         {
             BroadcastSync(packet, _ => true);
         }
-        void BroadcastSync(Packet packet, Predicate<Player> cond)
+        public void BroadcastSync(Packet packet, Predicate<Player> cond)
         {
             pendingPackets.Enqueue(Tuple.Create(packet, cond));
         }
-        void BroadcastSync(IEnumerable<Packet> packets)
+        public void BroadcastSync(IEnumerable<Packet> packets)
         {
             foreach (var i in packets)
                 BroadcastSync(i, _ => true);
         }
-        void BroadcastSync(IEnumerable<Packet> packets, Predicate<Player> cond)
+        public void BroadcastSync(IEnumerable<Packet> packets, Predicate<Player> cond)
         {
             foreach (var i in packets)
                 BroadcastSync(i, cond);

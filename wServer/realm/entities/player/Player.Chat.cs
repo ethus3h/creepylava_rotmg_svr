@@ -11,25 +11,6 @@ namespace wServer.realm.entities
 {
     partial class Player
     {
-        public void PlayerText(RealmTime time, PlayerTextPacket pkt)
-        {
-            if (pkt.Text[0] == '/')
-            {
-                CommandManager.Execute(this, time, pkt.Text);
-            }
-            else
-                Owner.BroadcastPacket(new TextPacket()
-                {
-                    Name = (Client.Account.Admin ? "@" : "") + Name,
-                    ObjectId = Id,
-                    Stars = Stars,
-                    BubbleTime = 5,
-                    Recipient = "",
-                    Text = pkt.Text,
-                    CleanText = pkt.Text
-                }, null);
-        }
-
         public void SendInfo(string text)
         {
             client.SendPacket(new TextPacket()

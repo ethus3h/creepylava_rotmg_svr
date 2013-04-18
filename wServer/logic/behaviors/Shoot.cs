@@ -57,7 +57,7 @@ namespace wServer.logic.behaviors
 
 
             var bulletSpeed = desc.Speed / 100f;
-            var dist = BehaviorUtils.Dist(target, host);
+            var dist = target.Dist(host);
             var angularVelo = (newAngle - originalAngle) / (100 / 1000f);
             return angularVelo * bulletSpeed;
         }

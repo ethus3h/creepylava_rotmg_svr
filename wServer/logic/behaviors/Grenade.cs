@@ -75,7 +75,7 @@ namespace wServer.logic.behaviors
                             Effects = 0,
                             OriginType = host.ObjectType
                         }, null);
-                        BehaviorUtils.AOE(world, target, radius, true, p =>
+                        EntityUtils.AOE(world, target, radius, true, p =>
                         {
                             (p as IPlayer).Damage(damage, host as Character);
                         });

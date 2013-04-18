@@ -179,7 +179,7 @@ namespace wServer.realm.entities
                         ObjectId = Id,
                         Color = new ARGB(0xFF00FF00),
                         Text = "Class Quest Complete!"
-                    }, p => BehaviorUtils.Dist(this, p) < 25);
+                    }, p => this.Dist(p) < 25);
                     Stars = GetStars();
                 }
                 FameGoal = newGoal;
@@ -226,7 +226,7 @@ namespace wServer.realm.entities
                     ObjectId = Id,
                     Color = new ARGB(0xFF00FF00),
                     Text = "Quest Complete!"
-                }, p => BehaviorUtils.Dist(this, p) < 25);
+                }, p => this.Dist(p) < 25);
             if (exp != 0)
             {
                 Experience += exp;

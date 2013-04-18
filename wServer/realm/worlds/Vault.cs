@@ -96,7 +96,7 @@ namespace wServer.realm.worlds
                 if (i.Key.Item1.UpdateCount > i.Value)
                 {
                     i.Key.Item2._Items = Utils.GetCommaSepString(i.Key.Item1.Inventory.Take(8).Select(_ => _ == null ? -1 : _.ObjectType).ToArray());
-                    client.Database.SaveChest(client.Account, i.Key.Item2);
+                    Manager.Database.SaveChest(client.Account, i.Key.Item2);
                     vaultChests[i.Key] = i.Key.Item1.UpdateCount;
                 }
             }

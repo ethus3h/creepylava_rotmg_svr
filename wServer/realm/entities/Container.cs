@@ -7,18 +7,12 @@ using System.Xml.Linq;
 
 namespace wServer.realm.entities
 {
-    public interface IContainer
-    {
-        int[] SlotTypes { get; }
-        Item[] Inventory { get; }
-    }
-
     public class Container : StaticObject, IContainer
     {
         public Container(short objType, int? life, bool dying)
             : base(objType, life, false, dying, false)
         {
-            Inventory = new Item[12];
+            Inventory = new Inventory(this);
             SlotTypes = new int[12];
             BagOwners = new int[0];
         }
@@ -32,13 +26,13 @@ namespace wServer.realm.entities
             {
                 var inv = Utils.FromCommaSepString16(eq.Value).Select(_ => _ == -1 ? null : XmlDatas.ItemDescs[_]).ToArray();
                 Array.Resize(ref inv, 12);
-                Inventory = inv;
+                Inventory.SetItems(inv);
             }
             BagOwners = new int[0];
         }
 
         public int[] SlotTypes { get; private set; }
-        public Item[] Inventory { get; private set; }
+        public Inventory Inventory { get; private set; }
         public int[] BagOwners { get; set; }
 
         protected override void ImportStats(StatsType stats, object val)

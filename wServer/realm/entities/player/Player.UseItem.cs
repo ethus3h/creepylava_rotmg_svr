@@ -85,20 +85,20 @@ namespace wServer.realm.entities
             }
         };
 
-        public void UseItem(RealmTime time, UseItemPacket pkt)
+        public void UseItem(RealmTime time, int objId, int slot, Position pos)
         {
-            IContainer container = Owner.GetEntity(pkt.Slot.ObjectId) as IContainer;
-            var item = container.Inventory[pkt.Slot.SlotId];
-            Activate(time, item, pkt.Position);
+            IContainer container = Owner.GetEntity(objId) as IContainer;
+            var item = container.Inventory[slot];
+            Activate(time, item, pos);
             if (item.Consumable)
             {
                 if (item.SuccessorId != null)
-                    container.Inventory[pkt.Slot.SlotId] = XmlDatas.ItemDescs[XmlDatas.IdToType[item.SuccessorId]];
+                    container.Inventory[slot] = XmlDatas.ItemDescs[XmlDatas.IdToType[item.SuccessorId]];
                 else
-                    container.Inventory[pkt.Slot.SlotId] = null;
+                    container.Inventory[slot] = null;
                 UpdateCount++;
             }
-            if (container.SlotTypes[pkt.Slot.SlotId] != -1)
+            if (container.SlotTypes[slot] != -1)
                 fames.UseAbility();
         }
 
@@ -234,7 +234,7 @@ namespace wServer.realm.entities
                                 TargetId = Id,
                                 Color = new ARGB(0xFFFF00AA)
                             };
-                            BroadcastSync(batch, p => BehaviorUtils.Dist(this, p) < 25);
+                            BroadcastSync(batch, p => this.Dist(p) < 25);
                         } break;
                     case ActivateEffects.Shoot:
                         {
@@ -300,7 +300,7 @@ namespace wServer.realm.entities
                                 TargetId = Id,
                                 Color = new ARGB(0xffffffff),
                                 PosA = new Position() { X = eff.Range / 2 }
-                            }, p => BehaviorUtils.Dist(this, p) < 25);
+                            }, p => this.Dist(p) < 25);
                         } break;
                     case ActivateEffects.ConditionEffectSelf:
                         {
@@ -315,7 +315,7 @@ namespace wServer.realm.entities
                                 TargetId = Id,
                                 Color = new ARGB(0xffffffff),
                                 PosA = new Position() { X = 1 }
-                            }, p => BehaviorUtils.Dist(this, p) < 25);
+                            }, p => this.Dist(p) < 25);
                         } break;
                     case ActivateEffects.ConditionEffectAura:
                         {
@@ -336,13 +336,13 @@ namespace wServer.realm.entities
                                 TargetId = Id,
                                 Color = new ARGB(color),
                                 PosA = new Position() { X = eff.Range / 2 }
-                            }, p => BehaviorUtils.Dist(this, p) < 25);
+                            }, p => this.Dist(p) < 25);
                         } break;
                     case ActivateEffects.Heal:
                         {
                             List<Packet> pkts = new List<Packet>();
                             ActivateHealHp(this, eff.Amount, pkts);
-                            BroadcastSync(pkts, p => BehaviorUtils.Dist(this, p) < 25);
+                            BroadcastSync(pkts, p => this.Dist(p) < 25);
                         } break;
                     case ActivateEffects.HealNova:
                         {
@@ -358,13 +358,13 @@ namespace wServer.realm.entities
                                 Color = new ARGB(0xffffffff),
                                 PosA = new Position() { X = eff.Range / 2 }
                             });
-                            BroadcastSync(pkts, p => BehaviorUtils.Dist(this, p) < 25);
+                            BroadcastSync(pkts, p => this.Dist(p) < 25);
                         } break;
                     case ActivateEffects.Magic:
                         {
                             List<Packet> pkts = new List<Packet>();
                             ActivateHealMp(this, eff.Amount, pkts);
-                            BroadcastSync(pkts, p => BehaviorUtils.Dist(this, p) < 25);
+                            BroadcastSync(pkts, p => this.Dist(p) < 25);
                         } break;
                     case ActivateEffects.MagicNova:
                         {
@@ -380,7 +380,7 @@ namespace wServer.realm.entities
                                 Color = new ARGB(0xffffffff),
                                 PosA = new Position() { X = eff.Range / 2 }
                             });
-                            BroadcastSync(pkts, p => BehaviorUtils.Dist(this, p) < 25);
+                            BroadcastSync(pkts, p => this.Dist(p) < 25);
                         } break;
                     case ActivateEffects.Teleport:
                         {
@@ -408,7 +408,7 @@ namespace wServer.realm.entities
                                     },
                                     Color = new ARGB(0xFFFFFFFF)
                                 }
-                            }, p => BehaviorUtils.Dist(this, p) < 25);
+                            }, p => this.Dist(p) < 25);
                         } break;
                     case ActivateEffects.VampireBlast:
                         {
@@ -458,7 +458,7 @@ namespace wServer.realm.entities
                                 });
                             }
 
-                            BroadcastSync(pkts, p => BehaviorUtils.Dist(this, p) < 25);
+                            BroadcastSync(pkts, p => this.Dist(p) < 25);
                         } break;
                     case ActivateEffects.Trap:
                         {
@@ -468,7 +468,7 @@ namespace wServer.realm.entities
                                 Color = new ARGB(0xff9000ff),
                                 TargetId = Id,
                                 PosA = target
-                            }, p => BehaviorUtils.Dist(this, p) < 25);
+                            }, p => this.Dist(p) < 25);
                             Owner.Timers.Add(new WorldTimer(1500, (world, t) =>
                             {
                                 Trap trap = new Trap(
@@ -532,11 +532,11 @@ namespace wServer.realm.entities
                                     {
                                         ObjectId = enemy.Id,
                                         Color = new ARGB(0xffff0000),
-                                        Text = "Statis"
+                                        Text = "Stasis"
                                     });
                                 }
                             });
-                            BroadcastSync(pkts, p => BehaviorUtils.Dist(this, p) < 25);
+                            BroadcastSync(pkts, p => this.Dist(p) < 25);
                         } break;
                     case ActivateEffects.Decoy:
                         {
@@ -571,7 +571,7 @@ namespace wServer.realm.entities
                                     enemy =>
                                         enemy is Enemy &&
                                         Array.IndexOf(targets, enemy) == -1 &&
-                                        BehaviorUtils.Dist(this, enemy) <= 6) as Enemy;
+                                        this.Dist(enemy) <= 6) as Enemy;
 
                                 if (next == null) break;
                                 else current = next;
@@ -602,7 +602,7 @@ namespace wServer.realm.entities
                                     PosB = new Position() { X = 350 }
                                 });
                             }
-                            BroadcastSync(pkts, p => BehaviorUtils.Dist(this, p) < 25);
+                            BroadcastSync(pkts, p => this.Dist(p) < 25);
                         } break;
                     case ActivateEffects.PoisonGrenade:
                         {
@@ -612,7 +612,7 @@ namespace wServer.realm.entities
                                 Color = new ARGB(0xffddff00),
                                 TargetId = Id,
                                 PosA = target
-                            }, p => BehaviorUtils.Dist(this, p) < 25);
+                            }, p => this.Dist(p) < 25);
                             Placeholder x = new Placeholder(1500);
                             x.Move(target.X, target.Y);
                             Owner.EnterWorld(x);
@@ -642,7 +642,7 @@ namespace wServer.realm.entities
                                 TargetId = Id,
                                 Color = new ARGB(0xffffffff),
                                 PosA = new Position() { X = eff.Range / 2 }
-                            }, p => BehaviorUtils.Dist(this, p) < 25);
+                            }, p => this.Dist(p) < 25);
                         } break;
                     case ActivateEffects.RemoveNegativeConditionsSelf:
                         {
@@ -653,7 +653,7 @@ namespace wServer.realm.entities
                                 TargetId = Id,
                                 Color = new ARGB(0xffffffff),
                                 PosA = new Position() { X = 1 }
-                            }, p => BehaviorUtils.Dist(this, p) < 25);
+                            }, p => this.Dist(p) < 25);
                         } break;
                     case ActivateEffects.IncrementStat:
                         {
@@ -676,30 +676,30 @@ namespace wServer.realm.entities
                             UpdateCount++;
                         } break;
                     case ActivateEffects.Create: //this is a portal
-                        {              
+                        {
                             short objType;
                             if (!XmlDatas.IdToType.TryGetValue(eff.Id, out objType) ||
                                 !XmlDatas.PortalDescs.ContainsKey(objType))
                                 break;// object not found, ignore
-                        var entity = Entity.Resolve(objType);
-                        entity.Move(X, Y);
-                        int TimeoutTime = XmlDatas.PortalDescs[objType].TimeoutTime;
-                        
-                        Owner.EnterWorld(entity);
-                        World w = Manager.GetWorld(Owner.Id); //can't use Owner here, as it goes out of scope
-                        w.Timers.Add(new WorldTimer(TimeoutTime * 1000, (world, t) => //default portal close time * 1000
-                        {
-                            try
+                            var entity = Entity.Resolve(objType);
+                            entity.Move(X, Y);
+                            int TimeoutTime = XmlDatas.PortalDescs[objType].TimeoutTime;
+
+                            Owner.EnterWorld(entity);
+                            World w = Manager.GetWorld(Owner.Id); //can't use Owner here, as it goes out of scope
+                            w.Timers.Add(new WorldTimer(TimeoutTime * 1000, (world, t) => //default portal close time * 1000
                             {
-                                w.LeaveWorld(entity); 
-                            }
-                            catch //couldn't remove portal, Owner became null. Should be fixed with RealmManager implementation
-                            {
-                                Console.WriteLine("Couldn't despawn portal.");
-                            }
-                        }));                                                        
+                                try
+                                {
+                                    w.LeaveWorld(entity);
+                                }
+                                catch //couldn't remove portal, Owner became null. Should be fixed with RealmManager implementation
+                                {
+                                    Console.WriteLine("Couldn't despawn portal.");
+                                }
+                            }));
                         } break;
-                    case ActivateEffects.Pet:              
+                    case ActivateEffects.Pet:
                     case ActivateEffects.UnlockPortal:
                         break;
                 }

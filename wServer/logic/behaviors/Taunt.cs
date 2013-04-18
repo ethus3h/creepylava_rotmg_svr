@@ -112,7 +112,7 @@ namespace wServer.logic.behaviors
             else
                 foreach (var i in host.Owner.PlayersCollision.HitTest(host.X, host.Y, 15))
                 {
-                    if (BehaviorUtils.Dist(host, i) < 15)
+                    if (host.Dist(i) < 15)
                         (i as Player).Client.SendPacket(packet);
                 }
         }

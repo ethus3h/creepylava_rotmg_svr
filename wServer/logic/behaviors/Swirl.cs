@@ -56,7 +56,7 @@ namespace wServer.logic.behaviors
                 if (entity != null && entity.X != host.X && entity.Y != host.Y)
                 { 
                     //find circle which pass through host and player pos
-                    var l = BehaviorUtils.Dist(entity, host);
+                    var l = entity.Dist(host);
                     var hx = (host.X + entity.X) / 2;
                     var hy = (host.Y + entity.Y) / 2;
                     var c = Math.Sqrt(Math.Abs(radius * radius - l * l) / 4);

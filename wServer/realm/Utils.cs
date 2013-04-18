@@ -5,23 +5,19 @@ using System.Text;
 using wServer.realm;
 using wServer.realm.entities;
 
-namespace wServer.logic
+namespace wServer
 {
-    static class BehaviorUtils
+    static class EntityUtils
     {
-        public static double DistSqr(Entity a, Entity b)
+        public static double DistSqr(this Entity a, Entity b)
         {
             var dx = a.X - b.X;
             var dy = a.Y - b.Y;
             return dx * dx + dy * dy;
         }
-        public static double Dist(Entity a, Entity b)
+        public static double Dist(this Entity a, Entity b)
         {
-            return Math.Sqrt(DistSqr(a, b));
-        }
-        public static double Dist(double x1, double y1, double x2, double y2)
-        {
-            return Math.Sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+            return Math.Sqrt(a.DistSqr(b));
         }
 
 
@@ -29,7 +25,7 @@ namespace wServer.logic
         {
             foreach (var i in entity.Owner.PlayersCollision.HitTest(entity.X, entity.Y, 16))
             {
-                var d = Dist(i, entity);
+                var d = i.Dist(entity);
                 if (d < 16 * 16)
                     return true;
             }
@@ -39,7 +35,7 @@ namespace wServer.logic
         {
             foreach (var i in world.PlayersCollision.HitTest(x, y, 16))
             {
-                var d = Dist(i.X, i.Y, x, y);
+                var d = MathsUtils.Dist(i.X, i.Y, x, y);
                 if (d < 16 * 16)
                     return true;
             }
@@ -57,7 +53,7 @@ namespace wServer.logic
                 foreach (var i in entity.Owner.PlayersCollision.HitTest(entity.X, entity.Y, dist))
                 {
                     if (!(i as IPlayer).IsVisibleToEnemy()) continue;
-                    var d = Dist(i, entity);
+                    var d = i.Dist(entity);
                     if (d < dist)
                         yield return i;
                 }
@@ -65,7 +61,7 @@ namespace wServer.logic
                 foreach (var i in entity.Owner.EnemiesCollision.HitTest(entity.X, entity.Y, dist))
                 {
                     if (i.ObjectType != objType.Value) continue;
-                    var d = Dist(i, entity);
+                    var d = i.Dist(entity);
                     if (d < dist)
                         yield return i;
                 }
@@ -79,7 +75,7 @@ namespace wServer.logic
                 {
                     if (!(i as IPlayer).IsVisibleToEnemy() ||
                         i == entity) continue;
-                    var d = Dist(i, entity);
+                    var d = i.Dist(entity);
                     if (d < dist)
                     {
                         if (predicate != null && !predicate(i))
@@ -92,7 +88,7 @@ namespace wServer.logic
                 foreach (var i in entity.Owner.EnemiesCollision.HitTest(entity.X, entity.Y, dist))
                 {
                     if (i == entity) continue;
-                    var d = Dist(i, entity);
+                    var d = i.Dist(entity);
                     if (d < dist)
                     {
                         if (predicate != null && !predicate(i))
@@ -115,7 +111,7 @@ namespace wServer.logic
             foreach (var i in entity.Owner.EnemiesCollision.HitTest(entity.X, entity.Y, dist))
             {
                 if (i.ObjectDesc == null || i.ObjectDesc.Group != group) continue;
-                var d = Dist(i, entity);
+                var d = i.Dist(entity);
                 if (d < dist)
                     yield return i;
             }
@@ -129,7 +125,7 @@ namespace wServer.logic
                 foreach (var i in entity.Owner.PlayersCollision.HitTest(entity.X, entity.Y, dist))
                 {
                     if (!(i as IPlayer).IsVisibleToEnemy()) continue;
-                    var d = Dist(i, entity);
+                    var d = i.Dist(entity);
                     if (d < dist)
                         ret++;
                 }
@@ -137,7 +133,7 @@ namespace wServer.logic
                 foreach (var i in entity.Owner.EnemiesCollision.HitTest(entity.X, entity.Y, dist))
                 {
                     if (i.ObjectType != objType.Value) continue;
-                    var d = Dist(i, entity);
+                    var d = i.Dist(entity);
                     if (d < dist)
                         ret++;
                 }
@@ -150,7 +146,7 @@ namespace wServer.logic
             foreach (var i in entity.Owner.EnemiesCollision.HitTest(entity.X, entity.Y, dist))
             {
                 if (i.ObjectDesc == null || i.ObjectDesc.Group != group) continue;
-                var d = Dist(i, entity);
+                var d = i.Dist(entity);
                 if (d < dist)
                     ret++;
             }
@@ -200,7 +196,7 @@ namespace wServer.logic
             if (objType == null)
                 foreach (var i in entity.Owner.PlayersCollision.HitTest(entity.X, entity.Y, radius))
                 {
-                    var d = Dist(i, entity);
+                    var d = i.Dist(entity);
                     if (d < radius)
                         callback(i);
                 }
@@ -208,7 +204,7 @@ namespace wServer.logic
                 foreach (var i in entity.Owner.EnemiesCollision.HitTest(entity.X, entity.Y, radius))
                 {
                     if (i.ObjectType != objType.Value) continue;
-                    var d = Dist(i, entity);
+                    var d = i.Dist(entity);
                     if (d < radius)
                         callback(i);
                 }
@@ -218,7 +214,7 @@ namespace wServer.logic
             if (players)
                 foreach (var i in entity.Owner.PlayersCollision.HitTest(entity.X, entity.Y, radius))
                 {
-                    var d = Dist(i, entity);
+                    var d = i.Dist(entity);
                     if (d < radius)
                         callback(i);
                 }
@@ -226,7 +222,7 @@ namespace wServer.logic
                 foreach (var i in entity.Owner.EnemiesCollision.HitTest(entity.X, entity.Y, radius))
                 {
                     if (!(i is Enemy)) continue;
-                    var d = Dist(i, entity);
+                    var d = i.Dist(entity);
                     if (d < radius)
                         callback(i);
                 }
@@ -236,7 +232,7 @@ namespace wServer.logic
             if (players)
                 foreach (var i in world.PlayersCollision.HitTest(pos.X, pos.Y, radius))
                 {
-                    var d = Dist(i.X, i.Y, pos.X, pos.Y);
+                    var d = MathsUtils.Dist(i.X, i.Y, pos.X, pos.Y);
                     if (d < radius)
                         callback(i);
                 }
@@ -244,10 +240,18 @@ namespace wServer.logic
                 foreach (var i in world.EnemiesCollision.HitTest(pos.X, pos.Y, radius))
                 {
                     if (!(i is Enemy)) continue;
-                    var d = Dist(i.X, i.Y, pos.X, pos.Y);
+                    var d = MathsUtils.Dist(i.X, i.Y, pos.X, pos.Y);
                     if (d < radius)
                         callback(i);
                 }
+        }
+    }
+
+    static class ItemUtils
+    {
+        public static bool AuditItem(this IContainer container, Item item, int slot)
+        {
+            return item == null || container.SlotTypes[slot] == 0 || item.SlotType == container.SlotTypes[slot];
         }
     }
 }

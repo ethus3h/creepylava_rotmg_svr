@@ -36,8 +36,5 @@ namespace wServer.realm.entities
                 }
             }
         }
-        public void GroundDamage(RealmTime t, GroundDamagePacket pkt)
-        {
-        }
     }
 }

@@ -47,7 +47,7 @@ namespace wServer.realm.entities
         public int MP { get; set; }
 
         public int[] SlotTypes { get; private set; }
-        public Item[] Inventory { get; private set; }
+        public Inventory Inventory { get; private set; }
         public int[] Stats { get; private set; }
         public int[] Boost { get; private set; }
 
@@ -141,7 +141,7 @@ namespace wServer.realm.entities
             stats[StatsType.Inventory10] = (Inventory[10] != null ? Inventory[10].ObjectType : -1);
             stats[StatsType.Inventory11] = (Inventory[11] != null ? Inventory[11].ObjectType : -1);
 
-            if (Boost == null) CalcBoost();
+            if (Boost == null) CalculateBoost();
 
             stats[StatsType.MaximumHP] = Stats[0] + Boost[0];
             stats[StatsType.MaximumMP] = Stats[1] + Boost[1];
@@ -182,7 +182,7 @@ namespace wServer.realm.entities
             chr.Dexterity = Stats[7];
         }
 
-        void CalcBoost()
+        void CalculateBoost()
         {
             if (Boost == null) Boost = new int[12];
             else
@@ -239,7 +239,11 @@ namespace wServer.realm.entities
             MP = client.Character.MagicPoints;
             ConditionEffects = 0;
 
-            Inventory = client.Character.Equipment.Select(_ => _ == -1 ? null : XmlDatas.ItemDescs[_]).ToArray();
+            Inventory = new Inventory(this,
+                client.Character.Equipment
+                    .Select(_ => _ == -1 ? null : XmlDatas.ItemDescs[_])
+                    .ToArray());
+            Inventory.InventoryChanged += (sender, e) => CalculateBoost();
             SlotTypes = Utils.FromCommaSepString32(XmlDatas.TypeToElement[ObjectType].Element("SlotTypes").Value);
             Stats = new int[]
             {
@@ -283,7 +287,7 @@ namespace wServer.realm.entities
             }
             if (!KeepAlive(time)) return;
 
-            if (Boost == null) CalcBoost();
+            if (Boost == null) CalculateBoost();
 
             CheckTradeTimeout(time);
             HandleRegen(time);
@@ -336,85 +340,6 @@ namespace wServer.realm.entities
             }
         }
 
-        public void Move(RealmTime time, MovePacket pkt)
-        {
-            Flush();
-            if (pkt.Position.X == -1 || pkt.Position.Y == -1) return;
-
-            double newX = X; double newY = Y;
-            if (newX != pkt.Position.X)
-            {
-                newX = pkt.Position.X;
-                UpdateCount++;
-            }
-            if (newY != pkt.Position.Y)
-            {
-                newY = pkt.Position.Y;
-                UpdateCount++;
-            }
-            Move((float)newX, (float)newY);
-        }
-
-        public void UsePortal(RealmTime time, UsePortalPacket pkt)
-        {
-            Portal entity = Owner.GetEntity(pkt.ObjectId) as Portal;
-            if (entity == null || !entity.Usable) return;
-            World world = entity.WorldInstance;
-            if (world == null)
-            {
-                switch (entity.ObjectType) //handling default case for not found. Add more as implemented
-                {
-                    case 0x0703: //portal of cowardice
-                        {
-                            if (Manager.PlayerWorldMapping.ContainsKey(this.AccountId))  //may not be valid, realm recycled?
-                                world = Manager.PlayerWorldMapping[this.AccountId];  //also reconnecting to vault is a little unexpected
-                            else
-                                world = Manager.GetWorld(World.NEXUS_ID);
-                        } break;
-                    case 0x0712:
-                        world = Manager.GetWorld(World.VAULT_ID); break;
-                    case 0x071d:
-                        world = Manager.GetWorld(World.NEXUS_ID); break;
-                    case 0x071c:
-                        world = Manager.Monitor.GetRandomRealm(); break;
-                    case 0x0720:
-                        world = Manager.GetWorld(World.VAULT_ID); break;
-                    case 0x071e:
-                        world = Manager.AddWorld(new Kitchen()); break;
-                    case 0x071f: //these need to match IDs
-                        //world = RealmManager.GetWorld(World.GauntletMap); break; //this creates a singleton dungeon
-                        world = Manager.AddWorld(new GauntletMap()); break; //this allows each dungeon to be unique
-                    default: SendError("Portal Not Implemented!"); break;
-                    //case 1795
-                    /*case 0x0712:
-                        world = RealmManager.GetWorld(World.NEXUS_ID); break;*/
-                }
-
-                entity.WorldInstance = world;
-            }
-
-            //used to match up player to last realm they were in, to return them to it. Sometimes is odd, like from Vault back to Vault...
-            if (Manager.PlayerWorldMapping.ContainsKey(this.AccountId))
-            {
-                World tempWorld;
-                Manager.PlayerWorldMapping.TryRemove(this.AccountId, out tempWorld);
-            }
-            Manager.PlayerWorldMapping.TryAdd(this.AccountId, Owner);
-            client.Reconnect(new ReconnectPacket()
-            {
-                Host = "",
-                Port = 2050,
-                GameId = world.Id,
-                Name = world.Name,
-                Key = Empty<byte>.Array,
-            });
-        }
-
-        public void Teleport(RealmTime time, TeleportPacket pkt)
-        {
-            Teleport(time, pkt.ObjectId);
-        }
-
         public void Teleport(RealmTime time, int objId)
         {
             if (!this.TPCooledDown())
@@ -449,14 +374,6 @@ namespace wServer.realm.entities
                 },
                 Color = new ARGB(0xFFFFFFFF)
             }, null);
-        }
-
-        public void GotoAck(RealmTime time, GotoAckPacket pkt)
-        {
-        }
-
-        public void AOEAck(RealmTime time, AOEAckPacket pkt)
-        {
         }
 
         public override bool HitByProjectile(Projectile projectile, RealmTime time)
@@ -623,8 +540,8 @@ namespace wServer.realm.entities
 
             client.Character.Dead = true;
             SaveToCharacter();
-            client.Database.SaveCharacter(client.Account, client.Character);
-            client.Database.Death(client.Account, client.Character, killer);
+            Manager.Database.SaveCharacter(client.Account, client.Character);
+            Manager.Database.Death(client.Account, client.Character, killer);
             client.SendPacket(new DeathPacket()
             {
                 AccountId = AccountId,

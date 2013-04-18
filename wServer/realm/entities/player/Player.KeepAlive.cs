@@ -31,14 +31,14 @@ namespace wServer.realm.entities
             }
             return true;
         }
-        public void Pong(PongPacket pkt)
+        internal void Pong(int time)
         {
-            if (lastTime != null && (pkt.Time - lastTime.Value > 3000 || pkt.Time - lastTime.Value < 0))
+            if (lastTime != null && (time - lastTime.Value > 3000 || time - lastTime.Value < 0))
                 ;//client.Disconnect();
             else
-                lastTime = pkt.Time;
-            tickMapping = ts.Dequeue() - pkt.Time;
-            lastPong = pkt.Time + tickMapping;
+                lastTime = time;
+            tickMapping = ts.Dequeue() - time;
+            lastPong = time + tickMapping;
             sentPing = false;
         }
     }

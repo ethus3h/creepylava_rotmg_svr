@@ -110,8 +110,12 @@ namespace wServer.realm
         Thread logic;
         public LogicTicker Logic { get; private set; }
 
+        Database db;
+        public Database Database { get; private set; }
+
         public void Initialize()
         {
+            Database = new Database();
             Network = new NetworkTicker(this);
             Logic = new LogicTicker(this);
             network = new Thread(Network.TickLoop)

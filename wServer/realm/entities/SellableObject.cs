@@ -45,20 +45,20 @@ namespace wServer.realm.entities
         protected bool TryDeduct(Player player)
         {
             var acc = player.Client.Account;
-            player.Client.Database.ReadStats(acc);
+            Manager.Database.ReadStats(acc);
             if (!player.NameChosen) return false;
 
             if (Currency == CurrencyType.Fame)
             {
                 if (acc.Stats.Fame < Price) return false;
-                player.CurrentFame = acc.Stats.Fame = player.Client.Database.UpdateFame(acc, -Price);
+                player.CurrentFame = acc.Stats.Fame = Manager.Database.UpdateFame(acc, -Price);
                 player.UpdateCount++;
                 return true;
             }
             else
             {
                 if (acc.Credits < Price) return false;
-                player.Credits = acc.Credits = player.Client.Database.UpdateCredit(acc, -Price);
+                player.Credits = acc.Credits = Manager.Database.UpdateCredit(acc, -Price);
                 player.UpdateCount++;
                 return true;
             }
@@ -70,7 +70,7 @@ namespace wServer.realm.entities
             {
                 if (TryDeduct(player))
                 {
-                    var chest = player.Client.Database.CreateChest(player.Client.Account);
+                    var chest = Manager.Database.CreateChest(player.Client.Account);
                     (Owner as Vault).AddChest(chest, this);
                     player.Client.SendPacket(new BuyResultPacket()
                     {

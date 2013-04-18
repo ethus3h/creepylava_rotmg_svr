@@ -10,12 +10,12 @@ namespace wServer.realm.entities
 {
     partial class Player
     {
-        Dictionary<Player, int> potentialTrader = new Dictionary<Player, int>();
-        Player tradeTarget;
-        bool[] trade;
-        bool tradeAccepted;
+        internal Dictionary<Player, int> potentialTrader = new Dictionary<Player, int>();
+        internal Player tradeTarget;
+        internal bool[] trade;
+        internal bool tradeAccepted;
 
-        public void RequestTrade(RealmTime time, RequestTradePacket pkt)
+        public void RequestTrade(string name)
         {
             if (!NameChosen)
             {
@@ -27,7 +27,7 @@ namespace wServer.realm.entities
                 SendError("You're already trading!");
                 return;
             }
-            Player target = Owner.GetUniqueNamedPlayer(pkt.Name);
+            Player target = Owner.GetUniqueNamedPlayer(name);
             if (target == null)
             {
                 SendError("Player not found!");
@@ -93,37 +93,8 @@ namespace wServer.realm.entities
                 return;
             }
         }
-        public void ChangeTrade(RealmTime time, ChangeTradePacket pkt)
-        {
-            this.tradeAccepted = false;
-            tradeTarget.tradeAccepted = false;
-            this.trade = pkt.Offers;
 
-            tradeTarget.client.SendPacket(new TradeChangedPacket()
-            {
-                Offers = this.trade
-            });
-        }
-        public void AcceptTrade(RealmTime time, AcceptTradePacket pkt)
-        {
-            this.trade = pkt.MyOffers;
-            if (tradeTarget.trade.SequenceEqual(pkt.YourOffers))
-            {
-                tradeTarget.trade = pkt.YourOffers;
-                this.tradeAccepted = true;
-                tradeTarget.client.SendPacket(new TradeAcceptedPacket()
-                {
-                    MyOffers = tradeTarget.trade,
-                    YourOffers = this.trade
-                });
-
-                if (this.tradeAccepted && tradeTarget.tradeAccepted)
-                {
-                    DoTrade();
-                }
-            }
-        }
-        public void CancelTrade(RealmTime time, CancelTradePacket pkt)
+        public void CancelTrade()
         {
             this.client.SendPacket(new TradeDonePacket()
             {
@@ -135,15 +106,30 @@ namespace wServer.realm.entities
                 Result = 1,
                 Message = "Trade canceled!"
             });
-
+            ResetTrade();
+        }
+        public void ResetTrade()
+        {
             tradeTarget.tradeTarget = null;
             tradeTarget.trade = null;
             tradeTarget.tradeAccepted = false;
+            tradeTarget.Inventory.InventoryChanged -= MonitorInventory;
             this.tradeTarget = null;
             this.trade = null;
             this.tradeAccepted = false;
-            return;
+            this.Inventory.InventoryChanged -= MonitorInventory;
         }
+        public void MonitorTrade()
+        {
+            Inventory.InventoryChanged += MonitorInventory;
+        }
+        void MonitorInventory(object sender, InventoryChangedEventArgs e)
+        {
+            Player parent = (sender as Inventory).Parent as Player;
+            if (parent == null) return;
+            parent.CancelTrade();
+        }
+
         void CheckTradeTimeout(RealmTime time)
         {
             List<Tuple<Player, int>> newState = new List<Tuple<Player, int>>();
@@ -159,115 +145,6 @@ namespace wServer.realm.entities
                 }
                 else potentialTrader[i.Item1] = i.Item2;
             }
-        }
-
-        void DoTrade()
-        {
-            List<Item> thisItems = new List<Item>();
-            for (int i = 0; i < this.trade.Length; i++)
-                if (this.trade[i])
-                {
-                    thisItems.Add(this.Inventory[i]);
-                    this.Inventory[i] = null;
-                }
-            List<Item> targetItems = new List<Item>();
-            for (int i = 0; i < tradeTarget.trade.Length; i++)
-                if (tradeTarget.trade[i])
-                {
-                    targetItems.Add(tradeTarget.Inventory[i]);
-                    tradeTarget.Inventory[i] = null;
-                }
-
-            for (int i = 0; i < this.Inventory.Length; i++) //put items by slotType
-                if (this.Inventory[i] == null)
-                {
-                    if (this.SlotTypes[i] == 0)
-                    {
-                        this.Inventory[i] = targetItems[0];
-                        targetItems.RemoveAt(0);
-                    }
-                    else
-                    {
-                        int itmIdx = -1;
-                        for (int j = 0; j < targetItems.Count; j++)
-                            if (targetItems[j].SlotType == this.SlotTypes[i])
-                            {
-                                itmIdx = j;
-                                break;
-                            }
-                        if (itmIdx != -1)
-                        {
-                            this.Inventory[i] = targetItems[itmIdx];
-                            targetItems.RemoveAt(itmIdx);
-                        }
-                    }
-                    if (targetItems.Count == 0) break;
-                }
-            if (targetItems.Count > 0)
-                for (int i = 0; i < this.Inventory.Length; i++) //force put item
-                    if (this.Inventory[i] == null)
-                    {
-                        this.Inventory[i] = targetItems[0];
-                        targetItems.RemoveAt(0);
-                        if (targetItems.Count == 0) break;
-                    }
-
-
-            for (int i = 0; i < tradeTarget.Inventory.Length; i++) //put items by slotType
-                if (tradeTarget.Inventory[i] == null)
-                {
-                    if (tradeTarget.SlotTypes[i] == 0)
-                    {
-                        tradeTarget.Inventory[i] = thisItems[0];
-                        thisItems.RemoveAt(0);
-                    }
-                    else
-                    {
-                        int itmIdx = -1;
-                        for (int j = 0; j < thisItems.Count; j++)
-                            if (thisItems[j].SlotType == tradeTarget.SlotTypes[i])
-                            {
-                                itmIdx = j;
-                                break;
-                            }
-                        if (itmIdx != -1)
-                        {
-                            tradeTarget.Inventory[i] = thisItems[itmIdx];
-                            thisItems.RemoveAt(itmIdx);
-                        }
-                    }
-                    if (thisItems.Count == 0) break;
-                }
-            if (thisItems.Count > 0)
-                for (int i = 0; i < tradeTarget.Inventory.Length; i++) //force put item
-                    if (tradeTarget.Inventory[i] == null)
-                    {
-                        tradeTarget.Inventory[i] = thisItems[0];
-                        thisItems.RemoveAt(0);
-                        if (thisItems.Count == 0) break;
-                    }
-
-            this.UpdateCount++;
-            tradeTarget.UpdateCount++;
-
-
-            this.client.SendPacket(new TradeDonePacket()
-            {
-                Result = 1,
-                Message = "Trade done!"
-            });
-            tradeTarget.client.SendPacket(new TradeDonePacket()
-             {
-                 Result = 1,
-                 Message = "Trade done!"
-             });
-
-            tradeTarget.tradeTarget = null;
-            tradeTarget.trade = null;
-            tradeTarget.tradeAccepted = false;
-            this.tradeTarget = null;
-            this.trade = null;
-            this.tradeAccepted = false;
         }
     }
 }
