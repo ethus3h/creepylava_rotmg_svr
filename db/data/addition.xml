@@ -1,5 +1,5 @@
 <Addition>
-  <Object type="0xf00" id="Staff of Someone">
+  <Object type="0xf00" id="Staff of Someone" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -8,7 +8,7 @@
     </Texture>
     <SlotType>17</SlotType>
     <Description>A OP staff of Someone.</Description>
-    <RateOfFire>1</RateOfFire>
+    <RateOfFire>0.5</RateOfFire>
     <Sound>weapon/fire_wand</Sound>
     <Projectile>
       <ObjectId>Anatis</ObjectId>
@@ -21,6 +21,7 @@
       <Size>50</Size>
       <PassesCover/>
       <MultiHit/>
+      <Parametric/>
     </Projectile>
     <BagType>4</BagType>
     <NumProjectiles>20</NumProjectiles>
@@ -28,37 +29,8 @@
     <OldSound>magicShoot</OldSound>
     <Soulbound/>
   </Object>
-  <Object type="0xff0" id="Staff of Someone2">
-    <Class>Equipment</Class>
-    <Item/>
-    <Texture>
-      <File>lofiObj5</File>
-      <Index>0x70</Index>
-    </Texture>
-    <SlotType>17</SlotType>
-    <Description>A OP staff of Someone.</Description>
-    <RateOfFire>2</RateOfFire>
-    <Sound>weapon/fire_wand</Sound>
-    <Projectile>
-      <ObjectId>LavaBombBlast</ObjectId>
-      <Speed>150</Speed>
-      <MinDamage>100</MinDamage>
-      <MaxDamage>500</MaxDamage>
-      <LifetimeMS>1000</LifetimeMS>
-      <Amplitude>1</Amplitude>
-      <Frequency>1</Frequency>
-      <Size>1</Size>
-      <PassesCover/>
-      <MultiHit/>
-    </Projectile>
-    <Resurrects/>
-    <BagType>1</BagType>
-    <NumProjectiles>20</NumProjectiles>
-    <ArcGap>18</ArcGap>
-    <OldSound>magicShoot</OldSound>
-  </Object>
 
-  <Object type="0xf01" id="Robe of Someone">
+  <Object type="0xf01" id="Robe of Someone" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -73,7 +45,7 @@
     <Soulbound/>
   </Object>
 
-  <Object type="0xf02" id="Star of Invincible">
+  <Object type="0xf02" id="Star of Invincible" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -91,7 +63,7 @@
     <Soulbound/>
   </Object>
 
-  <Object type="0xf03" id="Kitty">
+  <Object type="0xf03" id="Kitty" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <AnimatedTexture>
@@ -118,7 +90,7 @@
     <Activate>BulletNova</Activate>
     <Soulbound/>
   </Object>
-  <Object type="0xf04" id="Potion of Maxy">
+  <Object type="0xf04" id="Potion of Maxy" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -141,52 +113,8 @@
     <Potion/>
     <BagType>4</BagType>
   </Object>
-  <Object type="0xf09" id="Test Sword">
-    <Class>Equipment</Class>
-    <Item/>
-    <Texture>
-      <File>lofiObj5</File>
-      <Index>0x70</Index>
-    </Texture>
-    <SlotType>1</SlotType>
-    <Description>A sword used for testing.</Description>
-    <RateOfFire>0.33</RateOfFire>
-    <Sound>monster/slimes_death</Sound>
-    <Projectile>
-      <ObjectId>Rimmed Mystic Shot</ObjectId>
-      <Speed>100</Speed>
-      <MinDamage>1900</MinDamage>
-      <MaxDamage>2000</MaxDamage>
-      <LifetimeMS>300</LifetimeMS>
-      <MultiHit/>
-    </Projectile>
-    <BagType>4</BagType>
-    <NumProjectiles>3</NumProjectiles>
-    <ArcGap>5</ArcGap>
-    <OldSound>bladeSwing</OldSound>
-    <Soulbound/>
-  </Object>
-  <Object type="0xf05" id="Amulet of Someone">
-    <Class>Equipment</Class>
-    <Item/>
-    <Texture>
-      <File>lofiObj2</File>
-      <Index>0x50</Index>
-    </Texture>
-    <SlotType>9</SlotType>
-    <Description>Admin Amulet.</Description>
-    <ActivateOnEquip stat="20" amount="250">IncrementStat</ActivateOnEquip>
-    <ActivateOnEquip stat="21" amount="250">IncrementStat</ActivateOnEquip>
-    <ActivateOnEquip stat="22" amount="25">IncrementStat</ActivateOnEquip>
-    <ActivateOnEquip stat="26" amount="250">IncrementStat</ActivateOnEquip>
-    <ActivateOnEquip stat="27" amount="250">IncrementStat</ActivateOnEquip>
-    <ActivateOnEquip stat="28" amount="25">IncrementStat</ActivateOnEquip>
-    <ActivateOnEquip stat="0" amount="2000">IncrementStat</ActivateOnEquip>
-    <ActivateOnEquip stat="3" amount="2000">IncrementStat</ActivateOnEquip>
-    <Resurrects/>
-    <BagType>4</BagType>
-  </Object>
-  <Object type="0xf26" id="Souleater Skull">
+  
+  <Object type="0xf26" id="Souleater Skull" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -204,7 +132,7 @@
     <MpCost>160</MpCost>
     <Activate radius="4" totalDamage="175">VampireBlast</Activate>
   </Object>
-  <Object type="0xf27" id="Mobstopper Trap">
+  <Object type="0xf27" id="Mobstopper Trap" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -222,7 +150,7 @@
     <MpCost>160</MpCost>
     <Activate radius="7" totalDamage="350" condDuration="6">Trap</Activate>
   </Object>
-  <Object type="0xf28" id="Cloak of Dimensions">
+  <Object type="0xf28" id="Cloak of Dimensions" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -244,7 +172,7 @@
     <Activate effect="Invisible" duration="6">ConditionEffectSelf</Activate>
     <Cooldown>7</Cooldown>
   </Object>
-  <Object type="0xf29" id="Bloodorc Quiver">
+  <Object type="0xf29" id="Bloodorc Quiver" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -277,7 +205,7 @@
     <MpCost>80</MpCost>
     <Activate>Shoot</Activate>
   </Object>
-  <Object type="0xf2a" id="Space Deterioration Spell">
+  <Object type="0xf2a" id="Space Deterioration Spell" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -303,7 +231,7 @@
     <MpCost>90</MpCost>
     <Activate>BulletNova</Activate>
   </Object>
-  <Object type="0xf2b" id="Tome of the Fountains">
+  <Object type="0xf2b" id="Tome of the Fountains" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -322,7 +250,7 @@
     <MpCost>90</MpCost>
     <Activate range="9" amount="350">HealNova</Activate>
   </Object>
-  <Object type="0xf2c" id="Helm of the Holy Warrior">
+  <Object type="0xf2c" id="Helm of the Holy Warrior" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -343,7 +271,7 @@
     <Activate effect="Speedy" duration="6.5">ConditionEffectSelf</Activate>
     <Cooldown>7.5</Cooldown>
   </Object>
-  <Object type="0xf2d" id="Magma Shield">
+  <Object type="0xf2d" id="Magma Shield" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -377,7 +305,7 @@
     <Activate>Shoot</Activate>
     <NumProjectiles>6</NumProjectiles>
   </Object>
-  <Object type="0xf2e" id="1940s Orb">
+  <Object type="0xf2e" id="1940s Orb" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -395,7 +323,7 @@
     <MpCost>90</MpCost>
     <Activate duration="9">StasisBlast</Activate>
   </Object>
-  <Object type="0xf2f" id="Toothpaste Poison">
+  <Object type="0xf2f" id="Toothpaste Poison" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -413,7 +341,7 @@
     <MpCost>125</MpCost>
     <Activate radius="5.5" totalDamage="1100" duration="8">PoisonGrenade</Activate>
   </Object>
-  <Object type="0xf30" id="Seal of Mass Power">
+  <Object type="0xf30" id="Seal of Mass Power" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -433,7 +361,7 @@
     <Activate effect="Healing" duration="11" range="7.5">ConditionEffectAura</Activate>
     <Activate effect="Damaging" duration="11" range="7.5">ConditionEffectAura</Activate>
   </Object>
-  <Object type="0xf31" id="Prism of the Soul Stealer">
+  <Object type="0xf31" id="Prism of the Soul Stealer" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -452,7 +380,7 @@
     <Activate duration="6">Decoy</Activate>
     <Activate maxDistance="20">Teleport</Activate>
   </Object>
-  <Object type="0xf32" id="Scepter of the Grand Sorcerer">
+  <Object type="0xf32" id="Scepter of the Grand Sorcerer" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -473,7 +401,7 @@
   </Object>
 
 
-  <Object type="0xf14" id="Skull of the Undead King">
+  <Object type="0xf14" id="Skull of the Undead King" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -491,7 +419,7 @@
     <MpCost>180</MpCost>
     <Activate radius="4" totalDamage="200" condEffect="Sick" condDuration="3">VampireBlast</Activate>
   </Object>
-  <Object type="0xf15" id="Azure Trap">
+  <Object type="0xf15" id="Azure Trap" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -510,7 +438,7 @@
     <Activate radius="8" totalDamage="400" condEffect="Paralyzed" condDuration="8">Trap</Activate>
     <ConditionEffect duration="4">Sick</ConditionEffect>
   </Object>
-  <Object type="0xf16" id="Cloak of the Phantom">
+  <Object type="0xf16" id="Cloak of the Phantom" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -533,7 +461,7 @@
     <Activate effect="Speedy" duration="5.5">ConditionEffectSelf</Activate>
     <Cooldown>7</Cooldown>
   </Object>
-  <Object type="0xf17" id="Quiver of Artemis">
+  <Object type="0xf17" id="Quiver of Artemis" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -568,7 +496,7 @@
     <MpCost>85</MpCost>
     <Activate>Shoot</Activate>
   </Object>
-  <Object type="0xf18" id="Spell of the Eternal Void">
+  <Object type="0xf18" id="Spell of the Eternal Void" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -595,7 +523,7 @@
     <MpCost>95</MpCost>
     <Activate>BulletNova</Activate>
   </Object>
-  <Object type="0xf19" id="Tome of the Ancients">
+  <Object type="0xf19" id="Tome of the Ancients" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -614,7 +542,7 @@
     <MpCost>95</MpCost>
     <Activate range="10" amount="400">HealNova</Activate>
   </Object>
-  <Object type="0xf1a" id="Helm of the Leviathan General">
+  <Object type="0xf1a" id="Helm of the Leviathan General" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -637,7 +565,7 @@
     <Activate effect="Sick" duration="4">ConditionEffectSelf</Activate>
     <Cooldown>7.5</Cooldown>
   </Object>
-  <Object type="0xf1b" id="Shield of Death">
+  <Object type="0xf1b" id="Shield of Death" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -673,7 +601,7 @@
     <Activate>Shoot</Activate>
     <NumProjectiles>7</NumProjectiles>
   </Object>
-  <Object type="0xf1c" id="Fury Orb">
+  <Object type="0xf1c" id="Fury Orb" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -691,7 +619,7 @@
     <MpCost>95</MpCost>
     <Activate totalDamage="300" duration="9">StasisBlast</Activate>
   </Object>
-  <Object type="0xf1d" id="Bile Poison">
+  <Object type="0xf1d" id="Bile Poison" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -709,7 +637,7 @@
     <MpCost>150</MpCost>
     <Activate radius="6" totalDamage="1500" condEffect="Sick" condDuration="6" duration="8">PoisonGrenade</Activate>
   </Object>
-  <Object type="0xf1e" id="Seal of War">
+  <Object type="0xf1e" id="Seal of War" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -729,7 +657,7 @@
     <Activate effect="Healing" duration="12" range="8">ConditionEffectAura</Activate>
     <Activate effect="Damaging" duration="12" range="8">ConditionEffectAura</Activate>
   </Object>
-  <Object type="0xf1f" id="Prism of the Bloody Surprise">
+  <Object type="0xf1f" id="Prism of the Bloody Surprise" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -749,7 +677,7 @@
     <Activate maxDistance="30">Teleport</Activate>
     <Activate effect="Invisible" duration="3">ConditionEffectSelf</Activate>
   </Object>
-  <Object type="0xf20" id="Scepter of Vorv">
+  <Object type="0xf20" id="Scepter of Vorv" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -769,7 +697,7 @@
     <Activate totalDamage="280" effect="Dazed" duration="5" maxTargets="10">Lightning</Activate>
   </Object>
 
-  <Object type="0xf21" id="Dagger of Dreadstump">
+  <Object type="0xf21" id="Dagger of Dreadstump" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -790,7 +718,7 @@
     <BagType>2</BagType>
     <OldSound>daggerSwing</OldSound>
   </Object>
-  <Object type="0xf30" id="Seal of the Uncontrollable Rage">
+  <Object type="0xf30" id="Seal of the Uncontrollable Rage" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -809,7 +737,7 @@
     <Activate effect="Damaging" duration="11" range="9">ConditionEffectAura</Activate>
     <Activate effect="Drunk" duration="12.5">ConditionEffectSelf</Activate>
   </Object> 
-  <Object type="0xf22" id="Cloak of the Joker">
+  <Object type="0xf22" id="Cloak of the Joker" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -830,7 +758,7 @@
     <Activate effect="Confused" duration="8">ConditionEffectSelf</Activate>
     <Cooldown>10</Cooldown>
   </Object>
-  <Object type="0xf1c" id="Orb of the Time Capsule">
+  <Object type="0xf1c" id="Orb of the Time Capsule" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -848,7 +776,7 @@
     <Activate totalDamage="300" duration="1">StasisBlast</Activate>
     <Activate radius="3" totalDamage="0" condEffect="Dazed" condDuration="5" duration="0">PoisonGrenade</Activate>
   </Object>
-  <Object type="0xf23" id="Potion of Battle">  
+  <Object type="0xf23" id="Potion of Battle" ext="true">  
 		<Class>Equipment</Class>
 		<Item/>
         <Texture><File>lofiObj2</File><Index>0x26</Index></Texture>
@@ -863,7 +791,7 @@
 		<Activate stat="28" amount="10" duration="30" range="7.5">StatBoostAura</Activate>
 		<Activate stat="0" amount="100" duration="30" range="7.5">StatBoostAura</Activate>
 	</Object>
-  <Object type="0xf21" id="Trident of Alexander">
+  <Object type="0xf21" id="Trident of Alexander" ext="true">
 		<Class>Equipment</Class>
 		<Item/>
 		<Texture><File>lofiProjs</File><Index>0x2f</Index></Texture>
@@ -884,7 +812,7 @@
 		<ArcGap>15</ArcGap>
 		<OldSound>bladeSwing</OldSound>
 	</Object>
-	<Object type="0xf22" id="Skull God">
+	<Object type="0xf22" id="Skull God" ext="true">
 		<Group>Gods</Group>
 		<Enemy/>
 		<Class>Character</Class>
@@ -898,7 +826,7 @@
 		<SpawnProb>1.0</SpawnProb>
 		<Spawn><Mean>3</Mean><StdDev>1</StdDev><Min>2</Min><Max>5</Max></Spawn>
 		<God/>
-		<Projectile id="0">
+		<Projectile id="0" ext="true">
 			<ObjectId>Red Fire</ObjectId>
 			<Damage>80</Damage>
 			<Speed>100</Speed>
@@ -906,7 +834,7 @@
 		</Projectile>
 	</Object>
 
-  <Object type="0x786" id="Gauntlet Key">
+  <Object type="0x786" id="Gauntlet Key" ext="true">
     <Class>Equipment</Class>
     <Item/>
     <Texture>
@@ -918,10 +846,10 @@
     <Sound>use_key</Sound>
     <Consumable/>
     <Soulbound/>
-    <Activate id="Gauntlet Portal">Create</Activate>
+    <Activate id="Gauntlet Portal" ext="true">Create</Activate>
   </Object>
 
-  <Object type="0x071f" id="Gauntlet Portal">
+  <Object type="0x071f" id="Gauntlet Portal" ext="true">
     <Class>Portal</Class>
     <IntergamePortal/>
     <DungeonName>The Gauntlet</DungeonName>

@@ -20,8 +20,7 @@ public class XmlData
         }
     }
 
-    public XmlData(string path = "./data", int xmlCount = 36,
-                     string pattern = "dat{0}.xml", string addition = "addition.xml")
+    public XmlData(string path = "./data")
     {
         TypeToElement = new ReadOnlyDictionary<short, XElement>(
             type2elem = new Dictionary<short, XElement>());
@@ -43,28 +42,14 @@ public class XmlData
         this.addition = new XElement("ExtData");
 
         string basePath = Path.Combine(AssemblyDirectory, path);
-        string xml;
-        Stream stream;
-        for (int i = 0; i < xmlCount; i++)
+        foreach (var xml in Directory.EnumerateFiles(basePath, "*.xml", SearchOption.AllDirectories))
         {
-            xml = Path.Combine(basePath, string.Format(pattern, i));
-            using (stream = File.OpenRead(xml))
-                ProcessXml(XElement.Load(stream), false);
-        }
-
-        if (addition != null)
-        {
-            xml = Path.Combine(basePath, addition);
-            using (stream = File.OpenRead(xml))
-                ProcessXml(XElement.Load(stream), true);
+            using (Stream stream = File.OpenRead(xml))
+                ProcessXml(XElement.Load(stream));
         }
     }
 
-    public void AddObjects(XElement elem)
-    {
-        AddObjects(elem, true);
-    }
-    void AddObjects(XElement root, bool addition)
+    public void AddObjects(XElement root)
     {
         foreach (var elem in root.XPathSelectElements("//Object"))
         {
@@ -99,7 +84,9 @@ public class XmlData
                     break;
             }
 
-            if (addition)
+            var extAttr = elem.Attribute("ext");
+            bool ext;
+            if (extAttr != null && bool.TryParse(extAttr.Value, out ext) && ext)
             {
                 this.addition.Add(elem);
                 updateCount++;
@@ -107,11 +94,7 @@ public class XmlData
         }
     }
 
-    public void AddGrounds(XElement elem)
-    {
-        AddGrounds(elem, true);
-    }
-    void AddGrounds(XElement root, bool addition)
+    public void AddGrounds(XElement root)
     {
         foreach (var elem in root.XPathSelectElements("//Ground"))
         {
@@ -124,7 +107,9 @@ public class XmlData
 
             tiles[type] = new TileDesc(elem);
 
-            if (addition)
+            var extAttr = elem.Attribute("ext");
+            bool ext;
+            if (extAttr != null && bool.TryParse(extAttr.Value, out ext) && ext)
             {
                 this.addition.Add(elem);
                 updateCount++;
@@ -132,10 +117,10 @@ public class XmlData
         }
     }
 
-    void ProcessXml(XElement root, bool addition)
+    void ProcessXml(XElement root)
     {
-        AddObjects(root, addition);
-        AddGrounds(root, addition);
+        AddObjects(root);
+        AddGrounds(root);
     }
 
 
