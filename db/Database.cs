@@ -7,11 +7,14 @@ using System.Data;
 using System.Xml;
 using Ionic.Zlib;
 using System.Xml.Linq;
+using log4net;
 
 namespace db
 {
     public class Database : IDisposable
     {
+        static ILog log = LogManager.GetLogger(typeof(Database));
+
         MySqlConnection con;
         public Database(string connStr)
         {
@@ -21,7 +24,7 @@ namespace db
 
         public void Dispose()
         {
-            con.Dispose();
+            con.Close();
         }
 
         public MySqlCommand CreateQuery()

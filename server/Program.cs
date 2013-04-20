@@ -6,6 +6,9 @@ using System.Net;
 using System.Threading;
 using System.IO;
 using db;
+using log4net;
+using log4net.Config;
+using System.Globalization;
 
 namespace server
 {
@@ -21,8 +24,15 @@ namespace server
         internal static SimpleSettings Settings;
         internal static XmlData GameData;
 
+        static ILog log = LogManager.GetLogger("Server");
+
         static void Main(string[] args)
         {
+            XmlConfigurator.Configure(new FileInfo("log4net.config"));
+
+            Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
+            Thread.CurrentThread.Name = "Entry";
+
             using (Settings = new SimpleSettings("server"))
             {
                 GameData = new XmlData();
@@ -35,15 +45,15 @@ namespace server
                 listener.BeginGetContext(ListenerCallback, null);
                 for (var i = 0; i < workers.Length; i++)
                 {
-                    workers[i] = new Thread(Worker);
+                    workers[i] = new Thread(Worker) { Name = "Worker " + i };
                     workers[i].Start();
                 }
                 Console.CancelKeyPress += (sender, e) => e.Cancel = true;
-                Console.WriteLine("Listening at port " + port + "...");
+                log.Info("Listening at port " + port + "...");
 
                 while (Console.ReadKey(true).Key != ConsoleKey.Escape) ;
 
-                Console.WriteLine("Terminating...");
+                log.Info("Terminating...");
                 terminating = true;
                 listener.Stop();
                 queueReady.Set();
@@ -94,6 +104,8 @@ namespace server
         {
             try
             {
+                log.InfoFormat("Dispatching request '{0}'@{1}",
+                    context.Request.Url.LocalPath, context.Request.RemoteEndPoint);
                 IRequestHandler handler;
 
                 if (!RequestHandlers.Handlers.TryGetValue(context.Request.Url.LocalPath, out handler))
@@ -110,7 +122,7 @@ namespace server
             {
                 using (StreamWriter wtr = new StreamWriter(context.Response.OutputStream))
                     wtr.Write("<Error>Internal Server Error</Error>");
-                Console.Error.WriteLine(e);
+                log.Error("Error when dispatching request", e);
             }
 
             context.Response.Close();

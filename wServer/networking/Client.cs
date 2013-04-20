@@ -11,6 +11,7 @@ using System.Xml;
 using db;
 using wServer.realm;
 using wServer.realm.entities;
+using log4net;
 
 namespace wServer.networking
 {
@@ -23,6 +24,8 @@ namespace wServer.networking
     }
     public class Client
     {
+        static ILog log = LogManager.GetLogger(typeof(Client));
+
         Socket skt;
         public RC4 ReceiveKey { get; private set; }
         public RC4 SendKey { get; private set; }
@@ -41,6 +44,7 @@ namespace wServer.networking
         NetworkHandler handler;
         public void BeginProcess()
         {
+            log.InfoFormat("Received client @ {0}.", skt.RemoteEndPoint);
             handler = new NetworkHandler(this, skt);
             handler.BeginHandling();
         }
@@ -58,7 +62,7 @@ namespace wServer.networking
         {
             if (Stage == ProtocalStage.Disconnected)
                 return false;
-            if (Stage == ProtocalStage.Ready && 
+            if (Stage == ProtocalStage.Ready &&
                 (Player == null || Player != null && Player.Owner == null))
                 return false;
             return true;
@@ -67,15 +71,17 @@ namespace wServer.networking
         {
             try
             {
+                log.DebugFormat("Handling packet '{0}'...", pkt.ID);
                 if (pkt.ID == PacketID.Packet) return;
                 IPacketHandler handler;
                 if (!PacketHandlers.Handlers.TryGetValue(pkt.ID, out handler))
-                    Console.WriteLine("Unhandled packet: " + pkt.ToString());
+                    log.WarnFormat("Unhandled packet '{0}'.", pkt.ID);
                 else
                     handler.Handle(this, (ClientPacket)pkt);
             }
-            catch
+            catch (Exception e)
             {
+                log.ErrorFormat(string.Format("Error when handling packet '{0}'...", pkt.ToString()), e);
                 Disconnect();
             }
         }
@@ -83,16 +89,18 @@ namespace wServer.networking
         public void Disconnect()
         {
             if (Stage == ProtocalStage.Disconnected) return;
+            log.DebugFormat("Disconnecting client @ {0}...", skt.RemoteEndPoint);
             var original = Stage;
             Stage = ProtocalStage.Disconnected;
             if (Account != null)
                 DisconnectFromRealm();
             skt.Close();
         }
-        public void Save()
+        void Save()
         {
             if (Character != null)
             {
+                log.DebugFormat("Saving character...");
                 Player.SaveToCharacter();
                 Manager.Database.SaveCharacter(Account, Character);
             }
@@ -120,6 +128,7 @@ namespace wServer.networking
         }
         public void Reconnect(ReconnectPacket pkt)
         {
+            log.InfoFormat("Reconnecting client @ {0} to {1}...", skt.RemoteEndPoint, pkt.Name);
             Manager.Logic.AddPendingAction(t =>
             {
                 if (Player != null)

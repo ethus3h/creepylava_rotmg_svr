@@ -3,11 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using wServer.realm.terrain;
+using log4net;
 
 namespace wServer.realm.setpieces
 {
     class SetPieces
     {
+        static ILog log = LogManager.GetLogger(typeof(SetPieces));
+
         struct Rect
         {
             public int x;
@@ -87,6 +90,8 @@ namespace wServer.realm.setpieces
 
         public static void ApplySetPieces(World world)
         {
+            log.InfoFormat("Applying set pieces to world {0}({1}).", world.Id, world.Name);
+
             var map = world.Map;
             int w = map.Width, h = map.Height;
 
@@ -117,6 +122,7 @@ namespace wServer.realm.setpieces
                 }
             }
 
+            log.Info("Set pieces applied.");
         }
     }
 }

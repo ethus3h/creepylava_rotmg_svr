@@ -5,11 +5,14 @@ using System.Text;
 using wServer.realm.worlds;
 using wServer.realm.entities;
 using wServer.realm.terrain;
+using log4net;
 
 namespace wServer.realm
 {
     public class RealmPortalMonitor
     {
+        static ILog log = LogManager.GetLogger(typeof(RealmPortalMonitor));
+
         Nexus nexus;
         RealmManager manager;
         object worldLock = new object();
@@ -17,6 +20,7 @@ namespace wServer.realm
 
         public RealmPortalMonitor(RealmManager manager)
         {
+            log.Info("Initalizing Portal Monitor...");
             this.manager = manager;
             this.nexus = manager.Worlds[World.NEXUS_ID] as Nexus;
             lock (worldLock)
@@ -25,6 +29,7 @@ namespace wServer.realm
                     if (i.Value is GameWorld)
                         WorldAdded(i.Value);
                 }
+            log.Info("Portal Monitor initialized.");
         }
 
         Random rand = new Random();
@@ -55,6 +60,7 @@ namespace wServer.realm
                 portal.Move(pos.X + 0.5f, pos.Y + 0.5f);
                 nexus.EnterWorld(portal);
                 portals.Add(world, portal);
+                log.InfoFormat("World {0}({1}) added.", world.Id, world.Name);
             }
         }
         public void WorldRemoved(World world)
@@ -64,6 +70,7 @@ namespace wServer.realm
                 var portal = portals[world];
                 nexus.LeaveWorld(portal);
                 portals.Remove(world);
+                log.InfoFormat("World {0}({1}) removed.", world.Id, world.Name);
             }
         }
         public void WorldClosed(World world)
@@ -73,6 +80,7 @@ namespace wServer.realm
                 var portal = portals[world];
                 nexus.LeaveWorld(portal);
                 portals.Remove(world);
+                log.InfoFormat("World {0}({1}) closed.", world.Id, world.Name);
             }
         }
         public void WorldOpened(World world)
@@ -89,6 +97,7 @@ namespace wServer.realm
                 portal.Move(pos.X, pos.Y);
                 nexus.EnterWorld(portal);
                 portals.Add(world, portal);
+                log.InfoFormat("World {0}({1}) opened.", world.Id, world.Name);
             }
         }
 

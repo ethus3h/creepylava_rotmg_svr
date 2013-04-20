@@ -8,12 +8,15 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Net;
 using wServer.realm;
+using log4net;
 
 namespace wServer.networking
 {
     //hackish code
     class NetworkHandler
     {
+        static ILog log = LogManager.GetLogger(typeof(NetworkHandler));
+
         enum ReceiveState
         {
             Awaiting,
@@ -58,8 +61,6 @@ namespace wServer.networking
 
         public void BeginHandling()
         {
-            Console.WriteLine("{0} connected.", skt.RemoteEndPoint);
-
             skt.NoDelay = true;
             skt.UseOnlyOverlappedIO = true;
 
@@ -98,6 +99,8 @@ namespace wServer.networking
         {
             try
             {
+                if (!skt.Connected) return;
+
                 if (e.SocketError != SocketError.Success)
                     throw new SocketException((int)e.SocketError);
 
@@ -120,7 +123,7 @@ namespace wServer.networking
                         var len = (e.UserToken as ReceiveToken).Length =
                             IPAddress.NetworkToHostOrder(BitConverter.ToInt32(e.Buffer, 0)) - 5;
                         if (len < 0 || len > BUFFER_SIZE)
-                            throw new InternalBufferOverflowException();
+                            log.ErrorFormat("Buffer not large enough! (requested size={0})", len);
                         (e.UserToken as ReceiveToken).PacketBody = new byte[len];
                         (e.UserToken as ReceiveToken).ID = (PacketID)e.Buffer[4];
 
@@ -165,6 +168,8 @@ namespace wServer.networking
         {
             try
             {
+                if (!skt.Connected) return;
+
                 int len;
                 switch (sendState)
                 {
@@ -198,6 +203,7 @@ namespace wServer.networking
 
         void OnError(Exception ex)
         {
+            log.Error("Socket error.", ex);
             parent.Disconnect();
         }
         bool OnPacketReceived(PacketID id, byte[] pkt)

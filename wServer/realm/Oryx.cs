@@ -8,12 +8,15 @@ using wServer.logic;
 using wServer.networking.svrPackets;
 using wServer.realm.setpieces;
 using wServer.realm.terrain;
+using log4net;
 
 namespace wServer.realm
 {
     //The mad god who look after the realm
     class Oryx
     {
+        static ILog log = LogManager.GetLogger(typeof(Oryx));
+
         GameWorld world;
         public Oryx(GameWorld world)
         {
@@ -245,6 +248,7 @@ namespace wServer.realm
         int[] enemyCounts = new int[12];
         public void Init()
         {
+            log.InfoFormat("Oryx is controlling world {0}({1})...", world.Id, world.Name);
             int w = world.Map.Width;
             int h = world.Map.Height;
             int[] stats = new int[12];
@@ -256,6 +260,7 @@ namespace wServer.realm
                         stats[(int)tile.Terrain - 1]++;
                 }
 
+            log.Info("Spawning minions...");
             foreach (var i in spawn)
             {
                 var terrain = i.Key;
@@ -272,6 +277,7 @@ namespace wServer.realm
                     if (enemyCounts[idx] >= enemyCount) break;
                 }
             }
+            log.Info("Oryx is done.");
         }
 
         long prevTick = 0;
@@ -291,6 +297,7 @@ namespace wServer.realm
 
         void EnsurePopulation()
         {
+            log.Info("Oryx is controlling population...");
             RecalculateEnemyCount();
             int[] state = new int[12];
             int[] diff = new int[12];
@@ -348,6 +355,7 @@ namespace wServer.realm
             RecalculateEnemyCount();
 
             GC.Collect();
+            log.Info("Oryx is back to sleep.");
         }
 
         void RecalculateEnemyCount()
@@ -631,7 +639,7 @@ namespace wServer.realm
             player.SendInfo("Type \"/help\" for more help");
         }
 
-        void SpawnEvent(ISetPiece setpiece)
+        void SpawnEvent(string name, ISetPiece setpiece)
         {
             IntPoint pt = new IntPoint();
             do
@@ -646,6 +654,7 @@ namespace wServer.realm
             pt.X -= (setpiece.Size - 1) / 2;
             pt.Y -= (setpiece.Size - 1) / 2;
             setpiece.RenderSetPiece(world, pt);
+            log.InfoFormat("Oryx spawned {0} at ({1}, {2}).", name, pt.X, pt.Y);
         }
 
         List<Tuple<string, ISetPiece>> events = new List<Tuple<string, ISetPiece>>()
@@ -686,7 +695,7 @@ namespace wServer.realm
                     var evt = events[rand.Next(0, events.Count)];
                     if (world.Manager.GameData.ObjectDescs[world.Manager.GameData.IdToType[evt.Item1]].PerRealmMax == 1)
                         events.Remove(evt);
-                    SpawnEvent(evt.Item2);
+                    SpawnEvent(evt.Item1, evt.Item2);
 
                     dat = null;
                     foreach (var i in criticalEnemies)

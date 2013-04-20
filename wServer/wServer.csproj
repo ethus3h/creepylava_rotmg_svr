@@ -375,6 +375,9 @@
     <Compile Include="realm\entities\player\Player.KeepAlive.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="log4net.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <EmbeddedResource Include="realm\worlds\kitchen.wmap" />
     <EmbeddedResource Include="realm\worlds\nexus.wmap" />

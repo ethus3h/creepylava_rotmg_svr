@@ -11,6 +11,7 @@ using System.Collections.Concurrent;
 using wServer.networking;
 using System.Globalization;
 using wServer.logic;
+using log4net;
 
 namespace wServer.realm
 {
@@ -40,7 +41,17 @@ namespace wServer.realm
 
     public class RealmManager
     {
-        public int MAX_CLIENT = Program.Settings.GetValue<int>("maxClient", "100");
+        static ILog log = LogManager.GetLogger(typeof(RealmManager));
+
+        public int MaxClient { get; private set; }
+        public int TPS { get; private set; }
+        public Database Database { get; private set; }
+        public RealmManager(int maxClient, int tps, Database db)
+        {
+            this.MaxClient = maxClient;
+            this.TPS = tps;
+            this.Database = db;
+        }
 
         int nextWorldId = 0;
         public readonly ConcurrentDictionary<int, World> Worlds = new ConcurrentDictionary<int, World>();
@@ -51,7 +62,7 @@ namespace wServer.realm
 
         public bool TryConnect(Client client)
         {
-            if (Clients.Count >= MAX_CLIENT)
+            if (Clients.Count >= MaxClient)
                 return false;
             else
                 return Clients.TryAdd(client.Account.AccountId, client);
@@ -107,6 +118,7 @@ namespace wServer.realm
             world.Manager = this;
             if (world is GameWorld)
                 Monitor.WorldAdded(world);
+            log.InfoFormat("World {0}({1}) added.", world.Id, world.Name);
         }
 
         void OnWorldRemoved(World world)
@@ -114,6 +126,7 @@ namespace wServer.realm
             world.Manager = null;
             if (world is GameWorld)
                 Monitor.WorldRemoved(world);
+            log.InfoFormat("World {0}({1}) removed.", world.Id, world.Name);
         }
 
         Thread network;
@@ -124,10 +137,11 @@ namespace wServer.realm
 
         public XmlData GameData { get; private set; }
         public BehaviorDb Behaviors { get; private set; }
-        public Database Database { get; private set; }
 
         public void Initialize()
         {
+            log.Info("Initializing Realm Manager...");
+
             this.GameData = new XmlData();
             this.Behaviors = new BehaviorDb(this);
 
@@ -142,33 +156,43 @@ namespace wServer.realm
             AddWorld(World.GAUNTLET, new GauntletMap());
 
             AddWorld(new GameWorld(1, "Medusa", true));
+
+            log.Info("Realm Manager initialized.");
         }
 
         public void Run()
         {
-            Database = new Database(Program.Settings.GetValue("conn"));
+            log.Info("Starting Realm Manager...");
+
             Network = new NetworkTicker(this);
             Logic = new LogicTicker(this);
             network = new Thread(Network.TickLoop)
             {
-                Name = "Network Process Thread",
+                Name = "Network",
                 CurrentCulture = CultureInfo.InvariantCulture
             };
             logic = new Thread(Logic.TickLoop)
             {
-                Name = "Logic Ticking Thread",
+                Name = "Logic",
                 CurrentCulture = CultureInfo.InvariantCulture
             };
             //Start logic loop first
             logic.Start();
             network.Start();
+
+            log.Info("Realm Manager started.");
         }
 
         public bool Terminating { get; private set; }
         public void Stop()
         {
+            log.Info("Stopping Realm Manager...");
+
             Terminating = true;
-            Database.Dispose();
+            logic.Join();
+            network.Join();
+
+            log.Info("Realm Manager stopped.");
         }
     }
 }

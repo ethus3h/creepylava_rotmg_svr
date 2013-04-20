@@ -8,24 +8,21 @@
     </Texture>
     <SlotType>17</SlotType>
     <Description>A OP staff of Someone.</Description>
-    <RateOfFire>0.5</RateOfFire>
+    <RateOfFire>0.35</RateOfFire>
     <Sound>weapon/fire_wand</Sound>
     <Projectile>
       <ObjectId>Anatis</ObjectId>
       <Speed>100</Speed>
       <MinDamage>5000</MinDamage>
       <MaxDamage>10000</MaxDamage>
-      <LifetimeMS>2000</LifetimeMS>
-      <Amplitude>1</Amplitude>
-      <Frequency>2</Frequency>
-      <Size>50</Size>
+      <LifetimeMS>5000</LifetimeMS>
+      <Size>75</Size>
       <PassesCover/>
       <MultiHit/>
-      <Parametric/>
     </Projectile>
     <BagType>4</BagType>
-    <NumProjectiles>20</NumProjectiles>
-    <ArcGap>18</ArcGap>
+    <NumProjectiles>10</NumProjectiles>
+    <ArcGap>36</ArcGap>
     <OldSound>magicShoot</OldSound>
     <Soulbound/>
   </Object>

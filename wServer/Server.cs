@@ -6,11 +6,14 @@ using System.Net.Sockets;
 using System.Net;
 using wServer.realm;
 using wServer.networking;
+using log4net;
 
 namespace wServer
 {
     class Server
     {
+        static ILog log = LogManager.GetLogger(typeof(Server));
+
         public Socket Socket { get; private set; }
         public RealmManager Manager { get; private set; }
         public Server(RealmManager manager, int port)
@@ -21,6 +24,7 @@ namespace wServer
 
         public void Start()
         {
+            log.Info("Starting server...");
             Socket.Bind(new IPEndPoint(IPAddress.Any, 2050));
             Socket.Listen(0xff);
             Socket.BeginAccept(Listen, null);
@@ -40,6 +44,7 @@ namespace wServer
 
         public void Stop()
         {
+            log.Info("Stoping server...");
             foreach (var i in Manager.Clients.Values.ToArray())
                 i.Disconnect();
             Socket.Close();

@@ -5,12 +5,15 @@ using System.Text;
 using System.Collections.Concurrent;
 using System.Threading;
 using wServer.networking;
+using log4net;
 
 namespace wServer.realm
 {
     using Work = Tuple<Client, PacketID, byte[]>;
     public class NetworkTicker //Sync network processing
     {
+        ILog log = LogManager.GetLogger(typeof(NetworkTicker));
+
         public RealmManager Manager { get; private set; }
         public NetworkTicker(RealmManager manager)
         {
@@ -27,10 +30,11 @@ namespace wServer.realm
 
         public void TickLoop()
         {
+            log.Info("Network loop started.");
             Work work;
             while (true)
             {
-                if (Manager.Terminating) return;
+                if (Manager.Terminating) break;
                 loopLock.Reset();
                 while (pendings.TryDequeue(out work))
                 {
@@ -52,6 +56,7 @@ namespace wServer.realm
                 while (pendings.Count == 0 && !Manager.Terminating)
                     loopLock.SpinOnce();
             }
+            log.Info("Network loop stopped.");
         }
     }
 }

@@ -7,11 +7,14 @@ using wServer.realm.entities;
 using wServer.logic.loot;
 using System.Threading;
 using System.Reflection;
+using log4net;
 
 namespace wServer.logic
 {
     public partial class BehaviorDb
     {
+        static ILog log = LogManager.GetLogger(typeof(BehaviorDb));
+
         public RealmManager Manager { get; private set; }
 
         static int initializing;
@@ -20,21 +23,35 @@ namespace wServer.logic
 
         public BehaviorDb(RealmManager manager)
         {
+            log.Info("Initializing Behavior Database...");
+
             this.Manager = manager;
 
             Definitions = new Dictionary<short, Tuple<State, Loot>>();
 
             if (Interlocked.Exchange(ref initializing, 1) == 1)
+            {
+                log.Error("Attempted to initialize multiple BehaviorDb at the same time.");
                 throw new InvalidOperationException("Attempted to initialize multiple BehaviorDb at the same time.");
+            }
             InitDb = this;
-            foreach (var field in GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance))
-                if (field.FieldType == typeof(_))
-                {
-                    ((_)field.GetValue(this))();
-                    field.SetValue(this, null);
-                }
+
+            var fields = GetType()
+                .GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(field => field.FieldType == typeof(_))
+                .ToArray();
+            for (int i = 0; i < fields.Length; i++)
+            {
+                var field = fields[i];
+                log.InfoFormat("Loading behavior for '{0}'({1}/{2})...", field.Name, i + 1, fields.Length);
+                ((_)field.GetValue(this))();
+                field.SetValue(this, null);
+            }
+
             InitDb = null;
             initializing = 0;
+
+            log.Info("Behavior Database initialized...");
         }
 
         public void ResolveBehavior(Entity entity)

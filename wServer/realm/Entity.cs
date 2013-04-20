@@ -6,11 +6,14 @@ using db;
 using wServer.realm.entities;
 using wServer.logic;
 using wServer.networking.svrPackets;
+using log4net;
 
 namespace wServer.realm
 {
     public class Entity : IProjectileOwner, ICollidable<Entity>
     {
+        static ILog log = LogManager.GetLogger(typeof(Entity));
+
         public RealmManager Manager { get; private set; }
         protected Entity(RealmManager manager, short objType)
         {
@@ -154,14 +157,6 @@ namespace wServer.realm
 
             stateEntryCommonRoot = State.CommonParent(origState, CurrentState);
             stateEntry = true;
-
-            if (Owner != null)
-                Owner.BroadcastPacket(new NotificationPacket()
-                {
-                    ObjectId = Id,
-                    Color = new ARGB(0xFF00FF00),
-                    Text = state.Name
-                }, null);
         }
         void GoDeeeeeeeep()
         {
@@ -295,7 +290,7 @@ namespace wServer.realm
                 case "GuildHallPortal":
                 //return new StaticObject(id);
                 default:
-                    Console.WriteLine("Not supported type: " + type);
+                    log.WarnFormat("Not supported type: {0}", type);
                     return new Entity(manager, id);
             }
         }

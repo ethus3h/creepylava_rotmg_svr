@@ -5,11 +5,14 @@ using System.Text;
 using System.Diagnostics;
 using System.Collections.Concurrent;
 using System.Threading;
+using log4net;
 
 namespace wServer.realm
 {
     public class LogicTicker
     {
+        static ILog log = LogManager.GetLogger(typeof(LogicTicker));
+
         public int TPS;
         public int MsPT;
 
@@ -21,7 +24,7 @@ namespace wServer.realm
             for (int i = 0; i < 5; i++)
                 pendings[i] = new ConcurrentQueue<Action<RealmTime>>();
 
-            TPS = Program.Settings.GetValue<int>("tps", "20");
+            TPS = manager.TPS;
             MsPT = 1000 / TPS;
         }
 
@@ -39,6 +42,7 @@ namespace wServer.realm
         public static RealmTime CurrentTime;
         public void TickLoop()
         {
+            log.Info("Logic loop started.");
             Stopwatch watch = new Stopwatch();
             long dt = 0;
             long count = 0;
@@ -48,7 +52,7 @@ namespace wServer.realm
             long xa = 0;
             do
             {
-                if (Manager.Terminating) return;
+                if (Manager.Terminating) break;
 
                 long times = dt / MsPT;
                 dt -= times * MsPT;
@@ -58,7 +62,7 @@ namespace wServer.realm
 
                 count += times;
                 if (times > 3)
-                    Console.WriteLine("LAGGED!| time:" + times + " dt:" + dt + " count:" + count + " time:" + b + " tps:" + count / (b / 1000.0));
+                    log.Warn("LAGGED!| time:" + times + " dt:" + dt + " count:" + count + " time:" + b + " tps:" + count / (b / 1000.0));
 
                 t.tickTimes = b;
                 t.tickCount = count;
@@ -84,6 +88,7 @@ namespace wServer.realm
                 dt += Math.Max(0, watch.ElapsedMilliseconds - b - MsPT);
 
             } while (true);
+            log.Info("Logic loop stopped.");
         }
 
         void TickWorlds1(RealmTime t)    //Continous simulation

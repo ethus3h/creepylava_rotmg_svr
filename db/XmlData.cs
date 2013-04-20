@@ -6,6 +6,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using System.IO;
 using System.Reflection;
+using log4net;
 
 public class XmlData
 {
@@ -19,6 +20,8 @@ public class XmlData
             return Path.GetDirectoryName(path);
         }
     }
+
+    static ILog log = LogManager.GetLogger(typeof(XmlData));
 
     public XmlData(string path = "./data")
     {
@@ -42,11 +45,19 @@ public class XmlData
         this.addition = new XElement("ExtData");
 
         string basePath = Path.Combine(AssemblyDirectory, path);
-        foreach (var xml in Directory.EnumerateFiles(basePath, "*.xml", SearchOption.AllDirectories))
+        log.InfoFormat("Loading game data from '{0}'...", basePath);
+        var xmls = Directory.EnumerateFiles(basePath, "*.xml", SearchOption.AllDirectories).ToArray();
+        for (int i = 0; i < xmls.Length; i++)
         {
-            using (Stream stream = File.OpenRead(xml))
+            log.InfoFormat("Loading '{0}'({1}/{2})...", xmls[i], i + 1, xmls.Length);
+            using (Stream stream = File.OpenRead(xmls[i]))
                 ProcessXml(XElement.Load(stream));
         }
+        log.Info("Finish loading game data.");
+        log.InfoFormat("{0} Items", items.Count);
+        log.InfoFormat("{0} Tiles", tiles.Count);
+        log.InfoFormat("{0} Objects", objDescs.Count);
+        log.InfoFormat("{0} Additions", addition.Elements().Count());
     }
 
     public void AddObjects(XElement root)

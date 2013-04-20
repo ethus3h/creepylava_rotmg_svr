@@ -5,11 +5,14 @@ using System.Text;
 using System.IO;
 using wServer.realm.setpieces;
 using wServer.realm.entities;
+using log4net;
 
 namespace wServer.realm.worlds
 {
     class GameWorld : World
     {
+        static ILog log = LogManager.GetLogger(typeof(GameWorld));
+
         bool oryxPresent;
         int mapId;
         public GameWorld(int mapId, string name, bool oryxPresent)
@@ -24,6 +27,7 @@ namespace wServer.realm.worlds
 
         protected override void Init()
         {
+            log.InfoFormat("Initializing Game World {0}({1}) from map {2}...", Id, Name, mapId);
             base.FromWorldMap(typeof(RealmManager).Assembly.GetManifestResourceStream("wServer.realm.worlds.world" + mapId + ".wmap"));
             SetPieces.ApplySetPieces(this);
             if (oryxPresent)
@@ -33,6 +37,7 @@ namespace wServer.realm.worlds
             }
             else
                 Overseer = null;
+            log.Info("Game World initalized.");
         }
 
         public override void Tick(RealmTime time)

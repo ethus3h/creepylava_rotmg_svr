@@ -4,19 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Net.Sockets;
 using System.Net;
+using log4net;
 
 namespace wServer.networking
 {
     class PolicyServer
     {
+        static ILog log = LogManager.GetLogger(typeof(PolicyServer));
+
         TcpListener listener;
         public PolicyServer()
         {
-            try
-            {
-                listener = new TcpListener(IPAddress.Any, 843);
-            }
-            catch { }
+            listener = new TcpListener(IPAddress.Any, 843);
         }
 
         static void ServePolicyFile(IAsyncResult ar)
@@ -44,6 +43,7 @@ namespace wServer.networking
         bool started = false;
         public void Start()
         {
+            log.Info("Starting policy server...");
             try
             {
                 listener.Start();
@@ -52,6 +52,7 @@ namespace wServer.networking
             }
             catch
             {
+                log.Warn("Could not start Socket Policy Server, is port 843 occupied?");
                 started = false;
             }
         }
@@ -59,7 +60,10 @@ namespace wServer.networking
         public void Stop()
         {
             if (started)
+            {
+                log.Warn("Stopping policy server...");
                 listener.Stop();
+            }
         }
     }
 }

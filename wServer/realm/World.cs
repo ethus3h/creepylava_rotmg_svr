@@ -7,11 +7,14 @@ using wServer.realm.entities;
 using System.Collections.Concurrent;
 using wServer.networking;
 using wServer.realm.terrain;
+using log4net;
 
 namespace wServer.realm
 {
     public abstract class World
     {
+        static ILog log = LogManager.GetLogger(typeof(World));
+
         public const int TUT_ID = -1;
         public const int NEXUS_ID = -2;
         public const int RAND_REALM = -3;
@@ -104,6 +107,8 @@ namespace wServer.realm
 
         protected void FromWorldMap(System.IO.Stream dat)
         {
+            log.InfoFormat("Loading map for world {0}({1})...", Id, Name);
+
             this.Map = new Wmap(Manager.GameData);
             entityInc = 0;
             entityInc += Map.Load(dat, 0);

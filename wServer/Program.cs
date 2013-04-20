@@ -10,6 +10,9 @@ using System.Net.NetworkInformation;
 using wServer.networking;
 using System.Globalization;
 using db;
+using log4net;
+using log4net.Config;
+using System.IO;
 
 namespace wServer
 {
@@ -17,14 +20,23 @@ namespace wServer
     {
         internal static SimpleSettings Settings;
 
+        static ILog log = LogManager.GetLogger("Server");
+
         static void Main(string[] args)
         {
+            XmlConfigurator.Configure(new FileInfo("log4net.config"));
+
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
-            Thread.CurrentThread.Name = "Server Entry Point";
+            Thread.CurrentThread.Name = "Entry";
 
             using (Settings = new SimpleSettings("wServer"))
             {
-                RealmManager manager = new RealmManager();
+                var db = new Database(Settings.GetValue("conn"));
+                RealmManager manager = new RealmManager(
+                    Settings.GetValue<int>("maxClient", "100"),
+                    Settings.GetValue<int>("tps", "20"),
+                    db);
+
                 manager.Initialize();
                 manager.Run();
 
@@ -35,14 +47,16 @@ namespace wServer
 
                 policy.Start();
                 server.Start();
-                Console.WriteLine("Listening at port 2050...");
+                log.Info("Server initialized.");
 
                 while (Console.ReadKey(true).Key != ConsoleKey.Escape) ;
 
-                Console.WriteLine("Terminating...");
+                log.Info("Terminating...");
                 server.Stop();
                 policy.Stop();
                 manager.Stop();
+                db.Dispose();
+                log.Info("Server terminated.");
             }
         }
     }
