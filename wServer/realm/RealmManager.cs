@@ -12,6 +12,7 @@ using wServer.networking;
 using System.Globalization;
 using wServer.logic;
 using log4net;
+using wServer.realm.commands;
 
 namespace wServer.realm
 {
@@ -138,6 +139,11 @@ namespace wServer.realm
         public XmlData GameData { get; private set; }
         public BehaviorDb Behaviors { get; private set; }
 
+
+        public ChatManager Chat { get; private set; }
+        public CommandManager Commands { get; private set; }
+
+
         public void Initialize()
         {
             log.Info("Initializing Realm Manager...");
@@ -156,6 +162,9 @@ namespace wServer.realm
             AddWorld(World.GAUNTLET, new GauntletMap());
 
             AddWorld(new GameWorld(1, "Medusa", true));
+
+            Chat = new ChatManager(this);
+            Commands = new CommandManager(this);
 
             log.Info("Realm Manager initialized.");
         }

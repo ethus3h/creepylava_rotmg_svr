@@ -599,8 +599,7 @@ namespace wServer.realm
 
         void BroadcastMsg(string message)
         {
-            foreach (var i in world.Players.Values)
-                i.SendEnemy("Oryx the Mad God", message);
+            world.Manager.Chat.Oryx(world, message);
         }
 
         void HandleAnnouncements()

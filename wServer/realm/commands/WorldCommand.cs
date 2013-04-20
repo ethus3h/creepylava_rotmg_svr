@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using wServer.networking.svrPackets;
+using wServer.realm.entities;
 
-namespace wServer.realm.entities.player.commands
+namespace wServer.realm.commands
 {
     class TutorialCommand : Command
     {
@@ -190,7 +191,7 @@ namespace wServer.realm.entities.player.commands
         protected override bool Process(Player player, RealmTime time, string args)
         {
             StringBuilder sb = new StringBuilder("Available commands: ");
-            var cmds = CommandManager.Commands.Values
+            var cmds = player.Manager.Commands.Commands.Values
                 .Where(x => x.HasPermission(player))
                 .ToArray();
             for (int i = 0; i < cmds.Length; i++)

@@ -7,7 +7,7 @@ using wServer.realm;
 using wServer.networking.svrPackets;
 using db;
 using wServer.realm.entities;
-using wServer.realm.entities.player.commands;
+using wServer.realm.commands;
 
 namespace wServer.networking.handlers
 {
@@ -25,20 +25,9 @@ namespace wServer.networking.handlers
             if (player.Owner == null) return;
 
             if (text[0] == '/')
-            {
-                CommandManager.Execute(player, time, text);
-            }
+                player.Manager.Commands.Execute(player, time, text);
             else
-                player.Owner.BroadcastPacket(new TextPacket()
-                {
-                    Name = (player.Client.Account.Admin ? "@" : "") + player.Name,
-                    ObjectId = player.Id,
-                    Stars = player.Stars,
-                    BubbleTime = 5,
-                    Recipient = "",
-                    Text = text,
-                    CleanText = text
-                }, null);
+                player.Manager.Chat.Say(player, text);
         }
     }
 }

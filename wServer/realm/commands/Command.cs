@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using wServer.realm.entities;
+using log4net;
 
-namespace wServer.realm.entities.player.commands
+namespace wServer.realm.commands
 {
-    abstract class Command
+    public abstract class Command
     {
+        static ILog log = LogManager.GetLogger(typeof(Command));
+
         public Command(string name, int permLevel = 0)
         {
             this.CommandName = name;
@@ -44,21 +48,26 @@ namespace wServer.realm.entities.player.commands
             {
                 return Process(player, time, args);
             }
-            catch
+            catch (Exception ex)
             {
+                log.Error("Error when executing the command.", ex);
                 player.SendError("Error when executing the command.");
                 return false;
             }
         }
     }
 
-    static class CommandManager
+    public class CommandManager
     {
-        static Dictionary<string, Command> cmds;
-        public static IDictionary<string, Command> Commands { get { return cmds; } }
+        static ILog log = LogManager.GetLogger(typeof(CommandManager));
 
-        static CommandManager()
+        Dictionary<string, Command> cmds;
+        public IDictionary<string, Command> Commands { get { return cmds; } }
+
+        RealmManager manager;
+        public CommandManager(RealmManager manager)
         {
+            this.manager = manager;
             cmds = new Dictionary<string, Command>(StringComparer.InvariantCultureIgnoreCase);
             var t = typeof(Command);
             foreach (var i in t.Assembly.GetTypes())
@@ -69,7 +78,7 @@ namespace wServer.realm.entities.player.commands
                 }
         }
 
-        public static bool Execute(Player player, RealmTime time, string text)
+        public bool Execute(Player player, RealmTime time, string text)
         {
             var index = text.IndexOf(' ');
             string cmd = text.Substring(1, index == -1 ? text.Length - 1 : index - 1);
@@ -81,7 +90,11 @@ namespace wServer.realm.entities.player.commands
                 player.SendError("Unknown command!");
                 return false;
             }
-            return command.Execute(player, time, args);
+            else
+            {
+                log.InfoFormat("[Command] <{0}> {1}", player.Name, text);
+                return command.Execute(player, time, args);
+            }
         }
     }
 }

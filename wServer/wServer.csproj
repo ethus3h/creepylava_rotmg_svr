@@ -180,6 +180,7 @@
     <Compile Include="networking\handlers\CreatePacketHandler.cs" />
     <Compile Include="networking\handlers\HelloPacketHandler.cs" />
     <Compile Include="networking\IPacketHandler.cs" />
+    <Compile Include="realm\ChatManager.cs" />
     <Compile Include="realm\Inventory.cs" />
     <Compile Include="realm\Utils.cs" />
     <Compile Include="logic\Cooldown.cs" />
@@ -226,8 +227,8 @@
     <Compile Include="realm\entities\ConnectedObject.cs" />
     <Compile Include="realm\entities\Placeholder.cs" />
     <Compile Include="realm\entities\Decoy.cs" />
-    <Compile Include="realm\entities\player\commands\Command.cs" />
-    <Compile Include="realm\entities\player\commands\WorldCommand.cs" />
+    <Compile Include="realm\commands\Command.cs" />
+    <Compile Include="realm\commands\WorldCommand.cs" />
     <Compile Include="realm\entities\player\Player.Ground.cs" />
     <Compile Include="realm\entities\player\Player.Chat.cs" />
     <Compile Include="realm\entities\player\Player.Effects.cs" />
@@ -342,7 +343,7 @@
   <ItemGroup>
     <Content Include="bugs.txt" />
     <Content Include="packets.txt" />
-    <Compile Include="realm\entities\player\commands\AdminCommands.cs" />
+    <Compile Include="realm\commands\AdminCommands.cs" />
     <Content Include="todo.txt" />
   </ItemGroup>
   <ItemGroup>
