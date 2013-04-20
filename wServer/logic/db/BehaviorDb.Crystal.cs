@@ -11,7 +11,7 @@ namespace wServer.logic
 {
     partial class BehaviorDb
     {
-        static _ Crystal = Behav()
+        _ Crystal = () => Behav()
             .Init("Mysterious Crystal",
                     new State(
                         new State("Idle",

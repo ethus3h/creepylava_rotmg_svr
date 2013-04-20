@@ -23,7 +23,7 @@ namespace wServer.logic.behaviors
 
         public SpawnGroup(string group, int maxChildren = 5, double initialSpawn = 0.5, Cooldown coolDown = new Cooldown())
         {
-            this.children = XmlDatas.ObjectDescs.Values
+            this.children = BehaviorDb.InitGameData.ObjectDescs.Values
                 .Where(x => x.Group == group)
                 .Select(x => x.ObjectType).ToArray();
             this.maxChildren = maxChildren;
@@ -40,7 +40,7 @@ namespace wServer.logic.behaviors
             };
             for (int i = 0; i < initialSpawn; i++)
             {
-                Entity entity = Entity.Resolve(children[Random.Next(children.Length)]);
+                Entity entity = Entity.Resolve(host.Manager, children[Random.Next(children.Length)]);
 
                 entity.Move(
                     host.X + (float)(Random.NextDouble() * 0.5),
@@ -56,7 +56,7 @@ namespace wServer.logic.behaviors
 
             if (spawn.RemainingTime <= 0 && spawn.CurrentNumber < maxChildren)
             {
-                Entity entity = Entity.Resolve(children[Random.Next(children.Length)]);
+                Entity entity = Entity.Resolve(host.Manager, children[Random.Next(children.Length)]);
 
                 entity.Move(host.X, host.Y);
                 (entity as Enemy).Terrain = (host as Enemy).Terrain;

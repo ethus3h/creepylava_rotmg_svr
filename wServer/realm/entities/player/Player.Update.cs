@@ -157,7 +157,6 @@ namespace wServer.realm.entities
         }
 
         int tickId = 0;
-        long tickIdTime = 0;
         void SendNewTick(RealmTime time)
         {
             var sendEntities = new List<Entity>();

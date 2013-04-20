@@ -11,7 +11,7 @@ namespace wServer.logic
 {
     partial class BehaviorDb
     {
-        static _ Shore = Behav()
+        _ Shore = () => Behav()
             .Init("Pirate",
                     new State(
                         new Prioritize(

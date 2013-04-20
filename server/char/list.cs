@@ -58,12 +58,12 @@ namespace server.@char
                 {
                     db.GetCharData(chrs.Account, chrs);
                     db.LoadCharacters(chrs.Account, chrs);
-                    chrs.News = db.GetNews(chrs.Account);
+                    chrs.News = db.GetNews(Program.GameData, chrs.Account);
                 }
                 else
                 {
                     chrs.Account = Database.CreateGuestAccount(query["guid"]);
-                    chrs.News = db.GetNews(null);
+                    chrs.News = db.GetNews(Program.GameData, null);
                 }
 
                 MemoryStream ms = new MemoryStream();

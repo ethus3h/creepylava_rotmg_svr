@@ -28,7 +28,7 @@ namespace wServer
 
         void Listen(IAsyncResult ar)
         {
-            if (!Socket.Connected) return;
+            if (!Socket.IsBound) return;
             var cliSkt = Socket.EndAccept(ar);
             Socket.BeginAccept(Listen, null);
             if (cliSkt != null)

@@ -115,6 +115,8 @@ namespace wServer
             for (var i = 0; i < cliPkts.Count; i++)
                 File.WriteAllBytes("cli_pkt/" + i + "_" + cliPkts[i].id, cliPkts[i].content);
         }
+
+        static XmlData dat = new XmlData();
         void ProcessSvr()
         {
             try
@@ -139,7 +141,7 @@ namespace wServer
             {
                 skt.Close();
             }
-            JsonMap map = new JsonMap();
+            JsonMap map = new JsonMap(dat);
             for (var i = 0; i < svrPkts.Count; i++)
             {
                 File.WriteAllBytes("svr_pkt/" + i + "_" + svrPkts[i].id, svrPkts[i].content);

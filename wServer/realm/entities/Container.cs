@@ -9,25 +9,27 @@ namespace wServer.realm.entities
 {
     public class Container : StaticObject, IContainer
     {
-        public Container(short objType, int? life, bool dying)
-            : base(objType, life, false, dying, false)
+        public Container(RealmManager manager, short objType, int? life, bool dying)
+            : base(manager, objType, life, false, dying, false)
         {
             Inventory = new Inventory(this);
             SlotTypes = new int[12];
             BagOwners = new int[0];
-        }
 
-        public Container(XElement node)
-            : base((short)Utils.FromString(node.Attribute("type").Value), null, false, false, false)
-        {
+            var node = manager.GameData.TypeToElement[ObjectType];
             SlotTypes = Utils.FromCommaSepString32(node.Element("SlotTypes").Value);
             XElement eq = node.Element("Equipment");
             if (eq != null)
             {
-                var inv = Utils.FromCommaSepString16(eq.Value).Select(_ => _ == -1 ? null : XmlDatas.ItemDescs[_]).ToArray();
+                var inv = Utils.FromCommaSepString16(eq.Value).Select(_ => _ == -1 ? null : manager.GameData.Items[_]).ToArray();
                 Array.Resize(ref inv, 12);
                 Inventory.SetItems(inv);
             }
+        }
+
+        public Container(RealmManager manager, short id)
+            : base(manager, id, null, false, false, false)
+        {
             BagOwners = new int[0];
         }
 
@@ -39,18 +41,18 @@ namespace wServer.realm.entities
         {
             switch (stats)
             {
-                case StatsType.Inventory0: Inventory[0] = (int)val == -1 ? null : XmlDatas.ItemDescs[(short)(int)val]; break;
-                case StatsType.Inventory1: Inventory[1] = (int)val == -1 ? null : XmlDatas.ItemDescs[(short)(int)val]; break;
-                case StatsType.Inventory2: Inventory[2] = (int)val == -1 ? null : XmlDatas.ItemDescs[(short)(int)val]; break;
-                case StatsType.Inventory3: Inventory[3] = (int)val == -1 ? null : XmlDatas.ItemDescs[(short)(int)val]; break;
-                case StatsType.Inventory4: Inventory[4] = (int)val == -1 ? null : XmlDatas.ItemDescs[(short)(int)val]; break;
-                case StatsType.Inventory5: Inventory[5] = (int)val == -1 ? null : XmlDatas.ItemDescs[(short)(int)val]; break;
-                case StatsType.Inventory6: Inventory[6] = (int)val == -1 ? null : XmlDatas.ItemDescs[(short)(int)val]; break;
-                case StatsType.Inventory7: Inventory[7] = (int)val == -1 ? null : XmlDatas.ItemDescs[(short)(int)val]; break;
-                case StatsType.Inventory8: Inventory[8] = (int)val == -1 ? null : XmlDatas.ItemDescs[(short)(int)val]; break;
-                case StatsType.Inventory9: Inventory[9] = (int)val == -1 ? null : XmlDatas.ItemDescs[(short)(int)val]; break;
-                case StatsType.Inventory10: Inventory[10] = (int)val == -1 ? null : XmlDatas.ItemDescs[(short)(int)val]; break;
-                case StatsType.Inventory11: Inventory[11] = (int)val == -1 ? null : XmlDatas.ItemDescs[(short)(int)val]; break;
+                case StatsType.Inventory0: Inventory[0] = (int)val == -1 ? null : Manager.GameData.Items[(short)(int)val]; break;
+                case StatsType.Inventory1: Inventory[1] = (int)val == -1 ? null : Manager.GameData.Items[(short)(int)val]; break;
+                case StatsType.Inventory2: Inventory[2] = (int)val == -1 ? null : Manager.GameData.Items[(short)(int)val]; break;
+                case StatsType.Inventory3: Inventory[3] = (int)val == -1 ? null : Manager.GameData.Items[(short)(int)val]; break;
+                case StatsType.Inventory4: Inventory[4] = (int)val == -1 ? null : Manager.GameData.Items[(short)(int)val]; break;
+                case StatsType.Inventory5: Inventory[5] = (int)val == -1 ? null : Manager.GameData.Items[(short)(int)val]; break;
+                case StatsType.Inventory6: Inventory[6] = (int)val == -1 ? null : Manager.GameData.Items[(short)(int)val]; break;
+                case StatsType.Inventory7: Inventory[7] = (int)val == -1 ? null : Manager.GameData.Items[(short)(int)val]; break;
+                case StatsType.Inventory8: Inventory[8] = (int)val == -1 ? null : Manager.GameData.Items[(short)(int)val]; break;
+                case StatsType.Inventory9: Inventory[9] = (int)val == -1 ? null : Manager.GameData.Items[(short)(int)val]; break;
+                case StatsType.Inventory10: Inventory[10] = (int)val == -1 ? null : Manager.GameData.Items[(short)(int)val]; break;
+                case StatsType.Inventory11: Inventory[11] = (int)val == -1 ? null : Manager.GameData.Items[(short)(int)val]; break;
                 case StatsType.OwnerAccountId: break;// BagOwner = (int)val == -1 ? (int?)null : (int)val; break;
             }
             base.ImportStats(stats, val);

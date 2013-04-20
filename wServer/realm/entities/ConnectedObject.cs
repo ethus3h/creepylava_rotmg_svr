@@ -122,8 +122,8 @@ namespace wServer.realm.entities
             base.ExportStats(stats);
         }
 
-        public ConnectedObject(short objType)
-            : base(objType, null, true, false, true)
+        public ConnectedObject(RealmManager manager, short objType)
+            : base(manager, objType, null, true, false, true)
         {
         }
 

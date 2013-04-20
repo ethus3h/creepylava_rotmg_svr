@@ -25,8 +25,8 @@ namespace wServer.realm.entities
 
         public ProjectileDesc Descriptor { get; set; }
 
-        public Projectile(ProjectileDesc desc)
-            : base(XmlDatas.IdToType[desc.ObjectId])
+        public Projectile(RealmManager manager, ProjectileDesc desc)
+            : base(manager, manager.GameData.IdToType[desc.ObjectId])
         {
             this.Descriptor = desc;
         }
@@ -135,7 +135,7 @@ namespace wServer.realm.entities
 
                 var objId = Owner.Map[(int)pos.X, (int)pos.Y].ObjType;
                 if (objId != 0 &&
-                    XmlDatas.ObjectDescs[objId].OccupySquare &&
+                    Manager.GameData.ObjectDescs[objId].OccupySquare &&
                     !penetrateObsta)
                 {
                     Destroy(true);

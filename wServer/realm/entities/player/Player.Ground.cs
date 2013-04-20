@@ -20,8 +20,8 @@ namespace wServer.realm.entities
                     return;
 
                 WmapTile tile = Owner.Map[(int)X, (int)Y];
-                ObjectDesc objDesc = tile.ObjType == 0 ? null : XmlDatas.ObjectDescs[tile.ObjType];
-                TileDesc tileDesc = XmlDatas.TileDescs[tile.TileId];
+                ObjectDesc objDesc = tile.ObjType == 0 ? null : Manager.GameData.ObjectDescs[tile.ObjType];
+                TileDesc tileDesc = Manager.GameData.Tiles[tile.TileId];
                 if (tileDesc.Damaging && (objDesc == null || !objDesc.ProtectFromGroundDamage))
                 {
                     int dmg = Random.Next(tileDesc.MinDamage, tileDesc.MaxDamage);

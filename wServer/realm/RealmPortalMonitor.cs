@@ -46,7 +46,7 @@ namespace wServer.realm
             lock (worldLock)
             {
                 var pos = GetRandPosition();
-                var portal = new Portal(0x0712, null)
+                var portal = new Portal(manager, 0x0712, null)
                 {
                     Size = 80,
                     WorldInstance = world,
@@ -80,7 +80,7 @@ namespace wServer.realm
             lock (worldLock)
             {
                 var pos = GetRandPosition();
-                var portal = new Portal(0x71c, null)
+                var portal = new Portal(manager, 0x71c, null)
                 {
                     Size = 150,
                     WorldInstance = world,

@@ -14,8 +14,8 @@ namespace wServer.realm.setpieces
             get { return 40; }
         }
 
-        static readonly byte Lava = (byte)XmlDatas.IdToType["Lava Blend"];
-        static readonly short Floor = XmlDatas.IdToType["Partial Red Floor"];
+        static readonly string Lava = "Lava Blend";
+        static readonly string Floor = "Partial Red Floor";
 
         protected static readonly Loot chest = new Loot(
                 new TierLoot(7, ItemType.Weapon, 0.3),
@@ -68,20 +68,21 @@ namespace wServer.realm.setpieces
                 p = SetPieces.rotateCW(p);
             p[20, 20] = 2;
 
+            var dat = world.Manager.GameData;
             for (int x = 0; x < Size; x++)      //Rendering
                 for (int y = 0; y < Size; y++)
                 {
                     if (p[x, y] == 1)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Lava; tile.ObjType = 0;
+                        tile.TileId = (byte)dat.IdToType[Lava]; tile.ObjType = 0;
                         world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (p[x, y] == 2)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Lava; tile.ObjType = Floor;
+                        tile.TileId = (byte)dat.IdToType[Lava]; tile.ObjType = dat.IdToType[Floor];
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
                         world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
@@ -90,12 +91,12 @@ namespace wServer.realm.setpieces
 
 
 
-            Entity demon = Entity.Resolve(0x668);
+            Entity demon = Entity.Resolve(world.Manager, 0x668);
             demon.Move(pos.X + 20.5f, pos.Y + 20.5f);
             world.EnterWorld(demon);
 
-            Container container = new Container(0x0501, null, false);
-            Item[] items = chest.GetLoots(5, 8).ToArray();
+            Container container = new Container(world.Manager, 0x0501, null, false);
+            Item[] items = chest.GetLoots(world.Manager, 5, 8).ToArray();
             for (int i = 0; i < items.Length; i++)
                 container.Inventory[i] = items[i];
             container.Move(pos.X + 20.5f, pos.Y + 20.5f);

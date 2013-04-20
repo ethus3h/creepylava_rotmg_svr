@@ -11,7 +11,7 @@ namespace wServer.logic
 {
     partial class BehaviorDb
     {
-        static _ Midland = Behav()
+        _ Midland = () => Behav()
             .Init("Fire Sprite",
                     new State(
                         new Reproduce(densityMax: 2),

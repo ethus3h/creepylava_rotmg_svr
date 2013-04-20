@@ -186,7 +186,7 @@ namespace wServer.realm
                 n += k.Item2;
                 if (n > p)
                 {
-                    objType = XmlDatas.IdToType[k.Item1];
+                    objType = world.Manager.GameData.IdToType[k.Item1];
                     break;
                 }
             }
@@ -213,7 +213,7 @@ namespace wServer.realm
 
                 for (int k = 0; k < num; k++)
                 {
-                    entity = Entity.Resolve(desc.ObjectType);
+                    entity = Entity.Resolve(world.Manager, desc.ObjectType);
                     entity.Move(
                         pt.X + (float)(rand.NextDouble() * 2 - 1) * 5,
                         pt.Y + (float)(rand.NextDouble() * 2 - 1) * 5);
@@ -232,7 +232,7 @@ namespace wServer.realm
                          world.Obstacles[pt.X, pt.Y] != 0 ||
                          world.AnyPlayerNearby(pt.X, pt.Y));
 
-                entity = Entity.Resolve(desc.ObjectType);
+                entity = Entity.Resolve(world.Manager, desc.ObjectType);
                 entity.Move(pt.X, pt.Y);
                 (entity as Enemy).Terrain = terrain;
                 world.EnterWorld(entity);
@@ -268,7 +268,7 @@ namespace wServer.realm
                     short objType = GetRandomObjType(i.Value.Item2);
                     if (objType == 0) continue;
 
-                    enemyCounts[idx] += Spawn(XmlDatas.ObjectDescs[objType], terrain, w, h);
+                    enemyCounts[idx] += Spawn(world.Manager.GameData.ObjectDescs[objType], terrain, w, h);
                     if (enemyCounts[idx] >= enemyCount) break;
                 }
             }
@@ -342,7 +342,7 @@ namespace wServer.realm
                     short objType = GetRandomObjType(spawn[t].Item2);
                     if (objType == 0) continue;
 
-                    j += Spawn(XmlDatas.ObjectDescs[objType], t, w, h);
+                    j += Spawn(world.Manager.GameData.ObjectDescs[objType], t, w, h);
                 }
             }
             RecalculateEnemyCount();
@@ -684,7 +684,7 @@ namespace wServer.realm
                 if (rand.NextDouble() < 0.25)
                 {
                     var evt = events[rand.Next(0, events.Count)];
-                    if (XmlDatas.ObjectDescs[XmlDatas.IdToType[evt.Item1]].PerRealmMax == 1)
+                    if (world.Manager.GameData.ObjectDescs[world.Manager.GameData.IdToType[evt.Item1]].PerRealmMax == 1)
                         events.Remove(evt);
                     SpawnEvent(evt.Item2);
 

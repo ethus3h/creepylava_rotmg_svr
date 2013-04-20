@@ -11,7 +11,7 @@ namespace wServer.logic
 {
     partial class BehaviorDb
     {
-        static _ Cyclops = Behav()
+        _ Cyclops = () => Behav()
             .Init("Cyclops God",
                     new State(
                         new State("idle",

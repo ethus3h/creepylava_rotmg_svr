@@ -26,7 +26,7 @@ namespace wServer.logic.behaviors
         public Protect(double speed, string protectee, double acquireRange = 10, double protectionRange = 2, double reprotectRange = 1)
         {
             this.speed = (float)speed;
-            this.protectee = XmlDatas.IdToType[protectee];
+            this.protectee = BehaviorDb.InitGameData.IdToType[protectee];
             this.acquireRange = (float)acquireRange;
             this.protectionRange = (float)protectionRange;
             this.reprotectRange = (float)reprotectRange;

@@ -10,10 +10,20 @@ namespace wServer.realm.worlds
 {
     class GameWorld : World
     {
+        bool oryxPresent;
+        int mapId;
         public GameWorld(int mapId, string name, bool oryxPresent)
         {
             Name = name;
             Background = 0;
+            this.oryxPresent = oryxPresent;
+            this.mapId = mapId;
+        }
+
+        public Oryx Overseer { get; private set; }
+
+        protected override void Init()
+        {
             base.FromWorldMap(typeof(RealmManager).Assembly.GetManifestResourceStream("wServer.realm.worlds.world" + mapId + ".wmap"));
             SetPieces.ApplySetPieces(this);
             if (oryxPresent)
@@ -24,8 +34,6 @@ namespace wServer.realm.worlds
             else
                 Overseer = null;
         }
-
-        public Oryx Overseer { get; private set; }
 
         public override void Tick(RealmTime time)
         {

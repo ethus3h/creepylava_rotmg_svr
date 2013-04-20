@@ -2,15 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using wServer.realm.entities;
+using wServer.realm;
 
 namespace wServer.logic.loot
 {
-    interface ILootDef
+    public interface ILootDef
     {
-        void Populate(Loot loot, IList<LootDef> defs);
+        void Populate(RealmManager manager, Enemy enemy, Tuple<Player, int> playerDat,
+                      Random rand, IList<LootDef> lootDefs);
     }
 
-    class ItemLoot : ILootDef
+    public class ItemLoot : ILootDef
     {
         string item;
         double probability;
@@ -20,13 +23,16 @@ namespace wServer.logic.loot
             this.probability = probability;
         }
 
-        public void Populate(Loot loot, IList<LootDef> defs)
+        public void Populate(RealmManager manager, Enemy enemy, Tuple<Player, int> playerDat,
+                             Random rand, IList<LootDef> lootDefs)
         {
-            defs.Add(new LootDef(XmlDatas.ItemDescs[XmlDatas.IdToType[item]], probability));
+            if (playerDat != null) return;
+            var dat = manager.GameData;
+            lootDefs.Add(new LootDef(dat.Items[dat.IdToType[item]], probability));
         }
     }
 
-    enum ItemType
+    public enum ItemType
     {
         Weapon,
         Ability,
@@ -34,118 +40,53 @@ namespace wServer.logic.loot
         Ring,
         Potion
     }
-    class TierLoot : ILootDef
+    public class TierLoot : ILootDef
     {
-        public static readonly int[] WeaponsT = new int[] { 1, 2, 3, 8, 17, };
+        public static readonly int[] WeaponT = new int[] { 1, 2, 3, 8, 17, };
         public static readonly int[] AbilityT = new int[] { 4, 5, 11, 12, 13, 15, 16, 18, 19, 20, 21, 22, 23, };
-        public static readonly int[] ArmorsT = new int[] { 6, 7, 14, };
+        public static readonly int[] ArmorT = new int[] { 6, 7, 14, };
         public static readonly int[] RingT = new int[] { 9 };
         public static readonly int[] PotionT = new int[] { 10 };
 
-        public static readonly Dictionary<int, Item[]> WeaponItems;
-        public static readonly Dictionary<int, Item[]> AbilityItems;
-        public static readonly Dictionary<int, Item[]> ArmorItems;
-        public static readonly Dictionary<int, Item[]> RingItems;
-        public static readonly Dictionary<int, Item[]> PotionItems;
-
-        static TierLoot()
-        {
-            WeaponItems = new Dictionary<int, Item[]>();
-            for (int tier = 1; tier < 20; tier++)
-            {
-                List<Item> items = new List<Item>();
-                foreach (var i in WeaponsT)
-                    items.AddRange(XmlDatas.ItemDescs.Select(_ => _.Value).Where(_ => _.Tier == tier && _.SlotType == i));
-                if (items.Count == 0)
-                    break;
-                else
-                    WeaponItems[tier] = items.ToArray();
-            }
-            AbilityItems = new Dictionary<int, Item[]>();
-            for (int tier = 1; tier < 20; tier++)
-            {
-                List<Item> items = new List<Item>();
-                foreach (var i in AbilityT)
-                    items.AddRange(XmlDatas.ItemDescs.Select(_ => _.Value).Where(_ => _.Tier == tier && _.SlotType == i));
-                if (items.Count == 0)
-                    break;
-                else
-                    AbilityItems[tier] = items.ToArray();
-            }
-            ArmorItems = new Dictionary<int, Item[]>();
-            for (int tier = 1; tier < 20; tier++)
-            {
-                List<Item> items = new List<Item>();
-                foreach (var i in ArmorsT)
-                    items.AddRange(XmlDatas.ItemDescs.Select(_ => _.Value).Where(_ => _.Tier == tier && _.SlotType == i));
-                if (items.Count == 0)
-                    break;
-                else
-                    ArmorItems[tier] = items.ToArray();
-            }
-            RingItems = new Dictionary<int, Item[]>();
-            for (int tier = 1; tier < 20; tier++)
-            {
-                List<Item> items = new List<Item>();
-                foreach (var i in RingT)
-                    items.AddRange(XmlDatas.ItemDescs.Select(_ => _.Value).Where(_ => _.Tier == tier && _.SlotType == i));
-                if (items.Count == 0)
-                    break;
-                else
-                    RingItems[tier] = items.ToArray();
-            }
-            PotionItems = new Dictionary<int, Item[]>();
-            for (int tier = 1; tier < 20; tier++)
-            {
-                List<Item> items = new List<Item>();
-                foreach (var i in PotionT)
-                    items.AddRange(XmlDatas.ItemDescs.Select(_ => _.Value).Where(_ => _.Tier == tier && _.SlotType == i));
-                if (items.Count == 0)
-                    break;
-                else
-                    PotionItems[tier] = items.ToArray();
-            }
-        }
-
         byte tier;
-        ItemType type;
+        int[] types;
         double probability;
         public TierLoot(byte tier, ItemType type, double probability)
         {
             this.tier = tier;
-            this.type = type;
-            this.probability = probability;
-        }
-
-        public void Populate(Loot loot, IList<LootDef> defs)
-        {
-            Item[] candidates;
             switch (type)
             {
                 case ItemType.Weapon:
-                    candidates = WeaponItems[tier];
-                    break;
+                    types = WeaponT; break;
                 case ItemType.Ability:
-                    candidates = AbilityItems[tier];
-                    break;
+                    types = AbilityT; break;
                 case ItemType.Armor:
-                    candidates = ArmorItems[tier];
-                    break;
+                    types = ArmorT; break;
                 case ItemType.Ring:
-                    candidates = RingItems[tier];
-                    break;
+                    types = RingT; break;
                 case ItemType.Potion:
-                    candidates = PotionItems[tier];
-                    break;
+                    types = PotionT; break;
                 default:
                     throw new NotSupportedException(type.ToString());
             }
+            this.probability = probability;
+        }
+
+        public void Populate(RealmManager manager, Enemy enemy, Tuple<Player, int> playerDat,
+                             Random rand, IList<LootDef> lootDefs)
+        {
+            if (playerDat != null) return;
+            Item[] candidates = manager.GameData.Items
+                .Where(item => Array.IndexOf(types, item.Value.SlotType) != -1)
+                .Where(item => item.Value.Tier == tier)
+                .Select(item => item.Value)
+                .ToArray();
             foreach (var i in candidates)
-                defs.Add(new LootDef(i, probability / candidates.Length));
+                lootDefs.Add(new LootDef(i, probability / candidates.Length));
         }
     }
 
-    class Threshold : ILootDef
+    public class Threshold : ILootDef
     {
         double threshold;
         ILootDef[] children;
@@ -155,17 +96,14 @@ namespace wServer.logic.loot
             this.children = children;
         }
 
-        public void Populate(Loot loot, IList<LootDef> defs)
+        public void Populate(RealmManager manager, Enemy enemy, Tuple<Player, int> playerDat,
+                             Random rand, IList<LootDef> lootDefs)
         {
-            defs = new List<LootDef>();
-            foreach (var i in children)
-                i.Populate(loot, defs);
-            loot.LootConsidering += (sender, e) =>
+            if (playerDat != null && playerDat.Item2 / (double)enemy.ObjectDesc.MaxHP >= threshold)
             {
-                if (e.PlayerData.Item2 / (double)e.Enemy.ObjectDesc.MaxHP >= threshold)
-                    foreach (var i in defs)
-                        e.LootDefs.Add(i);
-            };
+                foreach (var i in children)
+                    i.Populate(manager, enemy, null, rand, lootDefs);
+            }
         }
     }
 }

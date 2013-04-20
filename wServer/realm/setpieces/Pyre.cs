@@ -14,7 +14,7 @@ namespace wServer.realm.setpieces
             get { return 30; }
         }
 
-        static readonly byte Floor = (byte)XmlDatas.IdToType["Scorch Blend"];
+        static readonly string Floor = "Scorch Blend";
 
         protected static readonly Loot chest = new Loot(
                 new TierLoot(5, ItemType.Weapon, 0.3),
@@ -37,6 +37,7 @@ namespace wServer.realm.setpieces
         Random rand = new Random();
         public void RenderSetPiece(World world, IntPoint pos)
         {
+            var dat = world.Manager.GameData;
             for (int x = 0; x < Size; x++)
                 for (int y = 0; y < Size; y++)
                 {
@@ -46,18 +47,18 @@ namespace wServer.realm.setpieces
                     if (r <= 10)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Floor; tile.ObjType = 0;
+                        tile.TileId = (byte)dat.IdToType[Floor]; tile.ObjType = 0;
                         world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                 }
 
-            Entity lord = Entity.Resolve(0x675);
+            Entity lord = Entity.Resolve(world.Manager, 0x675);
             lord.Move(pos.X + 15.5f, pos.Y + 15.5f);
             world.EnterWorld(lord);
 
-            Container container = new Container(0x0501, null, false);
-            Item[] items = chest.GetLoots(5, 8).ToArray();
+            Container container = new Container(world.Manager, 0x0501, null, false);
+            Item[] items = chest.GetLoots(world.Manager, 5, 8).ToArray();
             for (int i = 0; i < items.Length; i++)
                 container.Inventory[i] = items[i];
             container.Move(pos.X + 15.5f, pos.Y + 15.5f);

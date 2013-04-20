@@ -7,7 +7,7 @@ using wServer.realm;
 
 namespace wServer.logic.loot
 {
-    struct LootDef
+    public struct LootDef
     {
         public LootDef(Item item, double probabilty)
         {
@@ -17,38 +17,25 @@ namespace wServer.logic.loot
         public readonly Item Item;
         public readonly double Probabilty;
     }
-    class ConsiderEventArgs : EventArgs
-    {
-        public ConsiderEventArgs(Enemy enemy, Tuple<Player, int> dat,
-            Random rand, IList<LootDef> lootDefs)
-        {
-            this.Enemy = enemy;
-            this.PlayerData = dat;
-            this.Random = rand;
-            this.LootDefs = lootDefs;
-        }
-        public Enemy Enemy { get; private set; }
-        public Tuple<Player, int> PlayerData { get; private set; }
-        public Random Random { get; private set; }
-        public IList<LootDef> LootDefs { get; private set; }
-    }
-    class Loot : List<LootDef>
+
+    public class Loot : List<ILootDef>
     {
         public Loot() { }
         public Loot(params ILootDef[] lootDefs)   //For independent loots(e.g. chests)
         {
-            foreach (var i in lootDefs)
-                i.Populate(this, this);
+            AddRange(lootDefs);
         }
-
-        public event EventHandler<ConsiderEventArgs> LootConsidering;
 
         static Random rand = new Random();
 
-        public IEnumerable<Item> GetLoots(int min, int max)   //For independent loots(e.g. chests)
+        public IEnumerable<Item> GetLoots(RealmManager manager, int min, int max)   //For independent loots(e.g. chests)
         {
-            int retCount = rand.Next(min, max);
+            var consideration = new List<LootDef>();
             foreach (var i in this)
+                i.Populate(manager, null, null, rand, consideration);
+
+            int retCount = rand.Next(min, max);
+            foreach (var i in consideration)
             {
                 if (rand.NextDouble() < i.Probabilty)
                 {
@@ -62,8 +49,12 @@ namespace wServer.logic.loot
 
         public void Handle(Enemy enemy, RealmTime time)
         {
-            List<Item> sharedLoots = new List<Item>();
+            var consideration = new List<LootDef>();
+
+            var sharedLoots = new List<Item>();
             foreach (var i in this)
+                i.Populate(enemy.Manager, enemy, null, rand, consideration);
+            foreach (var i in consideration)
             {
                 if (rand.NextDouble() < i.Probabilty)
                     sharedLoots.Add(i.Item);
@@ -76,13 +67,11 @@ namespace wServer.logic.loot
             foreach (var loot in sharedLoots.Where(item => item.Soulbound))
                 loots[dats[rand.Next(dats.Length)].Item1].Add(loot);
 
-            var consideration = new List<LootDef>();
             foreach (var dat in dats)
             {
                 consideration.Clear();
-                ConsiderEventArgs e = new ConsiderEventArgs(enemy, dat, rand, consideration);
-                if (LootConsidering != null)
-                    LootConsidering(this, e);
+                foreach (var i in this)
+                    i.Populate(enemy.Manager, enemy, dat, rand, consideration);
 
                 IList<Item> playerLoot = loots[dat.Item1];
                 foreach (var i in consideration)
@@ -95,7 +84,7 @@ namespace wServer.logic.loot
             AddBagsToWorld(enemy, sharedLoots, loots);
         }
 
-        void AddBagsToWorld(Enemy enemy,IList<Item> shared, IDictionary<Player, IList<Item>> soulbound)
+        void AddBagsToWorld(Enemy enemy, IList<Item> shared, IDictionary<Player, IList<Item>> soulbound)
         {
             List<Player> pub = new List<Player>();  //only people not getting soulbound
             foreach (var i in soulbound)
@@ -111,12 +100,11 @@ namespace wServer.logic.loot
 
         void ShowBags(Enemy enemy, IEnumerable<Item> loots, params Player[] owners)
         {
+            var ownerIds = owners.Select(x => x.AccountId).ToArray();
             int bagType = 0;
             Item[] items = new Item[8];
             int idx = 0;
 
-            short bag;
-            Container container;
             foreach (var i in loots)
             {
                 if (i.BagType > bagType) bagType = i.BagType;
@@ -125,24 +113,7 @@ namespace wServer.logic.loot
 
                 if (idx == 8)
                 {
-                    bag = 0x0500;
-                    switch (bagType)
-                    {
-                        case 0: bag = 0x0500; break;
-                        case 1: bag = 0x0503; break;
-                        case 2: bag = 0x0507; break;
-                        case 3: bag = 0x0508; break;
-                        case 4: bag = 0x0509; break;
-                    }
-                    container = new Container(bag, 1000 * 60, true);
-                    for (int j = 0; j < 8; j++)
-                        container.Inventory[j] = items[j];
-                    container.BagOwners = owners.Select(x => x.AccountId).ToArray();
-                    container.Move(
-                        enemy.X + (float)((rand.NextDouble() * 2 - 1) * 0.5),
-                        enemy.Y + (float)((rand.NextDouble() * 2 - 1) * 0.5));
-                    container.Size = 80;
-                    enemy.Owner.EnterWorld(container);
+                    ShowBag(enemy, ownerIds, bagType, items);
 
                     bagType = 0;
                     items = new Item[8];
@@ -151,26 +122,29 @@ namespace wServer.logic.loot
             }
 
             if (idx > 0)
+                ShowBag(enemy, ownerIds, bagType, items);
+        }
+
+        private static void ShowBag(Enemy enemy, int[] owners, int bagType, Item[] items)
+        {
+            short bag = 0x0500;
+            switch (bagType)
             {
-                bag = 0x0500;
-                switch (bagType)
-                {
-                    case 0: bag = 0x0500; break;
-                    case 1: bag = 0x0503; break;
-                    case 2: bag = 0x0507; break;
-                    case 3: bag = 0x0508; break;
-                    case 4: bag = 0x0509; break;
-                }
-                container = new Container(bag, 1000 * 60, true);
-                for (int j = 0; j < idx; j++)
-                    container.Inventory[j] = items[j];
-                container.BagOwners = owners.Select(x => x.AccountId).ToArray();
-                container.Move(
-                    enemy.X + (float)((rand.NextDouble() * 2 - 1) * 0.5),
-                    enemy.Y + (float)((rand.NextDouble() * 2 - 1) * 0.5));
-                container.Size = 80;
-                enemy.Owner.EnterWorld(container);
+                case 0: bag = 0x0500; break;
+                case 1: bag = 0x0503; break;
+                case 2: bag = 0x0507; break;
+                case 3: bag = 0x0508; break;
+                case 4: bag = 0x0509; break;
             }
+            var container = new Container(enemy.Manager, bag, 1000 * 60, true);
+            for (int j = 0; j < 8; j++)
+                container.Inventory[j] = items[j];
+            container.BagOwners = owners;
+            container.Move(
+                enemy.X + (float)((rand.NextDouble() * 2 - 1) * 0.5),
+                enemy.Y + (float)((rand.NextDouble() * 2 - 1) * 0.5));
+            container.Size = 80;
+            enemy.Owner.EnterWorld(container);
         }
     }
 }

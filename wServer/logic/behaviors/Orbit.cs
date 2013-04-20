@@ -29,7 +29,7 @@ namespace wServer.logic.behaviors
             this.speed = (float)speed;
             this.radius = (float)radius;
             this.acquireRange = (float)acquireRange;
-            this.target = target == null ? null : (short?)XmlDatas.IdToType[target];
+            this.target = target == null ? null : (short?)BehaviorDb.InitGameData.IdToType[target];
             this.speedVariance = (float)(speedVariance ?? speed * 0.1);
             this.radiusVariance = (float)(radiusVariance ?? speed * 0.1);
         }

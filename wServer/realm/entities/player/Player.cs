@@ -79,18 +79,18 @@ namespace wServer.realm.entities
                 case StatsType.HP: HP = (int)val; break;
                 case StatsType.MP: MP = (int)val; break;
 
-                case StatsType.Inventory0: Inventory[0] = (int)val == -1 ? null : XmlDatas.ItemDescs[(short)(int)val]; break;
-                case StatsType.Inventory1: Inventory[1] = (int)val == -1 ? null : XmlDatas.ItemDescs[(short)(int)val]; break;
-                case StatsType.Inventory2: Inventory[2] = (int)val == -1 ? null : XmlDatas.ItemDescs[(short)(int)val]; break;
-                case StatsType.Inventory3: Inventory[3] = (int)val == -1 ? null : XmlDatas.ItemDescs[(short)(int)val]; break;
-                case StatsType.Inventory4: Inventory[4] = (int)val == -1 ? null : XmlDatas.ItemDescs[(short)(int)val]; break;
-                case StatsType.Inventory5: Inventory[5] = (int)val == -1 ? null : XmlDatas.ItemDescs[(short)(int)val]; break;
-                case StatsType.Inventory6: Inventory[6] = (int)val == -1 ? null : XmlDatas.ItemDescs[(short)(int)val]; break;
-                case StatsType.Inventory7: Inventory[7] = (int)val == -1 ? null : XmlDatas.ItemDescs[(short)(int)val]; break;
-                case StatsType.Inventory8: Inventory[8] = (int)val == -1 ? null : XmlDatas.ItemDescs[(short)(int)val]; break;
-                case StatsType.Inventory9: Inventory[9] = (int)val == -1 ? null : XmlDatas.ItemDescs[(short)(int)val]; break;
-                case StatsType.Inventory10: Inventory[10] = (int)val == -1 ? null : XmlDatas.ItemDescs[(short)(int)val]; break;
-                case StatsType.Inventory11: Inventory[11] = (int)val == -1 ? null : XmlDatas.ItemDescs[(short)(int)val]; break;
+                case StatsType.Inventory0: Inventory[0] = (int)val == -1 ? null : Manager.GameData.Items[(short)(int)val]; break;
+                case StatsType.Inventory1: Inventory[1] = (int)val == -1 ? null : Manager.GameData.Items[(short)(int)val]; break;
+                case StatsType.Inventory2: Inventory[2] = (int)val == -1 ? null : Manager.GameData.Items[(short)(int)val]; break;
+                case StatsType.Inventory3: Inventory[3] = (int)val == -1 ? null : Manager.GameData.Items[(short)(int)val]; break;
+                case StatsType.Inventory4: Inventory[4] = (int)val == -1 ? null : Manager.GameData.Items[(short)(int)val]; break;
+                case StatsType.Inventory5: Inventory[5] = (int)val == -1 ? null : Manager.GameData.Items[(short)(int)val]; break;
+                case StatsType.Inventory6: Inventory[6] = (int)val == -1 ? null : Manager.GameData.Items[(short)(int)val]; break;
+                case StatsType.Inventory7: Inventory[7] = (int)val == -1 ? null : Manager.GameData.Items[(short)(int)val]; break;
+                case StatsType.Inventory8: Inventory[8] = (int)val == -1 ? null : Manager.GameData.Items[(short)(int)val]; break;
+                case StatsType.Inventory9: Inventory[9] = (int)val == -1 ? null : Manager.GameData.Items[(short)(int)val]; break;
+                case StatsType.Inventory10: Inventory[10] = (int)val == -1 ? null : Manager.GameData.Items[(short)(int)val]; break;
+                case StatsType.Inventory11: Inventory[11] = (int)val == -1 ? null : Manager.GameData.Items[(short)(int)val]; break;
 
                 case StatsType.MaximumHP: Stats[0] = (int)val; break;
                 case StatsType.MaximumMP: Stats[1] = (int)val; break;
@@ -210,7 +210,7 @@ namespace wServer.realm.entities
 
         StatsManager statsMgr;
         public Player(Client client)
-            : base((short)client.Character.ObjectType, client.Random)
+            : base(client.Manager, (short)client.Character.ObjectType, client.Random)
         {
             this.client = client;
             statsMgr = new StatsManager(this);
@@ -241,10 +241,10 @@ namespace wServer.realm.entities
 
             Inventory = new Inventory(this,
                 client.Character.Equipment
-                    .Select(_ => _ == -1 ? null : XmlDatas.ItemDescs[_])
+                    .Select(_ => _ == -1 ? null : client.Manager.GameData.Items[_])
                     .ToArray());
             Inventory.InventoryChanged += (sender, e) => CalculateBoost();
-            SlotTypes = Utils.FromCommaSepString32(XmlDatas.TypeToElement[ObjectType].Element("SlotTypes").Value);
+            SlotTypes = Utils.FromCommaSepString32(client.Manager.GameData.TypeToElement[ObjectType].Element("SlotTypes").Value);
             Stats = new int[]
             {
                 client.Character.MaxHitPoints,
@@ -445,7 +445,7 @@ namespace wServer.realm.entities
                 Inventory[i] = null;
                 foreach (var player in Owner.Players.Values)
                     player.SendInfo(string.Format("{0}'s {1} breaks and he disappears", Name, item.ObjectId));
-                
+
                 client.Reconnect(new ReconnectPacket()
                 {
                     Host = "",
@@ -463,9 +463,9 @@ namespace wServer.realm.entities
         void GenerateGravestone()
         {
             int maxed = 0;
-            foreach (var i in XmlDatas.TypeToElement[ObjectType].Elements("LevelIncrease"))
+            foreach (var i in Manager.GameData.TypeToElement[ObjectType].Elements("LevelIncrease"))
             {
-                int limit = int.Parse(XmlDatas.TypeToElement[ObjectType].Element(i.Value).Attribute("max").Value);
+                int limit = int.Parse(Manager.GameData.TypeToElement[ObjectType].Element(i.Value).Attribute("max").Value);
                 int idx = StatsManager.StatsNameToIndex(i.Value);
                 if (Stats[idx] >= limit)
                     maxed++;
@@ -514,7 +514,7 @@ namespace wServer.realm.entities
                     }
                     break;
             }
-            StaticObject obj = new StaticObject(objType, time, true, time == null ? false : true, false);
+            StaticObject obj = new StaticObject(Manager, objType, time, true, time == null ? false : true, false);
             obj.Move(X, Y);
             obj.Name = this.Name;
             Owner.EnterWorld(obj);
@@ -541,7 +541,7 @@ namespace wServer.realm.entities
             client.Character.Dead = true;
             SaveToCharacter();
             Manager.Database.SaveCharacter(client.Account, client.Character);
-            Manager.Database.Death(client.Account, client.Character, killer);
+            Manager.Database.Death(Manager.GameData, client.Account, client.Character, killer);
             client.SendPacket(new DeathPacket()
             {
                 AccountId = AccountId,

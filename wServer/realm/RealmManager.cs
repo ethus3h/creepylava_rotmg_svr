@@ -10,6 +10,7 @@ using wServer.realm.worlds;
 using System.Collections.Concurrent;
 using wServer.networking;
 using System.Globalization;
+using wServer.logic;
 
 namespace wServer.realm
 {
@@ -39,21 +40,6 @@ namespace wServer.realm
 
     public class RealmManager
     {
-        public RealmManager()
-        {
-            AddWorld(World.TUT_ID, new Tutorial(true));
-            AddWorld(World.NEXUS_ID, Worlds[0] = new Nexus());
-            AddWorld(World.NEXUS_LIMBO, new NexusLimbo());
-            AddWorld(World.VAULT_ID, new Vault(true));
-            AddWorld(World.TEST_ID, new Test());
-            AddWorld(World.RAND_REALM, new RandomRealm());
-            AddWorld(World.GAUNTLET, new GauntletMap());
-
-            Monitor = new RealmPortalMonitor(this);
-
-            //AddWorld(new GameWorld(1, "Medusa", true));
-        }
-
         public int MAX_CLIENT = Program.Settings.GetValue<int>("maxClient", "100");
 
         int nextWorldId = 0;
@@ -77,6 +63,8 @@ namespace wServer.realm
 
         public World AddWorld(int id, World world)
         {
+            if (world.Manager != null)
+                throw new InvalidOperationException("World already added.");
             world.Id = id;
             Worlds[id] = world;
             OnWorldAdded(world);
@@ -84,11 +72,27 @@ namespace wServer.realm
         }
         public World AddWorld(World world)
         {
+            if (world.Manager != null)
+                throw new InvalidOperationException("World already added.");
             world.Id = Interlocked.Increment(ref nextWorldId);
             Worlds[world.Id] = world;
             OnWorldAdded(world);
             return world;
         }
+
+        public bool RemoveWorld(World world)
+        {
+            if (world.Manager == null)
+                throw new InvalidOperationException("World is not added.");
+            if (Worlds.TryRemove(world.Id, out world))
+            {
+                OnWorldRemoved(world);
+                return true;
+            }
+            else
+                return false;
+        }
+
         public World GetWorld(int id)
         {
             World ret;
@@ -97,11 +101,19 @@ namespace wServer.realm
             return ret;
         }
 
+
         void OnWorldAdded(World world)
         {
             world.Manager = this;
             if (world is GameWorld)
                 Monitor.WorldAdded(world);
+        }
+
+        void OnWorldRemoved(World world)
+        {
+            world.Manager = null;
+            if (world is GameWorld)
+                Monitor.WorldRemoved(world);
         }
 
         Thread network;
@@ -110,9 +122,29 @@ namespace wServer.realm
         Thread logic;
         public LogicTicker Logic { get; private set; }
 
+        public XmlData GameData { get; private set; }
+        public BehaviorDb Behaviors { get; private set; }
         public Database Database { get; private set; }
 
         public void Initialize()
+        {
+            this.GameData = new XmlData();
+            this.Behaviors = new BehaviorDb(this);
+
+            AddWorld(World.NEXUS_ID, Worlds[0] = new Nexus());
+            Monitor = new RealmPortalMonitor(this);
+
+            AddWorld(World.TUT_ID, new Tutorial(true));
+            AddWorld(World.NEXUS_LIMBO, new NexusLimbo());
+            AddWorld(World.VAULT_ID, new Vault(true));
+            AddWorld(World.TEST_ID, new Test());
+            AddWorld(World.RAND_REALM, new RandomRealm());
+            AddWorld(World.GAUNTLET, new GauntletMap());
+
+            AddWorld(new GameWorld(1, "Medusa", true));
+        }
+
+        public void Run()
         {
             Database = new Database(Program.Settings.GetValue("conn"));
             Network = new NetworkTicker(this);
@@ -133,7 +165,7 @@ namespace wServer.realm
         }
 
         public bool Terminating { get; private set; }
-        public void Terminate()
+        public void Stop()
         {
             Terminating = true;
             Database.Dispose();

@@ -9,11 +9,11 @@ namespace wServer.realm.setpieces
     {
         public int Size { get { return 26; } }
 
-        protected static readonly byte Floor = (byte)XmlDatas.IdToType["Blue Floor"];
-        protected static readonly short WallA = XmlDatas.IdToType["Blue Wall"];
-        protected static readonly short WallB = XmlDatas.IdToType["Destructible Blue Wall"];
-        protected static readonly short PillarA = XmlDatas.IdToType["Blue Pillar"];
-        protected static readonly short PillarB = XmlDatas.IdToType["Broken Blue Pillar"];
+        protected static readonly string Floor = "Blue Floor";
+        protected static readonly string WallA = "Blue Wall";
+        protected static readonly string WallB = "Destructible Blue Wall";
+        protected static readonly string PillarA = "Blue Pillar";
+        protected static readonly string PillarB = "Broken Blue Pillar";
 
         Random rand = new Random();
         public void RenderSetPiece(World world, IntPoint pos)
@@ -59,14 +59,15 @@ namespace wServer.realm.setpieces
             for (int i = 0; i < r; i++)     //Rotation
                 t = SetPieces.rotateCW(t);
             int w = t.GetLength(0), h = t.GetLength(1);
-            
+
+            var dat = world.Manager.GameData;
             for (int x = 0; x < w; x++)    //Rendering
                 for (int y = 0; y < h; y++)
                 {
                     if (t[x, y] == 1)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Floor; 
+                        tile.TileId = (byte)dat.IdToType[Floor]; 
                         tile.ObjType = 0;
                         world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
@@ -74,8 +75,8 @@ namespace wServer.realm.setpieces
                     else if (t[x, y] == 2)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Floor;
-                        tile.ObjType = WallA;
+                        tile.TileId = (byte)dat.IdToType[Floor];
+                        tile.ObjType = dat.IdToType[WallA];
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
                         world.Obstacles[x + pos.X, y + pos.Y] = 2;
                         world.Map[x + pos.X, y + pos.Y] = tile;
@@ -83,18 +84,18 @@ namespace wServer.realm.setpieces
                     else if (t[x, y] == 3)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Floor;
+                        tile.TileId = (byte)dat.IdToType[Floor];
                         world.Obstacles[x + pos.X, y + pos.Y] = 2;
                         world.Map[x + pos.X, y + pos.Y] = tile;
-                        Entity wall = Entity.Resolve(WallB);
+                        Entity wall = Entity.Resolve(world.Manager, dat.IdToType[WallB]);
                         wall.Move(x + pos.X + 0.5f, y + pos.Y + 0.5f);
                         world.EnterWorld(wall);
                     }
                     else if (t[x, y] == 4)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Floor; 
-                        tile.ObjType = PillarA;
+                        tile.TileId = (byte)dat.IdToType[Floor]; 
+                        tile.ObjType = dat.IdToType[PillarA];
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
                         world.Obstacles[x + pos.X, y + pos.Y] = 2;
                         world.Map[x + pos.X, y + pos.Y] = tile;
@@ -102,8 +103,8 @@ namespace wServer.realm.setpieces
                     else if (t[x, y] == 5)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Floor; 
-                        tile.ObjType = PillarB;
+                        tile.TileId = (byte)dat.IdToType[Floor]; 
+                        tile.ObjType = dat.IdToType[PillarB];
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
                         world.Obstacles[x + pos.X, y + pos.Y] = 2;
                         world.Map[x + pos.X, y + pos.Y] = tile;
@@ -111,7 +112,7 @@ namespace wServer.realm.setpieces
                 }
 
             //Boss
-            Entity lich = Entity.Resolve(0x091b);
+            Entity lich = Entity.Resolve(world.Manager, 0x091b);
             lich.Move(pos.X + Size / 2, pos.Y + Size / 2);
             world.EnterWorld(lich);
         }

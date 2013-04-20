@@ -11,7 +11,7 @@ namespace wServer.logic
 {
     partial class BehaviorDb
     {
-        static _ Mountain = Behav()
+        _ Mountain = () => Behav()
             .Init("White Demon",
                     new State(
                         new Prioritize(

@@ -45,11 +45,11 @@ namespace wServer.networking.handlers
             Container container;
             if (item.Soulbound)
             {
-                container = new Container(SOUL_BAG, 1000 * 60, true);
+                container = new Container(player.Manager, SOUL_BAG, 1000 * 60, true);
                 container.BagOwners = new int[] { player.AccountId };
             }
             else
-                container = new Container(NORM_BAG, 1000 * 60, true);
+                container = new Container(player.Manager, NORM_BAG, 1000 * 60, true);
             container.Inventory[0] = item;
             container.Move(player.X + (float)((invRand.NextDouble() * 2 - 1) * 0.5),
                            player.Y + (float)((invRand.NextDouble() * 2 - 1) * 0.5));

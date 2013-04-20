@@ -26,7 +26,7 @@ namespace wServer.networking.handlers
             var entity = player.Owner.GetEntity(targetId);
             if (entity != null)   //Tolerance
             {
-                var prj = (this as IProjectileOwner).Projectiles[bulletId];
+                var prj = (player as IProjectileOwner).Projectiles[bulletId];
                 if (prj != null)
                     prj.ForceHit(entity, time);
             }

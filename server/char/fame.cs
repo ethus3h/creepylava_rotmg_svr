@@ -41,7 +41,7 @@ namespace server.@char
                 }
 
                 using (StreamWriter wtr = new StreamWriter(context.Response.OutputStream))
-                    wtr.Write(chr.FameStats.Serialize(acc, chr, time, killer, firstBorn));
+                    wtr.Write(chr.FameStats.Serialize(Program.GameData, acc, chr, time, killer, firstBorn));
             }
         }
     }

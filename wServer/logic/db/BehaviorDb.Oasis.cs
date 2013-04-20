@@ -11,7 +11,7 @@ namespace wServer.logic
 {
     partial class BehaviorDb
     {
-        static _ Oasis = Behav()
+        _ Oasis = () => Behav()
             .Init("Oasis Giant",
                     new State(
                         new Shoot(10, count: 4, shootAngle: 7, predictive: 1),

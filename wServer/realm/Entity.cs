@@ -11,22 +11,17 @@ namespace wServer.realm
 {
     public class Entity : IProjectileOwner, ICollidable<Entity>
     {
-        public Entity(short objType)
-            : this(objType, true)
+        public RealmManager Manager { get; private set; }
+        protected Entity(RealmManager manager, short objType)
         {
-        }
-
-        bool interactive;
-        protected Entity(short objType, bool interactive)
-        {
-            this.interactive = interactive;
             this.ObjectType = objType;
             Name = "";
             Size = 100;
-            XmlDatas.ObjectDescs.TryGetValue(objType, out desc);
-            BehaviorDb.ResolveBehavior(this);
+            Manager = manager;
+            manager.Behaviors.ResolveBehavior(this);
 
-            if (interactive)
+            manager.GameData.ObjectDescs.TryGetValue(ObjectType, out desc);
+            if (desc != null && (desc.Player || desc.Enemy))
             {
                 posHistory = new Position[256];
                 projectiles = new Projectile[256];
@@ -39,7 +34,6 @@ namespace wServer.realm
         public ObjectDesc ObjectDesc { get { return desc; } }
 
         public World Owner { get; internal set; }
-        public RealmManager Manager { get { return Owner.Manager; } }
 
         public int UpdateCount { get; set; }
 
@@ -127,14 +121,16 @@ namespace wServer.realm
         byte posIdx = 0;
         public virtual void Tick(RealmTime time)
         {
-            if (this is Projectile) return;
-            if (interactive && Owner != null)
+            if (this is Projectile || Owner == null) return;
+            if (CurrentState != null && Owner != null)
             {
                 if (!HasConditionEffect(ConditionEffects.Stasis))
                     TickState(time);
-                posHistory[posIdx++] = new Position() { X = X, Y = Y };
-                ProcessConditionEffects(time);
             }
+            if (posHistory != null)
+                posHistory[posIdx++] = new Position() { X = X, Y = Y };
+            if (effects != null)
+                ProcessConditionEffects(time);
         }
 
 
@@ -255,44 +251,44 @@ namespace wServer.realm
          * GameObject
          * Character
          */
-        public static Entity Resolve(short id)
+        public static Entity Resolve(RealmManager manager, short id)
         {
-            var node = XmlDatas.TypeToElement[id];
+            var node = manager.GameData.TypeToElement[id];
             string type = node.Element("Class").Value;
             switch (type)
             {
                 case "Projectile":
                     throw new Exception("Projectile should not instantiated using Entity.Resolve");
                 case "Sign":
-                    return new Sign(id);
+                    return new Sign(manager, id);
                 case "Wall":
-                    return new Wall(id, node);
+                    return new Wall(manager, id, node);
                 case "ConnectedWall":
                 case "CaveWall":
-                    return new ConnectedObject(id);
+                    return new ConnectedObject(manager, id);
                 case "GameObject":
                 case "CharacterChanger":
                 case "MoneyChanger":
                 case "NameChanger":
-                    return new StaticObject(id, StaticObject.GetHP(node), true, false, true);
+                    return new StaticObject(manager, id, StaticObject.GetHP(node), true, false, true);
                 case "Container":
-                    return new Container(node);
+                    return new Container(manager, id);
                 case "Player":
                     throw new Exception("Player should not instantiated using Entity.Resolve");
                 case "Character":   //Other characters means enemy
-                    return new Enemy(id);
+                    return new Enemy(manager, id);
                 case "Portal":
-                    return new Portal(id, null);
+                    return new Portal(manager, id, null);
                 case "ClosedVaultChest":
                 case "GuildMerchant":
-                    return new SellableObject(id);
+                    return new SellableObject(manager, id);
 
 
                 case "GuildHallPortal":
                 //return new StaticObject(id);
                 default:
                     Console.WriteLine("Not supported type: " + type);
-                    return new Entity(id);
+                    return new Entity(manager, id);
             }
         }
 
@@ -303,7 +299,7 @@ namespace wServer.realm
         protected byte projectileId;
         public Projectile CreateProjectile(ProjectileDesc desc, short container, int dmg, long time, Position pos, float angle)
         {
-            var ret = new Projectile(desc) //Assume only one
+            var ret = new Projectile(Manager, desc) //Assume only one
             {
                 ProjectileOwner = this,
                 ProjectileId = projectileId++,

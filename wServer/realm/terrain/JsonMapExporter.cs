@@ -43,7 +43,7 @@ namespace terrain
             public loc[] dict;
         }
 
-        public string Export(TerrainTile[,] tiles)
+        public string Export(XmlData data, TerrainTile[,] tiles)
         {
             int w = tiles.GetLength(0);
             int h = tiles.GetLength(1);
@@ -61,7 +61,7 @@ namespace terrain
                         idxs.Add(tile, idx = (short)dict.Count);
                         dict.Add(new loc()
                         {
-                            ground = XmlDatas.TypeToId[tile.TileId],
+                            ground = data.TypeToId[tile.TileId],
                             objs = tile.TileObj == null ? null : new obj[]
                             {
                                 new obj()

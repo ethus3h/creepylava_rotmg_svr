@@ -12,8 +12,8 @@ namespace wServer.realm.setpieces
             get { return 25; }
         }
 
-        static readonly byte Floor = (byte)XmlDatas.IdToType["Light Grass"];
-        static readonly short Tree = XmlDatas.IdToType["Cherry Tree"];
+        static readonly string Floor = "Light Grass";
+        static readonly string Tree = "Cherry Tree";
 
         Random rand = new Random();
         public void RenderSetPiece(World world, IntPoint pos)
@@ -43,28 +43,29 @@ namespace wServer.realm.setpieces
             foreach (var i in trees)
                 t[i.X, i.Y] = 2;
 
+            var dat = world.Manager.GameData;
             for (int x = 0; x < Size; x++)
                 for (int y = 0; y < Size; y++)
                 {
                     if (t[x, y] == 1)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Floor; tile.ObjType = 0;
+                        tile.TileId = (byte)dat.IdToType[Floor]; tile.ObjType = 0;
                         world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (t[x, y] == 2)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Floor;
-                        tile.ObjType = Tree; tile.Name = "size:" + (rand.Next() % 2 == 0 ? 120 : 140);
+                        tile.TileId = (byte)dat.IdToType[Floor];
+                        tile.ObjType = dat.IdToType[Tree]; tile.Name = "size:" + (rand.Next() % 2 == 0 ? 120 : 140);
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
                         world.Obstacles[x + pos.X, y + pos.Y] = 2;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                 }
 
-            Entity ent = Entity.Resolve(0x091f);
+            Entity ent = Entity.Resolve(world.Manager, 0x091f);
             ent.Size = 140;
             ent.Move(pos.X + Size / 2 + 1, pos.Y + Size / 2 + 1);
             world.EnterWorld(ent);

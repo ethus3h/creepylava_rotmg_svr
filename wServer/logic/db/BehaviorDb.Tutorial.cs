@@ -11,7 +11,7 @@ namespace wServer.logic
 {
     partial class BehaviorDb
     {
-        static _ Tutorial = Behav()
+        _ Tutorial = () => Behav()
             .Init("West Tutorial Gun",
                     new State(
                         new Shoot(32, fixedAngle: 180, coolDown: new Cooldown(3000, 1000))

@@ -13,23 +13,29 @@ namespace wServer.realm.worlds
 {
     public class Vault : World
     {
+        Client client;
         public Vault(bool isLimbo, Client client = null)
         {
             Id = VAULT_ID;
             Name = "Vault";
             Background = 2;
-            if (!(IsLimbo = isLimbo))
+            IsLimbo = isLimbo;
+
+            this.client = client;
+        }
+
+        protected override void Init()
+        {
+            if (!IsLimbo)
             {
                 base.FromWorldMap(typeof(RealmManager).Assembly.GetManifestResourceStream("wServer.realm.worlds.vault.wmap"));
-                Init(client);
+                InitVault();
             }
         }
 
         ConcurrentDictionary<Tuple<Container, VaultChest>, int> vaultChests = new ConcurrentDictionary<Tuple<Container, VaultChest>, int>();
-        Client client;
-        void Init(Client client)
+        void InitVault()
         {
-            this.client = client;
             List<IntPoint> vaultChestPosition = new List<IntPoint>();
             IntPoint spawn = new IntPoint(0, 0);
 
@@ -51,8 +57,8 @@ namespace wServer.realm.worlds
             var chests = client.Account.Vault.Chests;
             for (int i = 0; i < chests.Count; i++)
             {
-                Container con = new Container(0x0504, null, false);
-                var inv = chests[i].Items.Select(_ => _ == -1 ? null : XmlDatas.ItemDescs[(short)_]).ToArray();
+                Container con = new Container(client.Manager, 0x0504, null, false);
+                var inv = chests[i].Items.Select(_ => _ == -1 ? null : client.Manager.GameData.Items[(short)_]).ToArray();
                 for (int j = 0; j < 8; j++)
                     con.Inventory[j] = inv[j];
                 con.Move(vaultChestPosition[0].X + 0.5f, vaultChestPosition[0].Y + 0.5f);
@@ -63,7 +69,7 @@ namespace wServer.realm.worlds
             }
             foreach (var i in vaultChestPosition)
             {
-                SellableObject x = new SellableObject(0x0505);
+                SellableObject x = new SellableObject(client.Manager, 0x0505);
                 x.Move(i.X + 0.5f, i.Y + 0.5f);
                 EnterWorld(x);
             }
@@ -71,8 +77,8 @@ namespace wServer.realm.worlds
 
         public void AddChest(VaultChest chest, Entity original)
         {
-            Container con = new Container(0x0504, null, false);
-            var inv = chest.Items.Select(_ => _ == -1 ? null : XmlDatas.ItemDescs[(short)_]).ToArray();
+            Container con = new Container(client.Manager, 0x0504, null, false);
+            var inv = chest.Items.Select(_ => _ == -1 ? null : Manager.GameData.Items[(short)_]).ToArray();
             for (int j = 0; j < 8; j++)
                 con.Inventory[j] = inv[j];
             con.Move(original.X, original.Y);

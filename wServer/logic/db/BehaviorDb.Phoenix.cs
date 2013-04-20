@@ -11,7 +11,7 @@ namespace wServer.logic
 {
     partial class BehaviorDb
     {
-        static _ Phoenix = Behav()
+        _ Phoenix = () => Behav()
             .Init("Phoenix Lord",
                     new State(
                         new Shoot(10, count: 4, shootAngle: 7, predictive: 0.5, coolDown: 600),

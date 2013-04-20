@@ -20,7 +20,7 @@ namespace wServer.logic.behaviors
         public Order(double range, string children, string targetState)
         {
             this.range = range;
-            this.children = XmlDatas.IdToType[children];
+            this.children = BehaviorDb.InitGameData.IdToType[children];
             this.targetStateName = targetState;
         }
 
@@ -40,7 +40,7 @@ namespace wServer.logic.behaviors
         protected override void TickCore(Entity host, RealmTime time, ref object state)
         {
             if (targetState == null)
-                this.targetState = FindState(BehaviorDb.Definitions[this.children].Item1, targetStateName);
+                this.targetState = FindState(host.Manager.Behaviors.Definitions[this.children].Item1, targetStateName);
             foreach (var i in host.GetNearestEntities(range, children))
                 if (!i.CurrentState.Is(targetState))
                     i.SwitchTo(targetState);

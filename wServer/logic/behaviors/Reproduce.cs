@@ -18,7 +18,7 @@ namespace wServer.logic.behaviors
 
         public Reproduce(string children = null, double densityRadius = 10, int densityMax = 5, Cooldown coolDown = new Cooldown())
         {
-            this.children = children == null ? null : (short?)XmlDatas.IdToType[children];
+            this.children = children == null ? null : (short?)BehaviorDb.InitGameData.IdToType[children];
             this.densityRadius = densityRadius;
             this.densityMax = densityMax;
             this.coolDown = coolDown.Normalize(60000);
@@ -35,7 +35,7 @@ namespace wServer.logic.behaviors
                 int count = host.CountEntity(densityRadius, children ?? host.ObjectType);
                 if (count < densityMax)
                 {
-                    Entity entity = Entity.Resolve(children ?? host.ObjectType);
+                    Entity entity = Entity.Resolve(host.Manager, children ?? host.ObjectType);
 
                     double targetX = host.X;
                     double targetY = host.Y;

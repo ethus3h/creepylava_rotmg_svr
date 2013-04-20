@@ -19,11 +19,13 @@ namespace server
         static readonly ManualResetEvent queueReady = new ManualResetEvent(false);
 
         internal static SimpleSettings Settings;
+        internal static XmlData GameData;
 
         static void Main(string[] args)
         {
             using (Settings = new SimpleSettings("server"))
             {
+                GameData = new XmlData();
                 int port = Settings.GetValue<int>("port", "8888");
 
                 listener = new HttpListener();

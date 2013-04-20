@@ -25,8 +25,8 @@ namespace wServer.realm.entities.player.commands
                 num = 1;
 
             short objType;
-            if (!XmlDatas.IdToType.TryGetValue(name, out objType) ||
-                !XmlDatas.ObjectDescs.ContainsKey(objType))
+            if (!player.Manager.GameData.IdToType.TryGetValue(name, out objType) ||
+                !player.Manager.GameData.ObjectDescs.ContainsKey(objType))
             {
                 player.SendError("Unknown entity!");
                 return false;
@@ -34,7 +34,7 @@ namespace wServer.realm.entities.player.commands
 
             for (int i = 0; i < num; i++)
             {
-                var entity = Entity.Resolve(objType);
+                var entity = Entity.Resolve(player.Manager, objType);
                 entity.Move(player.X, player.Y);
                 player.Owner.EnterWorld(entity);
             }
@@ -83,7 +83,7 @@ namespace wServer.realm.entities.player.commands
         protected override bool Process(Player player, RealmTime time, string args)
         {
             short objType;
-            if (!XmlDatas.IdToType.TryGetValue(args, out objType))
+            if (!player.Manager.GameData.IdToType.TryGetValue(args, out objType))
             {
                 player.SendError("Unknown item type!");
                 return false;
@@ -91,7 +91,7 @@ namespace wServer.realm.entities.player.commands
             for (int i = 0; i < player.Inventory.Length; i++)
                 if (player.Inventory[i] == null)
                 {
-                    player.Inventory[i] = XmlDatas.ItemDescs[objType];
+                    player.Inventory[i] = player.Manager.GameData.Items[objType];
                     player.UpdateCount++;
                     return true;
                 }
@@ -156,7 +156,7 @@ namespace wServer.realm.entities.player.commands
         {
             Player player;
             public Locater(Player player)
-                : base(0x0d5d)
+                : base(player.Manager, 0x0d5d)
             {
                 this.player = player;
                 Move(player.X, player.Y);

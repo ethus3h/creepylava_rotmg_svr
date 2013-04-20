@@ -18,7 +18,7 @@ namespace wServer.logic.transitions
             : base(targetState)
         {
             this.dist = dist;
-            this.target = XmlDatas.IdToType[target];
+            this.target = BehaviorDb.InitGameData.IdToType[target];
         }
 
         protected override bool TickCore(Entity host, RealmTime time, ref object state)

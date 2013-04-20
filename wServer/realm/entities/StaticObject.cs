@@ -25,16 +25,8 @@ namespace wServer.realm.entities
                 return null;
         }
 
-        static bool IsInteractive(short objType)
-        {
-            ObjectDesc desc;
-            if (XmlDatas.ObjectDescs.TryGetValue(objType, out desc))
-                return !(desc.Static && !desc.Enemy && !desc.EnemyOccupySquare);
-            else
-                return false;
-        }
-        public StaticObject(short objType, int? life, bool stat, bool dying, bool hittestable)
-            : base(objType, IsInteractive(objType))
+        public StaticObject(RealmManager manager, short objType, int? life, bool stat, bool dying, bool hittestable)
+            : base(manager, objType)
         {
             if (Vulnerable = life.HasValue)
                 HP = life.Value;

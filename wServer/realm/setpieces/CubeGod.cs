@@ -12,7 +12,7 @@ namespace wServer.realm.setpieces
 
         public void RenderSetPiece(World world, IntPoint pos)
         {
-            Entity cube = Entity.Resolve(0x0d59);
+            Entity cube = Entity.Resolve(world.Manager, 0x0d59);
             cube.Move(pos.X + 2.5f, pos.Y + 2.5f);
             world.EnterWorld(cube);
         }

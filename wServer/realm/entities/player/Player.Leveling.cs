@@ -193,12 +193,12 @@ namespace wServer.realm.entities
             {
                 Level++;
                 ExperienceGoal = GetExpGoal(Level);
-                foreach (XElement i in XmlDatas.TypeToElement[ObjectType].Elements("LevelIncrease"))
+                foreach (XElement i in Manager.GameData.TypeToElement[ObjectType].Elements("LevelIncrease"))
                 {
                     Random rand = new System.Random();
                     int min = int.Parse(i.Attribute("min").Value);
                     int max = int.Parse(i.Attribute("max").Value) + 1;
-                    int limit = int.Parse(XmlDatas.TypeToElement[ObjectType].Element(i.Value).Attribute("max").Value);
+                    int limit = int.Parse(Manager.GameData.TypeToElement[ObjectType].Element(i.Value).Attribute("max").Value);
                     int idx = StatsManager.StatsNameToIndex(i.Value);
                     Stats[idx] += rand.Next(min, max);
                     if (Stats[idx] > limit) Stats[idx] = limit;

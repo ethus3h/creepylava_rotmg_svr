@@ -34,7 +34,7 @@ namespace db
             return (int)(dateTime - new DateTime(1970, 1, 1).ToLocalTime()).TotalSeconds;
         }
 
-        public List<NewsItem> GetNews(Account acc)
+        public List<NewsItem> GetNews(XmlData dat, Account acc)
         {
             var cmd = CreateQuery();
             cmd.CommandText = "SELECT icon, title, text, link, date FROM news ORDER BY date LIMIT 10;";
@@ -66,7 +66,7 @@ AND characters.charId=death.chrId;";
                         {
                             Icon = "fame",
                             Title = string.Format("Your {0} died at level {1}",
-                                XmlDatas.TypeToId[(short)rdr.GetInt32("charType")],
+                                dat.TypeToId[(short)rdr.GetInt32("charType")],
                                 rdr.GetInt32("level")),
                             TagLine = string.Format("You earned {0} glorious Fame",
                                 rdr.GetInt32("totalFame")),
@@ -415,9 +415,9 @@ SELECT MAX(chestId) FROM vaults WHERE accId = @accId;";
             }
         }
 
-        public static Char CreateCharacter(short type, int chrId)
+        public static Char CreateCharacter(XmlData dat, short type, int chrId)
         {
-            XElement cls = XmlDatas.TypeToElement[type];
+            XElement cls = dat.TypeToElement[type];
             if (cls == null) return null;
             return new Char()
             {
@@ -544,7 +544,7 @@ bestFame = GREATEST(bestFame, @bestFame);";
             cmd.ExecuteNonQuery();
         }
 
-        public void Death(Account acc, Char chr, string killer)    //Save first
+        public void Death(XmlData dat, Account acc, Char chr, string killer)    //Save first
         {
             var cmd = CreateQuery();
             cmd.CommandText = @"UPDATE characters SET 
@@ -556,7 +556,7 @@ WHERE accId=@accId AND charId=@charId;";
             cmd.ExecuteNonQuery();
 
             bool firstBorn;
-            var finalFame = chr.FameStats.CalculateTotal(acc, chr, chr.CurrentFame, out firstBorn);
+            var finalFame = chr.FameStats.CalculateTotal(dat, acc, chr, chr.CurrentFame, out firstBorn);
 
             cmd = CreateQuery();
             cmd.CommandText = @"UPDATE stats SET 

@@ -21,7 +21,7 @@ namespace wServer.logic.behaviors
         public TossObject(string child, double range = 5, double? angle = null,
             Cooldown coolDown = new Cooldown(), int coolDownOffset = 0)
         {
-            this.child = XmlDatas.IdToType[child];
+            this.child = BehaviorDb.InitGameData.IdToType[child];
             this.range = range;
             this.angle = angle * Math.PI / 180;
             this.coolDown = coolDown.Normalize();
@@ -55,7 +55,7 @@ namespace wServer.logic.behaviors
                 }, null);
                 host.Owner.Timers.Add(new WorldTimer(1500, (world, t) =>
                 {
-                    Entity entity = Entity.Resolve(child);
+                    Entity entity = Entity.Resolve(world.Manager, child);
                     entity.Move(target.X, target.Y);
                     (entity as Enemy).Terrain = (host as Enemy).Terrain;
                     world.EnterWorld(entity);

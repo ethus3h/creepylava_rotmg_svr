@@ -15,7 +15,11 @@ namespace wServer.realm.worlds
             Name = "The Gauntlet";
             Background = 0;
             AllowTeleport = false;
-            base.FromWorldMap(typeof(RealmManager).Assembly.GetManifestResourceStream("wServer.realm.worlds.gauntlet.wmap"));            
+        }
+
+        protected override void Init()
+        {
+            base.FromWorldMap(typeof(RealmManager).Assembly.GetManifestResourceStream("wServer.realm.worlds.gauntlet.wmap"));
         }
 
         public override World GetInstance(Client client)

@@ -36,8 +36,8 @@ namespace wServer.realm.setpieces
 
         public int Size { get { return 27; } }
 
-        protected static readonly byte Floor = (byte)XmlDatas.IdToType["Rock"];
-        protected static readonly short Wall = XmlDatas.IdToType["Grey Wall"];
+        protected static readonly string Floor = "Rock";
+        protected static readonly string Wall = "Grey Wall";
 
         Random rand = new Random();
         public void RenderSetPiece(World world, IntPoint pos)
@@ -77,15 +77,15 @@ namespace wServer.realm.setpieces
 
             t[13 + 6, 13] = 3;
 
-
+            var dat = world.Manager.GameData;
             for (int x = 0; x < 27; x++)            //Rendering
                 for (int y = 0; y < 27; y++)
                 {
                     if (t[x, y] == 1)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Floor;
-                        tile.ObjType = Wall;
+                        tile.TileId = (byte)dat.IdToType[Floor];
+                        tile.ObjType = dat.IdToType[Wall];
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
                         world.Obstacles[x + pos.X, y + pos.Y] = 2;
                         world.Map[x + pos.X, y + pos.Y] = tile;
@@ -93,7 +93,7 @@ namespace wServer.realm.setpieces
                     else if (t[x, y] == 2)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Floor;
+                        tile.TileId = (byte)dat.IdToType[Floor];
                         tile.ObjType = 0;
                         world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
@@ -101,7 +101,7 @@ namespace wServer.realm.setpieces
 
                     else if (t[x, y] == 3)
                     {
-                        Entity cyclops = Entity.Resolve(0x0928);
+                        Entity cyclops = Entity.Resolve(world.Manager, 0x0928);
                         cyclops.Move(pos.X + x, pos.Y + y);
                         world.EnterWorld(cyclops);
                     }

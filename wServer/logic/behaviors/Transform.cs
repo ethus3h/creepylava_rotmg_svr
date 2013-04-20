@@ -13,12 +13,12 @@ namespace wServer.logic.behaviors
         short target;
         public Transform(string target)
         {
-            this.target = XmlDatas.IdToType[target];
+            this.target = BehaviorDb.InitGameData.IdToType[target];
         }
 
         protected override void TickCore(Entity host, RealmTime time, ref object state)
         {
-            Entity entity = Entity.Resolve(target);
+            Entity entity = Entity.Resolve(host.Manager, target);
 
             entity.Move(host.X, host.Y);
             host.Owner.EnterWorld(entity);

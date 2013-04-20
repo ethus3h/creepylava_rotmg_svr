@@ -11,7 +11,7 @@ namespace wServer.logic
 {
     partial class BehaviorDb
     {
-        static _ Deathmage = Behav()
+        _ Deathmage = () => Behav()
             .Init("Skeleton",
                     new State(
                         new Shoot(3),

@@ -30,8 +30,8 @@ namespace wServer.realm
         Item[] items;
         IContainer parent;
 
-        public Inventory(IContainer parent) : this(parent,new Item[12]) { }
-        public Inventory(IContainer parent,Item[] items)
+        public Inventory(IContainer parent) : this(parent, new Item[12]) { }
+        public Inventory(IContainer parent, Item[] items)
         {
             this.parent = parent;
             this.items = items;

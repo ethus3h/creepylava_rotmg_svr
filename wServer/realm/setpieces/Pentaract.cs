@@ -10,7 +10,7 @@ namespace wServer.realm.setpieces
     {
         public int Size { get { return 41; } }
 
-        static readonly byte Floor = (byte)XmlDatas.IdToType["Scorch Blend"];
+        static readonly string Floor = "Scorch Blend";
         static readonly byte[,] Circle = new byte[,]
         {
             { 0, 0, 1, 1, 1, 0, 0 },
@@ -42,30 +42,31 @@ namespace wServer.realm.setpieces
             }
             t[20, 20] = 3;
 
+            var data = world.Manager.GameData;
             for (int x = 0; x < 40; x++)
                 for (int y = 0; y < 40; y++)
                 {
                     if (t[x, y] == 1)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Floor; tile.ObjType = 0;
+                        tile.TileId = (byte)data.IdToType[Floor]; tile.ObjType = 0;
                         world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (t[x, y] == 2)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Floor; tile.ObjType = 0;
+                        tile.TileId = (byte)data.IdToType[Floor]; tile.ObjType = 0;
                         world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
 
-                        Entity penta = Entity.Resolve(0x0d5e);
+                        Entity penta = Entity.Resolve(world.Manager, 0x0d5e);
                         penta.Move(pos.X + x + .5f, pos.Y + y + .5f);
                         world.EnterWorld(penta);
                     }
                     else if (t[x, y] == 3)
                     {
-                        Entity penta = Entity.Resolve(0x0d5f);
+                        Entity penta = Entity.Resolve(world.Manager, 0x0d5f);
                         penta.Move(pos.X + x + .5f, pos.Y + y + .5f);
                         world.EnterWorld(penta);
                     }

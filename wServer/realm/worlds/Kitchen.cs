@@ -14,5 +14,10 @@ namespace wServer.realm.worlds
             Background = 0;
             base.FromWorldMap(typeof(RealmManager).Assembly.GetManifestResourceStream("wServer.realm.worlds.kitchen.wmap"));
         }
+
+        protected override void Init()
+        {
+            base.FromWorldMap(typeof(RealmManager).Assembly.GetManifestResourceStream("wServer.realm.worlds.kitchen.wmap"));
+        }
     }
 }

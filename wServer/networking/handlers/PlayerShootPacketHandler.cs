@@ -23,7 +23,7 @@ namespace wServer.networking.handlers
         {
             if (player.Owner == null) return;
 
-            Item item = XmlDatas.ItemDescs[packet.ContainerType];
+            Item item = player.Manager.GameData.Items[packet.ContainerType];
             var prjDesc = item.Projectiles[0]; //Assume only one
             Projectile prj = player.PlayerShootProjectile(
                 packet.BulletId, prjDesc, item.ObjectType,

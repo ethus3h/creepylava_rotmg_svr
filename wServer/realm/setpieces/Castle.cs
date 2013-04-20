@@ -11,12 +11,12 @@ namespace wServer.realm.setpieces
     {
         public int Size { get { return 40; } }
 
-        protected static readonly byte Floor = (byte)XmlDatas.IdToType["Rock"];
-        protected static readonly byte Bridge = (byte)XmlDatas.IdToType["Bridge"];
-        protected static readonly byte WaterA = (byte)XmlDatas.IdToType["Shallow Water"];
-        protected static readonly byte WaterB = (byte)XmlDatas.IdToType["Dark Water"];
-        protected static readonly short WallA = XmlDatas.IdToType["Grey Wall"];
-        protected static readonly short WallB = XmlDatas.IdToType["Destructible Grey Wall"];
+        protected static readonly string Floor = "Rock";
+        protected static readonly string Bridge = "Bridge";
+        protected static readonly string WaterA = "Shallow Water";
+        protected static readonly string WaterB = "Dark Water";
+        protected static readonly string WallA = "Grey Wall";
+        protected static readonly string WallB = "Destructible Grey Wall";
 
         protected static readonly Loot chest = new Loot(
                 new TierLoot(6, ItemType.Weapon, 0.3),
@@ -111,13 +111,14 @@ namespace wServer.realm.setpieces
                 t = SetPieces.rotateCW(t);
             int w = t.GetLength(0), h = t.GetLength(1);
 
+            var dat = world.Manager.GameData;
             for (int x = 0; x < w; x++)     //Rendering
                 for (int y = 0; y < h; y++)
                 {
                     if (t[x, y] == 1)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Floor;
+                        tile.TileId = (byte)dat.IdToType[Floor];
                         tile.ObjType = 0;
                         world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
@@ -126,7 +127,7 @@ namespace wServer.realm.setpieces
                     else if (t[x, y] == 2)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = WaterA;
+                        tile.TileId = (byte)dat.IdToType[WaterA];
                         tile.ObjType = 0;
                         world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
@@ -134,7 +135,7 @@ namespace wServer.realm.setpieces
                     else if (t[x, y] == 3)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = WaterB;
+                        tile.TileId = (byte)dat.IdToType[WaterB];
                         tile.ObjType = 0;
                         world.Obstacles[x + pos.X, y + pos.Y] = 3;
                         world.Map[x + pos.X, y + pos.Y] = tile;
@@ -143,8 +144,8 @@ namespace wServer.realm.setpieces
                     else if (t[x, y] == 4)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Floor;
-                        tile.ObjType = WallA;
+                        tile.TileId = (byte)dat.IdToType[Floor];
+                        tile.ObjType = dat.IdToType[WallA];
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
                         world.Obstacles[x + pos.X, y + pos.Y] = 2;
                         world.Map[x + pos.X, y + pos.Y] = tile;
@@ -152,10 +153,10 @@ namespace wServer.realm.setpieces
                     else if (t[x, y] == 5)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Floor;
+                        tile.TileId = (byte)dat.IdToType[Floor];
                         world.Obstacles[x + pos.X, y + pos.Y] = 2;
                         world.Map[x + pos.X, y + pos.Y] = tile;
-                        Entity wall = Entity.Resolve(WallB);
+                        Entity wall = Entity.Resolve(world.Manager, dat.IdToType[WallB]);
                         wall.Move(x + pos.X + 0.5f, y + pos.Y + 0.5f);
                         world.EnterWorld(wall);
                     }
@@ -163,14 +164,14 @@ namespace wServer.realm.setpieces
                     else if (t[x, y] == 6)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Bridge;
+                        tile.TileId = (byte)dat.IdToType[Bridge];
                         world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (t[x, y] == 7)
                     {
-                        Container container = new Container(0x0501, null, false);
-                        Item[] items = chest.GetLoots(5, 8).ToArray();
+                        Container container = new Container(world.Manager, 0x0501, null, false);
+                        Item[] items = chest.GetLoots(world.Manager, 5, 8).ToArray();
                         for (int i = 0; i < items.Length; i++)
                             container.Inventory[i] = items[i];
                         container.Move(pos.X + x + 0.5f, pos.Y + y + 0.5f);
@@ -178,7 +179,7 @@ namespace wServer.realm.setpieces
                     }
                     else if (t[x, y] == 8)
                     {
-                        Entity cyclops = Entity.Resolve(0x67d);
+                        Entity cyclops = Entity.Resolve(world.Manager, 0x67d);
                         cyclops.Move(pos.X + x, pos.Y + y);
                         world.EnterWorld(cyclops);
                     }

@@ -14,7 +14,7 @@ namespace wServer.logic.behaviors
         float probability;
         public TransformOnDeath(string target, int min = 1, int max = 1, double probability = 1)
         {
-            this.target = XmlDatas.IdToType[target];
+            this.target = BehaviorDb.InitGameData.IdToType[target];
             this.min = min;
             this.max = max;
             this.probability = (float)probability;
@@ -30,7 +30,7 @@ namespace wServer.logic.behaviors
                     int count = Random.Next(min, max + 1);
                     for (int i = 0; i < count; i++)
                     {
-                        Entity entity = Entity.Resolve(target);
+                        Entity entity = Entity.Resolve(e.Host.Manager, target);
 
                         entity.Move(e.Host.X, e.Host.Y);
                         e.Host.Owner.EnterWorld(entity);

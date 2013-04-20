@@ -14,9 +14,9 @@ namespace wServer.realm.setpieces
             get { return 30; }
         }
 
-        static readonly byte Floor = (byte)XmlDatas.IdToType["Light Grass"];
-        static readonly byte Water = (byte)XmlDatas.IdToType["Shallow Water"];
-        static readonly short Tree = XmlDatas.IdToType["Palm Tree"];
+        static readonly string Floor = "Light Grass";
+        static readonly string Water = "Shallow Water";
+        static readonly string Tree = "Palm Tree";
 
         protected static readonly Loot chest = new Loot(
                 new TierLoot(5, ItemType.Weapon, 0.3),
@@ -90,40 +90,41 @@ namespace wServer.realm.setpieces
             foreach (var i in trees)
                 t[i.X, i.Y] = 3;
 
+            var dat = world.Manager.GameData;
             for (int x = 0; x < Size; x++)
                 for (int y = 0; y < Size; y++)
                 {
                     if (t[x, y] == 1)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Floor; tile.ObjType = 0;
+                        tile.TileId = (byte)dat.IdToType[Floor]; tile.ObjType = 0;
                         world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (t[x, y] == 2)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Water; tile.ObjType = 0;
+                        tile.TileId = (byte)dat.IdToType[Water]; tile.ObjType = 0;
                         world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (t[x, y] == 3)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Floor;
-                        tile.ObjType = Tree; tile.Name = "size:" + (rand.Next() % 2 == 0 ? 120 : 140);
+                        tile.TileId = (byte)dat.IdToType[Floor];
+                        tile.ObjType = dat.IdToType[Tree]; tile.Name = "size:" + (rand.Next() % 2 == 0 ? 120 : 140);
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
                         world.Obstacles[x + pos.X, y + pos.Y] = 2;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                 }
 
-            Entity giant = Entity.Resolve(0x678);
+            Entity giant = Entity.Resolve(world.Manager, 0x678);
             giant.Move(pos.X + 15.5f, pos.Y + 15.5f);
             world.EnterWorld(giant);
 
-            Container container = new Container(0x0501, null, false);
-            Item[] items = chest.GetLoots(5, 8).ToArray();
+            Container container = new Container(world.Manager, 0x0501, null, false);
+            Item[] items = chest.GetLoots(world.Manager, 5, 8).ToArray();
             for (int i = 0; i < items.Length; i++)
                 container.Inventory[i] = items[i];
             container.Move(pos.X + 15.5f, pos.Y + 15.5f);

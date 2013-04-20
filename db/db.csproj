@@ -75,9 +75,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="data\Descriptors.cs" />
+    <Compile Include="Descriptors.cs" />
     <Compile Include="Database.cs" />
-    <Compile Include="data\XmlDatas.cs" />
+    <Compile Include="ReadonlyDictionary.cs" />
+    <Compile Include="XmlData.cs" />
     <Compile Include="FameStats.cs" />
     <Compile Include="Models.cs" />
     <Compile Include="NReader.cs" />
@@ -90,46 +91,118 @@
   <ItemGroup>
     <EmbeddedResource Include="data\addition.xml">
       <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
     <Content Include="struct.sql" />
-    <EmbeddedResource Include="data\dat0.xml" />
-    <EmbeddedResource Include="data\dat1.xml" />
-    <EmbeddedResource Include="data\dat10.xml" />
-    <EmbeddedResource Include="data\dat11.xml" />
-    <EmbeddedResource Include="data\dat12.xml" />
-    <EmbeddedResource Include="data\dat13.xml" />
-    <EmbeddedResource Include="data\dat14.xml" />
-    <EmbeddedResource Include="data\dat15.xml" />
-    <EmbeddedResource Include="data\dat16.xml" />
-    <EmbeddedResource Include="data\dat17.xml" />
-    <EmbeddedResource Include="data\dat18.xml" />
-    <EmbeddedResource Include="data\dat19.xml" />
-    <EmbeddedResource Include="data\dat2.xml" />
+    <EmbeddedResource Include="data\dat0.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat1.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat10.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat11.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat12.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat13.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat14.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat15.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat16.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat17.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat18.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat19.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat2.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <EmbeddedResource Include="data\dat20.xml">
       <SubType>Designer</SubType>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </EmbeddedResource>
-    <EmbeddedResource Include="data\dat21.xml" />
-    <EmbeddedResource Include="data\dat22.xml" />
-    <EmbeddedResource Include="data\dat23.xml" />
-    <EmbeddedResource Include="data\dat24.xml" />
-    <EmbeddedResource Include="data\dat3.xml" />
-    <EmbeddedResource Include="data\dat4.xml" />
-    <EmbeddedResource Include="data\dat5.xml" />
-    <EmbeddedResource Include="data\dat6.xml" />
-    <EmbeddedResource Include="data\dat7.xml" />
-    <EmbeddedResource Include="data\dat8.xml" />
-    <EmbeddedResource Include="data\dat9.xml" />
-    <EmbeddedResource Include="data\dat25.xml" />
-    <EmbeddedResource Include="data\dat26.xml" />
-    <EmbeddedResource Include="data\dat27.xml" />
-    <EmbeddedResource Include="data\dat28.xml" />
-    <EmbeddedResource Include="data\dat29.xml" />
-    <EmbeddedResource Include="data\dat30.xml" />
-    <EmbeddedResource Include="data\dat31.xml" />
-    <EmbeddedResource Include="data\dat32.xml" />
-    <EmbeddedResource Include="data\dat33.xml" />
-    <EmbeddedResource Include="data\dat34.xml" />
-    <EmbeddedResource Include="data\dat35.xml" />
+    <EmbeddedResource Include="data\dat21.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat22.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat23.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat24.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat3.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat4.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat5.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat6.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat7.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat8.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat9.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat25.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat26.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat27.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat28.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat29.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat30.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat31.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat32.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat33.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat34.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="data\dat35.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </EmbeddedResource>
     <Content Include="objects.txt" />
   </ItemGroup>
   <ItemGroup>

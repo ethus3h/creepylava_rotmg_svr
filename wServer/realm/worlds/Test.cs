@@ -18,7 +18,7 @@ namespace wServer.realm.worlds
 
         public void LoadJson(string json)
         {
-            FromWorldMap(new MemoryStream(Json2Wmap.Convert(json)));
-        }                                                   
+            FromWorldMap(new MemoryStream(Json2Wmap.Convert(Manager.GameData, json)));
+        }
     }
 }

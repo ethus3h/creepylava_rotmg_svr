@@ -37,7 +37,7 @@ namespace wServer.networking.handlers
                 return;
             }
 
-            client.Character = Database.CreateCharacter(packet.ObjectType, nextCharId);
+            client.Character = Database.CreateCharacter(client.Manager.GameData, packet.ObjectType, nextCharId);
 
             int[] stats = new int[]
             {

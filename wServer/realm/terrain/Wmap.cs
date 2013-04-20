@@ -117,6 +117,12 @@ namespace wServer.realm.terrain
     }
     public class Wmap
     {
+        XmlData dat;
+        public Wmap(XmlData dat)
+        {
+            this.dat = dat;
+        }
+
         public int Width { get; set; }
         public int Height { get; set; }
 
@@ -149,7 +155,7 @@ namespace wServer.realm.terrain
                 WmapTile tile = new WmapTile();
                 tile.TileId = (byte)reader.ReadInt16();
                 string obj = reader.ReadString();
-                tile.ObjType = string.IsNullOrEmpty(obj) ? (short)0 : XmlDatas.IdToType[obj];
+                tile.ObjType = string.IsNullOrEmpty(obj) ? (short)0 : dat.IdToType[obj];
                 tile.Name = reader.ReadString();
                 tile.Terrain = (WmapTerrain)reader.ReadByte();
                 tile.Region = (TileRegion)reader.ReadByte();
@@ -168,7 +174,7 @@ namespace wServer.realm.terrain
 
                     ObjectDesc desc;
                     if (tile.ObjType != 0 &&
-                        (!XmlDatas.ObjectDescs.TryGetValue(tile.ObjType, out desc) ||
+                        (!dat.ObjectDescs.TryGetValue(tile.ObjType, out desc) ||
                         !desc.Static || desc.Enemy))
                     {
                         entities.Add(new Tuple<IntPoint, short, string>(new IntPoint(x, y), tile.ObjType, tile.Name));
@@ -197,7 +203,7 @@ namespace wServer.realm.terrain
                 WmapTile tile = new WmapTile();
                 tile.TileId = (byte)reader.ReadInt16();
                 string obj = reader.ReadString();
-                tile.ObjType = string.IsNullOrEmpty(obj) ? (short)0 : XmlDatas.IdToType[obj];
+                tile.ObjType = string.IsNullOrEmpty(obj) ? (short)0 : dat.IdToType[obj];
                 tile.Name = reader.ReadString();
                 tile.Terrain = (WmapTerrain)reader.ReadByte();
                 tile.Region = (TileRegion)reader.ReadByte();
@@ -217,7 +223,7 @@ namespace wServer.realm.terrain
 
                     ObjectDesc desc;
                     if (tile.ObjType != 0 &&
-                        (!XmlDatas.ObjectDescs.TryGetValue(tile.ObjType, out desc) ||
+                        (!dat.ObjectDescs.TryGetValue(tile.ObjType, out desc) ||
                         !desc.Static || desc.Enemy))
                     {
                         entities.Add(new Tuple<IntPoint, short, string>(new IntPoint(x, y), tile.ObjType, tile.Name));
@@ -246,7 +252,7 @@ namespace wServer.realm.terrain
                 WmapTile tile = new WmapTile();
                 tile.TileId = (byte)reader.ReadInt16();
                 string obj = reader.ReadString();
-                tile.ObjType = string.IsNullOrEmpty(obj) ? (short)0 : XmlDatas.IdToType[obj];
+                tile.ObjType = string.IsNullOrEmpty(obj) ? (short)0 : dat.IdToType[obj];
                 tile.Name = reader.ReadString();
                 tile.Terrain = (WmapTerrain)reader.ReadByte();
                 tile.Region = (TileRegion)reader.ReadByte();
@@ -266,7 +272,7 @@ namespace wServer.realm.terrain
 
                     ObjectDesc desc;
                     if (tile.ObjType != 0 &&
-                        (!XmlDatas.ObjectDescs.TryGetValue(tile.ObjType, out desc) ||
+                        (!dat.ObjectDescs.TryGetValue(tile.ObjType, out desc) ||
                         !desc.Static || desc.Enemy))
                     {
                         entities.Add(new Tuple<IntPoint, short, string>(new IntPoint(x, y), tile.ObjType, tile.Name));
@@ -286,11 +292,11 @@ namespace wServer.realm.terrain
             return enCount;
         }
 
-        public IEnumerable<Entity> InstantiateEntities()
+        public IEnumerable<Entity> InstantiateEntities(RealmManager manager)
         {
             foreach (var i in entities)
             {
-                var entity = Entity.Resolve(i.Item2);
+                var entity = Entity.Resolve(manager, i.Item2);
                 entity.Move(i.Item1.X + 0.5f, i.Item1.Y + 0.5f);
                 if (i.Item3 != null)
                     foreach (var item in i.Item3.Split(';'))

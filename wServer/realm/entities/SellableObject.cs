@@ -12,8 +12,8 @@ namespace wServer.realm.entities
         const int BUY_NO_GOLD = 3;
         const int BUY_NO_FAME = 6;
 
-        public SellableObject(short objType)
-            : base(objType, null, true, false, false)
+        public SellableObject(RealmManager manager, short objType)
+            : base(manager, objType, null, true, false, false)
         {
             if (objType == 0x0505)  //Vault chest
             {

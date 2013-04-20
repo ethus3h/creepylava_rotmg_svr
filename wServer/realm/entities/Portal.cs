@@ -8,8 +8,8 @@ namespace wServer.realm.entities
 {
     public class Portal : StaticObject
     {
-        public Portal(short objType, int? life)
-            : base(objType, life, false, true, false)
+        public Portal(RealmManager manager, short objType, int? life)
+            : base(manager, objType, life, false, true, false)
         {
             Usable = true;
         }

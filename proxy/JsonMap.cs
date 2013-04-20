@@ -11,6 +11,11 @@ namespace wServer.realm
 {
     class JsonMap
     {
+        XmlData dat;
+        public JsonMap(XmlData dat)
+        {
+            this.dat = dat;
+        }
         public int Width { get; set; }
         public int Height { get; set; }
         public Tile[][] Tiles { get; private set; }
@@ -62,7 +67,7 @@ namespace wServer.realm
                     {
                         var loc = obj.dict[rdr.ReadInt16()];
                         if (loc.ground != null)
-                            Tiles[x][y] = (Tile)XmlDatas.IdToType[loc.ground];
+                            Tiles[x][y] = (Tile)this.dat.IdToType[loc.ground];
                         else
                             Tiles[x][y] = (Tile)0xff;
                         if (loc.objs != null)
@@ -88,14 +93,14 @@ namespace wServer.realm
                     for (int x = 0; x < obj.width; x++)
                     {
                         var loc = new loc();
-                        loc.ground = XmlDatas.TypeToId[(short)Tiles[x][y]];
+                        loc.ground = dat.TypeToId[(short)Tiles[x][y]];
                         loc.objs = new obj[Entities[x][y].Length];
                         for (int i = 0; i < loc.objs.Length; i++)
                         {
                             var en = Entities[x][y][i];
                             obj o = new obj()
                             {
-                                id = XmlDatas.TypeToId[(short)en.ObjectType]
+                                id = dat.TypeToId[(short)en.ObjectType]
                             };
                             string s = "";
                             Dictionary<StatsType, object> vals = new Dictionary<StatsType, object>();

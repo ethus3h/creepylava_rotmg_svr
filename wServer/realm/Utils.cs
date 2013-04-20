@@ -183,7 +183,7 @@ namespace wServer
 
             var objId = entity.Owner.Map[(int)x, (int)y].ObjType;
             if (objId != 0 &&
-                XmlDatas.ObjectDescs[objId].OccupySquare)
+                entity.Manager.GameData.ObjectDescs[objId].OccupySquare)
                 return false;
 
             if (entity.Owner.Obstacles[(int)x, (int)y] != 0)

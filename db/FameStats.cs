@@ -121,7 +121,7 @@ public class FameStats
         return ret.ToArray();
     }
 
-    public int CalculateTotal(Account acc, Char chr, int baseFame, out bool firstBorn)
+    public int CalculateTotal(XmlData data, Account acc, Char chr, int baseFame, out bool firstBorn)
     {
         int bonus = 0;
         if (chr.CharacterId < 2)            //Ancestor
@@ -209,7 +209,7 @@ public class FameStats
         for (int i = 0; i < 4; i++)         //Well Equipped
         {
             if (chr.Equipment[i] == -1) continue;
-            var b = XmlDatas.ItemDescs[chr.Equipment[i]].FameBonus;
+            var b = data.Items[chr.Equipment[i]].FameBonus;
             if (b > 0)
                 bonus += baseFame * b / 100;
         }
@@ -224,7 +224,7 @@ public class FameStats
         return (int)(baseFame + bonus);
     }
 
-    void SerializeBonus(XmlDocument doc, Account acc, Char chr, int baseFame, bool firstBorn)
+    void SerializeBonus(XmlDocument doc, XmlData dat, Account acc, Char chr, int baseFame, bool firstBorn)
     {
         if (chr.CharacterId < 2)            //Ancestor
         {
@@ -456,7 +456,7 @@ public class FameStats
         for (int i = 0; i < 4; i++)         //Well Equipped
         {
             if (chr.Equipment[i] == -1) continue;
-            var b = XmlDatas.ItemDescs[chr.Equipment[i]].FameBonus;
+            var b = dat.Items[chr.Equipment[i]].FameBonus;
             if (b > 0)
                 bo += baseFame * b / 100;
         }
@@ -485,7 +485,7 @@ public class FameStats
             doc.DocumentElement.AppendChild(x);
         }
     }
-    public string Serialize(Account acc, Char chr, int time, string killer, bool firstBorn)
+    public string Serialize(XmlData dat, Account acc, Char chr, int time, string killer, bool firstBorn)
     {
         __Char = chr;
         XmlDocument xmlDoc = new XmlDocument();
@@ -502,13 +502,13 @@ public class FameStats
 
         xmlDoc.SelectSingleNode("/Fame/Char").AppendChild(ac);
 
-        SerializeBonus(xmlDoc, acc, chr, chr.CurrentFame, firstBorn);
+        SerializeBonus(xmlDoc, dat, acc, chr, chr.CurrentFame, firstBorn);
 
         XmlElement basFame = xmlDoc.CreateElement("BaseFame");
         basFame.InnerText = chr.CurrentFame.ToString();
         xmlDoc.DocumentElement.AppendChild(basFame);
         XmlElement totalFame = xmlDoc.CreateElement("TotalFame");
-        totalFame.InnerText = CalculateTotal(acc, chr, chr.CurrentFame, out firstBorn).ToString();
+        totalFame.InnerText = CalculateTotal(dat, acc, chr, chr.CurrentFame, out firstBorn).ToString();
         xmlDoc.DocumentElement.AppendChild(totalFame);
         XmlElement deathTime = xmlDoc.CreateElement("CreatedOn");
         deathTime.InnerText = time.ToString();

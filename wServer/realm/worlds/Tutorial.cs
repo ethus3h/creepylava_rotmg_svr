@@ -14,10 +14,13 @@ namespace wServer.realm.worlds
             Id = TUT_ID;
             Name = "Tutorial";
             Background = 0;
-            if (!(IsLimbo = isLimbo))
-            {
+            IsLimbo = isLimbo;
+        }
+
+        protected override void Init()
+        {
+            if (!IsLimbo)
                 base.FromWorldMap(typeof(RealmManager).Assembly.GetManifestResourceStream("wServer.realm.worlds.tutorial.wmap"));
-            }
         }
 
         public override World GetInstance(Client client)

@@ -62,7 +62,7 @@ namespace db
             if (!values.TryGetValue(key, out ret))
             {
                 if (def == null)
-                    throw new ArgumentException(string.Format("'{0}' does not exist in settings."));
+                    throw new ArgumentException(string.Format("'{0}' does not exist in settings.", key));
                 ret = values[key] = def;
             }
             return (T)Convert.ChangeType(ret, typeof(T));

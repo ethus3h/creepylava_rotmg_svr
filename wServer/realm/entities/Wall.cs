@@ -11,8 +11,8 @@ namespace wServer.realm.entities
 {
     public class Wall : StaticObject
     {
-        public Wall(short objType, XElement node)
-            : base(objType, GetHP(node), true, false, true)
+        public Wall(RealmManager manager, short objType, XElement node)
+            : base(manager, objType, GetHP(node), true, false, true)
         {
         }
 

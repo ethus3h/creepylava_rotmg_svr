@@ -26,6 +26,7 @@ namespace wServer
             {
                 RealmManager manager = new RealmManager();
                 manager.Initialize();
+                manager.Run();
 
                 Server server = new Server(manager, 2050);
                 PolicyServer policy = new PolicyServer();
@@ -41,7 +42,7 @@ namespace wServer
                 Console.WriteLine("Terminating...");
                 server.Stop();
                 policy.Stop();
-                manager.Terminate();
+                manager.Stop();
             }
         }
     }

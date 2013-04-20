@@ -28,18 +28,25 @@ namespace wServer.realm
             Projectiles = new ConcurrentDictionary<Tuple<int, byte>, Projectile>();
             StaticObjects = new ConcurrentDictionary<int, StaticObject>();
             Timers = new List<WorldTimer>();
-            ClientXML = ExtraXML = Empty<string>.Array;
-            Map = new Wmap();
+            ExtraXML = Empty<string>.Array;
             AllowTeleport = true;
             ShowDisplays = true;
-
-            ExtraXML = new string[] { XmlDatas.AdditionXml };
         }
 
         public bool IsLimbo { get; protected set; }
         public virtual World GetInstance(Client client) { return null; }
 
-        public RealmManager Manager { get; internal set; }
+        RealmManager manager;
+        public RealmManager Manager
+        {
+            get { return manager; }
+            internal set
+            {
+                manager = value;
+                if (manager != null)
+                    Init();
+            }
+        }
         public int Id { get; internal set; }
         public string Name { get; protected set; }
 
@@ -56,7 +63,6 @@ namespace wServer.realm
 
         public bool AllowTeleport { get; protected set; }
         public bool ShowDisplays { get; protected set; }
-        public string[] ClientXML { get; protected set; }
         public string[] ExtraXML { get; protected set; }
 
         public Wmap Map { get; private set; }
@@ -82,23 +88,24 @@ namespace wServer.realm
             return true;
         }
 
+        protected virtual void Init() { }
+
         protected void FromWorldMap(System.IO.Stream dat)
         {
-            Wmap map = new Wmap();
-            this.Map = map;
+            this.Map = new Wmap(Manager.GameData);
             entityInc = 0;
-            entityInc += map.Load(dat, 0);
+            entityInc += Map.Load(dat, 0);
 
-            int w = map.Width, h = map.Height;
+            int w = Map.Width, h = Map.Height;
             Obstacles = new byte[w, h];
             for (int y = 0; y < h; y++)
                 for (int x = 0; x < w; x++)
                 {
-                    var tile = map[x, y];
+                    var tile = Map[x, y];
                     ObjectDesc desc;
-                    if (XmlDatas.TileDescs[tile.TileId].NoWalk)
+                    if (Manager.GameData.Tiles[tile.TileId].NoWalk)
                         Obstacles[x, y] = 3;
-                    if (XmlDatas.ObjectDescs.TryGetValue(tile.ObjType, out desc))
+                    if (Manager.GameData.ObjectDescs.TryGetValue(tile.ObjType, out desc))
                     {
                         if (desc.Class == "Wall" ||
                             desc.Class == "ConnectedWall" ||
@@ -116,7 +123,7 @@ namespace wServer.realm
             StaticObjects.Clear();
             Enemies.Clear();
             Players.Clear();
-            foreach (var i in map.InstantiateEntities())
+            foreach (var i in Map.InstantiateEntities(Manager))
             {
                 if (i.ObjectDesc != null &&
                     (i.ObjectDesc.OccupySquare || i.ObjectDesc.EnemyOccupySquare))

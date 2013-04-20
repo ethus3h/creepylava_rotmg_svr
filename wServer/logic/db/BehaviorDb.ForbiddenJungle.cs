@@ -11,7 +11,7 @@ namespace wServer.logic
 {
     partial class BehaviorDb
     {
-        static _ ForbiddenJungle = Behav()
+        _ ForbiddenJungle = () => Behav()
             .Init("Great Coil Snake",
                     new State(
                         new Prioritize(

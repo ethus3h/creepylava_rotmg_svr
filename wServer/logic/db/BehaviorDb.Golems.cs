@@ -11,7 +11,7 @@ namespace wServer.logic
 {
     partial class BehaviorDb
     {
-        static _ Golems = Behav()
+        _ Golems = () => Behav()
             .Init("Red Satellite",
                     new State(
                         new Prioritize(

@@ -9,8 +9,8 @@ namespace wServer.realm.setpieces
     {
         public int Size { get { return 21; } }
 
-        static readonly byte Floor = (byte)XmlDatas.IdToType["Brown Lines"];
-        static readonly short Wall = XmlDatas.IdToType["Wooden Wall"];
+        static readonly string Floor = "Brown Lines";
+        static readonly string Wall = "Wooden Wall";
 
         Random rand = new Random();
         public void RenderSetPiece(World world, IntPoint pos)
@@ -78,13 +78,14 @@ namespace wServer.realm.setpieces
                 t = SetPieces.rotateCW(t);
             w = t.GetLength(0); h = t.GetLength(1);
 
+            var dat = world.Manager.GameData;
             for (int x = 0; x < w; x++)                     //Rendering
                 for (int y = 0; y < h; y++)
                 {
                     if (t[x, y] == 1)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.ObjType = Wall;
+                        tile.ObjType = dat.IdToType[Wall];
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
                         world.Obstacles[x + pos.X, y + pos.Y] = 2;
                         world.Map[x + pos.X, y + pos.Y] = tile;
@@ -92,7 +93,7 @@ namespace wServer.realm.setpieces
                     else if (t[x, y] == 2)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Floor; tile.ObjType = 0;
+                        tile.TileId = (byte)dat.IdToType[Floor]; tile.ObjType = 0;
                         world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }

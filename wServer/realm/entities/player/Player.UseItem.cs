@@ -93,7 +93,7 @@ namespace wServer.realm.entities
             if (item.Consumable)
             {
                 if (item.SuccessorId != null)
-                    container.Inventory[slot] = XmlDatas.ItemDescs[XmlDatas.IdToType[item.SuccessorId]];
+                    container.Inventory[slot] = Manager.GameData.Items[Manager.GameData.IdToType[item.SuccessorId]];
                 else
                     container.Inventory[slot] = null;
                 UpdateCount++;
@@ -613,7 +613,7 @@ namespace wServer.realm.entities
                                 TargetId = Id,
                                 PosA = target
                             }, p => this.Dist(p) < 25);
-                            Placeholder x = new Placeholder(1500);
+                            Placeholder x = new Placeholder(Manager, 1500);
                             x.Move(target.X, target.Y);
                             Owner.EnterWorld(x);
                             Owner.Timers.Add(new WorldTimer(1500, (world, t) =>
@@ -670,7 +670,7 @@ namespace wServer.realm.entities
                                 case StatsType.Dexterity: idx = 7; break;
                             }
                             Stats[idx] += eff.Amount;
-                            int limit = int.Parse(XmlDatas.TypeToElement[ObjectType].Element(StatsManager.StatsIndexToName(idx)).Attribute("max").Value);
+                            int limit = int.Parse(Manager.GameData.TypeToElement[ObjectType].Element(StatsManager.StatsIndexToName(idx)).Attribute("max").Value);
                             if (Stats[idx] > limit)
                                 Stats[idx] = limit;
                             UpdateCount++;
@@ -678,12 +678,12 @@ namespace wServer.realm.entities
                     case ActivateEffects.Create: //this is a portal
                         {
                             short objType;
-                            if (!XmlDatas.IdToType.TryGetValue(eff.Id, out objType) ||
-                                !XmlDatas.PortalDescs.ContainsKey(objType))
+                            if (!Manager.GameData.IdToType.TryGetValue(eff.Id, out objType) ||
+                                !Manager.GameData.Portals.ContainsKey(objType))
                                 break;// object not found, ignore
-                            var entity = Entity.Resolve(objType);
+                            var entity = Entity.Resolve(Manager, objType);
                             entity.Move(X, Y);
-                            int TimeoutTime = XmlDatas.PortalDescs[objType].TimeoutTime;
+                            int TimeoutTime = Manager.GameData.Portals[objType].TimeoutTime;
 
                             Owner.EnterWorld(entity);
                             World w = Manager.GetWorld(Owner.Id); //can't use Owner here, as it goes out of scope

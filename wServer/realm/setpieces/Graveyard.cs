@@ -11,10 +11,10 @@ namespace wServer.realm.setpieces
     {
         public int Size { get { return 34; } }
 
-        protected static readonly byte Floor = (byte)XmlDatas.IdToType["Grass"];
-        protected static readonly short WallA = XmlDatas.IdToType["Grey Wall"];
-        protected static readonly short WallB = XmlDatas.IdToType["Destructible Grey Wall"];
-        protected static readonly short Cross = XmlDatas.IdToType["Cross"];
+        protected static readonly string Floor = "Grass";
+        protected static readonly string WallA = "Grey Wall";
+        protected static readonly string WallB = "Destructible Grey Wall";
+        protected static readonly string Cross = "Cross";
 
         protected static readonly Loot chest = new Loot(
                 new TierLoot(4, ItemType.Weapon, 0.3),
@@ -81,13 +81,14 @@ namespace wServer.realm.setpieces
                 t = SetPieces.rotateCW(t);
             int w = t.GetLength(0), h = t.GetLength(1);
 
+            var dat = world.Manager.GameData;
             for (int x = 0; x < w; x++)     //Rendering
                 for (int y = 0; y < h; y++)
                 {
                     if (t[x, y] == 1)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Floor;
+                        tile.TileId = (byte)dat.IdToType[Floor];
                         tile.ObjType = 0;
                         world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
@@ -95,8 +96,8 @@ namespace wServer.realm.setpieces
                     else if (t[x, y] == 2)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Floor;
-                        tile.ObjType = WallA;
+                        tile.TileId = (byte)dat.IdToType[Floor];
+                        tile.ObjType = dat.IdToType[WallA];
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
                         world.Obstacles[x + pos.X, y + pos.Y] = 2;
                         world.Map[x + pos.X, y + pos.Y] = tile;
@@ -104,26 +105,26 @@ namespace wServer.realm.setpieces
                     else if (t[x, y] == 3)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Floor;
+                        tile.TileId = (byte)dat.IdToType[Floor];
                         world.Obstacles[x + pos.X, y + pos.Y] = 2;
                         world.Map[x + pos.X, y + pos.Y] = tile;
-                        Entity wall = Entity.Resolve(WallB);
+                        Entity wall = Entity.Resolve(world.Manager, dat.IdToType[WallB]);
                         wall.Move(x + pos.X + 0.5f, y + pos.Y + 0.5f);
                         world.EnterWorld(wall);
                     }
                     else if (t[x, y] == 4)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = Floor;
-                        tile.ObjType = Cross;
+                        tile.TileId = (byte)dat.IdToType[Floor];
+                        tile.ObjType = dat.IdToType[Cross];
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
                         world.Obstacles[x + pos.X, y + pos.Y] = 2;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (t[x, y] == 5)
                     {
-                        Container container = new Container(0x0501, null, false);
-                        Item[] items = chest.GetLoots(3, 8).ToArray();
+                        Container container = new Container(world.Manager, 0x0501, null, false);
+                        Item[] items = chest.GetLoots(world.Manager, 3, 8).ToArray();
                         for (int i = 0; i < items.Length; i++)
                             container.Inventory[i] = items[i];
                         container.Move(pos.X + x + 0.5f, pos.Y + y + 0.5f);
@@ -131,7 +132,7 @@ namespace wServer.realm.setpieces
                     }
                     else if (t[x, y] == 6)
                     {
-                        Entity mage = Entity.Resolve(0x0925);
+                        Entity mage = Entity.Resolve(world.Manager, 0x0925);
                         mage.Move(pos.X + x, pos.Y + y);
                         world.EnterWorld(mage);
                     }
