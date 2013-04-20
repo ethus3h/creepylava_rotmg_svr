@@ -39,6 +39,20 @@ namespace wServer.logic
         public IList<Behavior> Behaviors { get; private set; }
         public IList<Transition> Transitions { get; private set; }
 
+        public static State CommonParent(State a, State b)
+        {
+            if (a == null || b == null) return null;
+            else return _CommonParent(a, a, b);
+        }
+        static State _CommonParent(State current, State a, State b)
+        {
+            if (b.Is(current)) return current;
+            else if (a.Parent == null) return null;
+            else return _CommonParent(current.Parent, a, b);
+        }
+
+        //child is parent
+        //parent is not child
         public bool Is(State state)
         {
             if (this == state) return true;
@@ -61,9 +75,13 @@ namespace wServer.logic
             states[Name] = this;
             foreach (var i in States)
                 i.Resolve(states);
+        }
+        internal void ResolveChildren(Dictionary<string, State> states)
+        {
             foreach (var i in States)
-                foreach (var j in i.Transitions)
-                    j.Resolve(states);
+                i.ResolveChildren(states);
+            foreach (var j in Transitions)
+                j.Resolve(states);
             foreach (var j in Behaviors)
                 j.Resolve(this);
         }

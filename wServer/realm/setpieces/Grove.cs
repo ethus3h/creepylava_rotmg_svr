@@ -51,7 +51,6 @@ namespace wServer.realm.setpieces
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
                         tile.TileId = (byte)dat.IdToType[Floor]; tile.ObjType = 0;
-                        world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (t[x, y] == 2)
@@ -60,7 +59,6 @@ namespace wServer.realm.setpieces
                         tile.TileId = (byte)dat.IdToType[Floor];
                         tile.ObjType = dat.IdToType[Tree]; tile.Name = "size:" + (rand.Next() % 2 == 0 ? 120 : 140);
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
-                        world.Obstacles[x + pos.X, y + pos.Y] = 2;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                 }

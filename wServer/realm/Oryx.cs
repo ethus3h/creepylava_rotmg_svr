@@ -208,7 +208,7 @@ namespace wServer.realm
                     pt.X = rand.Next(0, w);
                     pt.Y = rand.Next(0, h);
                 } while (world.Map[pt.X, pt.Y].Terrain != terrain ||
-                         world.Obstacles[pt.X, pt.Y] != 0 ||
+                         !world.IsPassable(pt.X, pt.Y) ||
                          world.AnyPlayerNearby(pt.X, pt.Y));
 
                 for (int k = 0; k < num; k++)
@@ -229,7 +229,7 @@ namespace wServer.realm
                     pt.X = rand.Next(0, w);
                     pt.Y = rand.Next(0, h);
                 } while (world.Map[pt.X, pt.Y].Terrain != terrain ||
-                         world.Obstacles[pt.X, pt.Y] != 0 ||
+                         !world.IsPassable(pt.X, pt.Y) ||
                          world.AnyPlayerNearby(pt.X, pt.Y));
 
                 entity = Entity.Resolve(world.Manager, desc.ObjectType);
@@ -640,7 +640,7 @@ namespace wServer.realm
                 pt.Y = rand.Next(0, world.Map.Height);
             } while ((world.Map[pt.X, pt.Y].Terrain < WmapTerrain.Mountains ||
                       world.Map[pt.X, pt.Y].Terrain > WmapTerrain.MidForest) ||
-                      world.Obstacles[pt.X, pt.Y] != 0 ||
+                      !world.IsPassable(pt.X, pt.Y) ||
                       world.AnyPlayerNearby(pt.X, pt.Y));
 
             pt.X -= (setpiece.Size - 1) / 2;

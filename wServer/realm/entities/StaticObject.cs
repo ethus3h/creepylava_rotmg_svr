@@ -54,8 +54,12 @@ namespace wServer.realm.entities
             if (HP <= 0)
             {
                 if (ObjectDesc != null &&
-                    (ObjectDesc.EnemyOccupySquare || ObjectDesc.OccupySquare))
-                    Owner.Obstacles[(int)(X - 0.5), (int)(Y - 0.5)] = 0;
+                    Owner.Map[(int)(X - 0.5), (int)(Y - 0.5)].ObjType == ObjectType)
+                {
+                    var tile = Owner.Map[(int)(X - 0.5), (int)(Y - 0.5)].Clone();
+                    tile.ObjType = 0;
+                    Owner.Map[(int)(X - 0.5), (int)(Y - 0.5)] = tile;
+                }
                 Owner.LeaveWorld(this);
                 return false;
             }

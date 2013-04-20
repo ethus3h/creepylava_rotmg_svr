@@ -143,11 +143,18 @@ namespace wServer.realm
                 return states;
             }
         }
+
         public State CurrentState { get; private set; }
         public void SwitchTo(State state)
         {
+            var origState = CurrentState;
+
             CurrentState = state;
-            stateEntry = state;
+            GoDeeeeeeeep();
+
+            stateEntryCommonRoot = State.CommonParent(origState, CurrentState);
+            stateEntry = true;
+
             if (Owner != null)
                 Owner.BroadcastPacket(new NotificationPacket()
                 {
@@ -156,23 +163,37 @@ namespace wServer.realm
                     Text = state.Name
                 }, null);
         }
-        State stateEntry = null;
+        void GoDeeeeeeeep()
+        {
+            //always the first deepest sub-state
+            if (CurrentState == null) return;
+            while (CurrentState.States.Count > 0)
+                CurrentState = CurrentState = CurrentState.States[0];
+        }
+
+        bool stateEntry = false;
+        State stateEntryCommonRoot = null;
         void TickState(RealmTime time)
         {
-            State state = CurrentState;
-            if (state == null) return;
-            while (state.States.Count > 0)  //always the first deepest sub-state
-                state = CurrentState = state.States[0];
+            if (stateEntry)
+            {
+                //State entry
+                var s = CurrentState;
+                while (s != null && s != stateEntryCommonRoot)
+                {
+                    foreach (var i in s.Behaviors)
+                        i.OnStateEntry(this, time);
+                    s = s.Parent;
+                }
+                stateEntryCommonRoot = null;
+                stateEntry = false;
+            }
 
-
-            var localState = state;
-            var localEntry = stateEntry;
-            bool entry = localEntry != null;
+            var origState = CurrentState;
+            var state = CurrentState;
             bool transited = false;
             while (state != null)
             {
-                if (localEntry != null && state == localEntry.Parent)
-                    entry = false;
                 if (!transited)
                     foreach (var i in state.Transitions)
                         if (i.Tick(this, time))
@@ -183,8 +204,6 @@ namespace wServer.realm
 
                 foreach (var i in state.Behaviors)
                 {
-                    if (entry)
-                        i.OnStateEntry(this, time);
                     if (Owner == null) break;
                     i.Tick(this, time);
                 }
@@ -192,26 +211,15 @@ namespace wServer.realm
 
                 state = state.Parent;
             }
-            if (!transited)
-                stateEntry = null;
-            else
+            if (transited)
             {
-                state = localState;
-                while (state != null)
+                //State exit
+                var s = origState;
+                while (s != null && s != stateEntryCommonRoot)
                 {
-                    if (!CurrentState.Is(state))
-                        foreach (var i in state.Behaviors)
-                        {
-                            if (Owner == null) break;
-                            i.OnStateExit(this, time);
-                        }
-                    if (Owner == null) break;
-                    state = state.Parent;
-                }
-                if (CurrentState != null)
-                {
-                    while (CurrentState.States.Count > 0)
-                        CurrentState = CurrentState.States[0];
+                    foreach (var i in s.Behaviors)
+                        i.OnStateExit(this, time);
+                    s = s.Parent;
                 }
             }
         }
@@ -324,7 +332,7 @@ namespace wServer.realm
             if (ObjectDesc == null)
                 return true;
             else
-                return ObjectDesc.OccupySquare || ObjectDesc.EnemyOccupySquare || ObjectDesc.FullOccupy;
+                return ObjectDesc.Enemy || ObjectDesc.Player;
         }
         public virtual void ProjectileHit(Projectile projectile, Entity target)
         {

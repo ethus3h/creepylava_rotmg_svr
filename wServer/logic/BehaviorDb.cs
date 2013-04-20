@@ -49,7 +49,9 @@ namespace wServer.logic
         {
             public ctor Init(string objType, State rootState, params ILootDef[] defs)
             {
-                rootState.Resolve(new Dictionary<string, State>());
+                var d = new Dictionary<string, State>();
+                rootState.Resolve(d);
+                rootState.ResolveChildren(d);
                 var dat = InitDb.Manager.GameData;
                 if (defs.Length > 0)
                 {

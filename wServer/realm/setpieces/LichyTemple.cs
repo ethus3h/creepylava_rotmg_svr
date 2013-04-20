@@ -69,7 +69,6 @@ namespace wServer.realm.setpieces
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
                         tile.TileId = (byte)dat.IdToType[Floor]; 
                         tile.ObjType = 0;
-                        world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (t[x, y] == 2)
@@ -78,14 +77,12 @@ namespace wServer.realm.setpieces
                         tile.TileId = (byte)dat.IdToType[Floor];
                         tile.ObjType = dat.IdToType[WallA];
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
-                        world.Obstacles[x + pos.X, y + pos.Y] = 2;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (t[x, y] == 3)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
                         tile.TileId = (byte)dat.IdToType[Floor];
-                        world.Obstacles[x + pos.X, y + pos.Y] = 2;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                         Entity wall = Entity.Resolve(world.Manager, dat.IdToType[WallB]);
                         wall.Move(x + pos.X + 0.5f, y + pos.Y + 0.5f);
@@ -97,7 +94,6 @@ namespace wServer.realm.setpieces
                         tile.TileId = (byte)dat.IdToType[Floor]; 
                         tile.ObjType = dat.IdToType[PillarA];
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
-                        world.Obstacles[x + pos.X, y + pos.Y] = 2;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (t[x, y] == 5)
@@ -106,7 +102,6 @@ namespace wServer.realm.setpieces
                         tile.TileId = (byte)dat.IdToType[Floor]; 
                         tile.ObjType = dat.IdToType[PillarB];
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
-                        world.Obstacles[x + pos.X, y + pos.Y] = 2;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                 }

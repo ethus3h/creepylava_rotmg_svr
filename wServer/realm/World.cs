@@ -59,7 +59,19 @@ namespace wServer.realm
 
         public CollisionMap<Entity> EnemiesCollision { get; private set; }
         public CollisionMap<Entity> PlayersCollision { get; private set; }
-        public byte[,] Obstacles { get; private set; }
+        public bool IsPassable(int x, int y)
+        {
+            var tile = Map[x, y];
+            ObjectDesc desc;
+            if (Manager.GameData.Tiles[tile.TileId].NoWalk)
+                return false;
+            if (Manager.GameData.ObjectDescs.TryGetValue(tile.ObjType, out desc))
+            {
+                if (!desc.Static)
+                    return false;
+            }
+            return true;
+        }
 
         public bool AllowTeleport { get; protected set; }
         public bool ShowDisplays { get; protected set; }
@@ -97,25 +109,6 @@ namespace wServer.realm
             entityInc += Map.Load(dat, 0);
 
             int w = Map.Width, h = Map.Height;
-            Obstacles = new byte[w, h];
-            for (int y = 0; y < h; y++)
-                for (int x = 0; x < w; x++)
-                {
-                    var tile = Map[x, y];
-                    ObjectDesc desc;
-                    if (Manager.GameData.Tiles[tile.TileId].NoWalk)
-                        Obstacles[x, y] = 3;
-                    if (Manager.GameData.ObjectDescs.TryGetValue(tile.ObjType, out desc))
-                    {
-                        if (desc.Class == "Wall" ||
-                            desc.Class == "ConnectedWall" ||
-                            desc.Class == "CaveWall")
-                            Obstacles[x, y] = 2;
-                        else if (desc.OccupySquare || desc.EnemyOccupySquare)
-                            Obstacles[x, y] = 1;
-                    }
-
-                }
             EnemiesCollision = new CollisionMap<Entity>(0, w, h);
             PlayersCollision = new CollisionMap<Entity>(1, w, h);
 
@@ -125,9 +118,6 @@ namespace wServer.realm
             Players.Clear();
             foreach (var i in Map.InstantiateEntities(Manager))
             {
-                if (i.ObjectDesc != null &&
-                    (i.ObjectDesc.OccupySquare || i.ObjectDesc.EnemyOccupySquare))
-                    Obstacles[(int)(i.X - 0.5), (int)(i.Y - 0.5)] = 2;
                 EnterWorld(i);
             }
         }

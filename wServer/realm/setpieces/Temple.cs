@@ -49,14 +49,12 @@ namespace wServer.realm.setpieces
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
                         tile.TileId = (byte)dat.IdToType[DarkGrass]; tile.ObjType = 0;
-                        world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (ground[x, y] == 2)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
                         tile.TileId = (byte)dat.IdToType[Floor]; tile.ObjType = 0;
-                        world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
 
@@ -65,7 +63,6 @@ namespace wServer.realm.setpieces
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
                         tile.ObjType = dat.IdToType[WallA];
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
-                        world.Obstacles[x + pos.X, y + pos.Y] = 2;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (objs[x, y] == 2)
@@ -73,7 +70,6 @@ namespace wServer.realm.setpieces
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
                         tile.ObjType = dat.IdToType[WallB];
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
-                        world.Obstacles[x + pos.X, y + pos.Y] = 2;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (objs[x, y] == 3)
@@ -81,7 +77,6 @@ namespace wServer.realm.setpieces
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
                         tile.ObjType = dat.IdToType[WallC];
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
-                        world.Obstacles[x + pos.X, y + pos.Y] = 2;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (objs[x, y] == 4)
@@ -89,7 +84,6 @@ namespace wServer.realm.setpieces
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
                         tile.ObjType = dat.IdToType[Flower];
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
-                        world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (objs[x, y] == 5)
@@ -97,7 +91,6 @@ namespace wServer.realm.setpieces
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
                         tile.ObjType = dat.IdToType[Grass];
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
-                        world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (objs[x, y] == 6)
@@ -105,7 +98,6 @@ namespace wServer.realm.setpieces
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
                         tile.ObjType = dat.IdToType[Tree];
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
-                        world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                 }

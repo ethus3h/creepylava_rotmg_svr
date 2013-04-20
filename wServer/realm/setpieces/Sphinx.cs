@@ -74,14 +74,12 @@ namespace wServer.realm.setpieces
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
                         tile.TileId = (byte)dat.IdToType[Floor]; tile.ObjType = 0;
-                        world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (t[x, y] == 2)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
                         tile.TileId = (byte)dat.IdToType[Central]; tile.ObjType = 0;
-                        world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (t[x, y] == 3)
@@ -91,7 +89,6 @@ namespace wServer.realm.setpieces
                         tile.ObjType = dat.IdToType[Pillar];
                         tile.Name = ConnectionComputer.GetConnString((_x, _y) => t[x + _x, y + _y] == 3);
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
-                        world.Obstacles[x + pos.X, y + pos.Y] = 2;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (t[x, y] == 4)
@@ -101,7 +98,6 @@ namespace wServer.realm.setpieces
                         tile.ObjType = dat.IdToType[Pillar];
                         tile.Name = ConnectionComputer.GetConnString((_x, _y) => t[x + _x, y + _y] == 4);
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
-                        world.Obstacles[x + pos.X, y + pos.Y] = 2;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
 

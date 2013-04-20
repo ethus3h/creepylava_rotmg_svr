@@ -87,14 +87,12 @@ namespace wServer.realm.setpieces
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
                         tile.ObjType = dat.IdToType[Wall];
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
-                        world.Obstacles[x + pos.X, y + pos.Y] = 2;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (t[x, y] == 2)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
                         tile.TileId = (byte)dat.IdToType[Floor]; tile.ObjType = 0;
-                        world.Obstacles[x + pos.X, y + pos.Y] = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                 }

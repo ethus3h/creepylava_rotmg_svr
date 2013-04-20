@@ -15,7 +15,7 @@ namespace wServer.logic
             .Init("Pirate",
                     new State(
                         new Prioritize(
-                            new Follow(0.85, range: 1, duration: 1000, coolDown: 0),
+                            new Follow(0.85, range: 1, duration: 5000, coolDown: 0),
                             new Wander(0.4)
                         ),
                         new Shoot(3, coolDown: 2500)

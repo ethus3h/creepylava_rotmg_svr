@@ -546,11 +546,13 @@ namespace wServer.logic
                             new State("Attack",
                                 new Flash(0xff000000, 10, 100),
                                 new Shoot(10, coolDown: 500),
-                                new HpLessTransition(0.5, "Heal")
+                                new HpLessTransition(0.5, "Heal"),
+                                new EntityNotExistsTransition("Shield Orc Key", 7, "Idling")
                             ),
                             new State("Heal",
                                 new Heal(7, "Shield Orcs", coolDown: 500),
-                                new TimedTransition(500, "Attack")
+                                new TimedTransition(500, "Attack"),
+                                new EntityNotExistsTransition("Shield Orc Key", 7, "Idling")
                             )
                         ),
                         new State("Flash",
@@ -572,11 +574,13 @@ namespace wServer.logic
                             new State("Attack",
                                 new Flash(0xff000000, 10, 100),
                                 new Shoot(10, coolDown: 500),
-                                new HpLessTransition(0.5, "Heal")
+                                new HpLessTransition(0.5, "Heal"),
+                                new EntityNotExistsTransition("Shield Orc Key", 7, "Idling")
                             ),
                             new State("Heal",
                                 new Heal(7, "Shield Orcs", coolDown: 500),
-                                new TimedTransition(500, "Attack")
+                                new TimedTransition(500, "Attack"),
+                                new EntityNotExistsTransition("Shield Orc Key", 7, "Idling")
                             )
                         ),
                         new State("Flash",

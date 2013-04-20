@@ -179,15 +179,8 @@ namespace wServer
             if (x < 0 || x >= entity.Owner.Map.Width ||
                 y < 0 || y >= entity.Owner.Map.Height)
                 return false;
-            if (entity.Owner.Obstacles[(int)x, (int)y] != 2) return true;
+            if (!entity.Owner.IsPassable((int)x, (int)y)) return false;
 
-            var objId = entity.Owner.Map[(int)x, (int)y].ObjType;
-            if (objId != 0 &&
-                entity.Manager.GameData.ObjectDescs[objId].OccupySquare)
-                return false;
-
-            if (entity.Owner.Obstacles[(int)x, (int)y] != 0)
-                return false;
             return true;
         }
 
