@@ -343,6 +343,7 @@
     <Content Include="bugs.txt" />
     <Content Include="packets.txt" />
     <Compile Include="realm\entities\player\commands\AdminCommands.cs" />
+    <Content Include="todo.txt" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\db\db.csproj">

@@ -1,0 +1,9 @@
+﻿	central chat broadcast
+	remote texture
+	move to a better db
+	make client independent of account
+	events
+	dungeon
+	pets/dye
+	guild
+	oryx
