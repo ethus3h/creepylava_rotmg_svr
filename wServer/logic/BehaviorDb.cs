@@ -27,7 +27,7 @@ namespace wServer.logic
 
             this.Manager = manager;
 
-            Definitions = new Dictionary<short, Tuple<State, Loot>>();
+            Definitions = new Dictionary<ushort, Tuple<State, Loot>>();
 
             if (Interlocked.Exchange(ref initializing, 1) == 1)
             {
@@ -74,10 +74,10 @@ namespace wServer.logic
                 {
                     var loot = new Loot(defs);
                     rootState.Death += (sender, e) => loot.Handle((Enemy)e.Host, e.Time);
-                    InitDb.Definitions.Add(dat.IdToType[objType], new Tuple<State, Loot>(rootState, loot));
+                    InitDb.Definitions.Add(dat.IdToObjectType[objType], new Tuple<State, Loot>(rootState, loot));
                 }
                 else
-                    InitDb.Definitions.Add(dat.IdToType[objType], new Tuple<State, Loot>(rootState, null));
+                    InitDb.Definitions.Add(dat.IdToObjectType[objType], new Tuple<State, Loot>(rootState, null));
                 return this;
             }
         }
@@ -86,7 +86,7 @@ namespace wServer.logic
             return new ctor();
         }
 
-        public Dictionary<short, Tuple<State, Loot>> Definitions { get; private set; }
+        public Dictionary<ushort, Tuple<State, Loot>> Definitions { get; private set; }
 
     }
 }

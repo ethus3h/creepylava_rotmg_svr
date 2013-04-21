@@ -242,6 +242,7 @@ namespace wServer.networking
         object sendLock = new object();
         public void SendPacket(Packet pkt)
         {
+            if (!skt.Connected) return;
             pendingPackets.Enqueue(pkt);
             if (CanSendPacket(send, false))
             {
@@ -255,6 +256,7 @@ namespace wServer.networking
         }
         public void SendPackets(IEnumerable<Packet> pkts)
         {
+            if (!skt.Connected) return;
             foreach (var i in pkts)
                 pendingPackets.Enqueue(i);
             if (CanSendPacket(send, false))

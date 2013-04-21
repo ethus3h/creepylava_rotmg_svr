@@ -45,7 +45,7 @@ namespace terrain
                 var o = obj.dict[i];
                 tileDict[(short)i] = new TerrainTile()
                 {
-                    TileId = o.ground == null ? (short)0xff : data.IdToType[o.ground],
+                    TileId = o.ground == null ? (ushort)0xff : data.IdToTileType[o.ground],
                     TileObj = o.objs == null ? null : o.objs[0].id,
                     Name = o.objs == null ? "" : o.objs[0].name ?? "",
                     Terrain = TerrainType.None,

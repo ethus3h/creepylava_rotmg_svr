@@ -11,12 +11,12 @@ namespace wServer.realm.setpieces
     {
         public int Size { get { return 34; } }
 
-        protected static readonly string Floor = "Grass";
-        protected static readonly string WallA = "Grey Wall";
-        protected static readonly string WallB = "Destructible Grey Wall";
-        protected static readonly string Cross = "Cross";
+        static readonly string Floor = "Grass";
+        static readonly string WallA = "Grey Wall";
+        static readonly string WallB = "Destructible Grey Wall";
+        static readonly string Cross = "Cross";
 
-        protected static readonly Loot chest = new Loot(
+        static readonly Loot chest = new Loot(
                 new TierLoot(4, ItemType.Weapon, 0.3),
                 new TierLoot(5, ItemType.Weapon, 0.2),
                 new TierLoot(6, ItemType.Weapon, 0.1),
@@ -88,32 +88,32 @@ namespace wServer.realm.setpieces
                     if (t[x, y] == 1)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = (byte)dat.IdToType[Floor];
+                        tile.TileId = dat.IdToTileType[Floor];
                         tile.ObjType = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (t[x, y] == 2)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = (byte)dat.IdToType[Floor];
-                        tile.ObjType = dat.IdToType[WallA];
+                        tile.TileId = dat.IdToTileType[Floor];
+                        tile.ObjType = dat.IdToObjectType[WallA];
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (t[x, y] == 3)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = (byte)dat.IdToType[Floor];
+                        tile.TileId = dat.IdToTileType[Floor];
                         world.Map[x + pos.X, y + pos.Y] = tile;
-                        Entity wall = Entity.Resolve(world.Manager, dat.IdToType[WallB]);
+                        Entity wall = Entity.Resolve(world.Manager, dat.IdToObjectType[WallB]);
                         wall.Move(x + pos.X + 0.5f, y + pos.Y + 0.5f);
                         world.EnterWorld(wall);
                     }
                     else if (t[x, y] == 4)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = (byte)dat.IdToType[Floor];
-                        tile.ObjType = dat.IdToType[Cross];
+                        tile.TileId = dat.IdToTileType[Floor];
+                        tile.ObjType = dat.IdToObjectType[Cross];
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
@@ -128,14 +128,11 @@ namespace wServer.realm.setpieces
                     }
                     else if (t[x, y] == 6)
                     {
-                        Entity mage = Entity.Resolve(world.Manager, 0x0925);
+                        Entity mage = Entity.Resolve(world.Manager, "Deathmage");
                         mage.Move(pos.X + x, pos.Y + y);
                         world.EnterWorld(mage);
                     }
                 }
-
-
-            //Boss & Chest
         }
     }
 }

@@ -24,7 +24,7 @@ namespace wServer
 
         static void Main(string[] args)
         {
-            XmlConfigurator.Configure(new FileInfo("log4net.config"));
+            XmlConfigurator.ConfigureAndWatch(new FileInfo("log4net.config"));
 
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             Thread.CurrentThread.Name = "Entry";

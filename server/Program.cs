@@ -15,7 +15,6 @@ namespace server
     class Program
     {
         static HttpListener listener;
-        static Thread listen;
         static readonly Thread[] workers = new Thread[5];
         static readonly Queue<HttpListenerContext> contextQueue = new Queue<HttpListenerContext>();
         static readonly object queueLock = new object();
@@ -28,7 +27,7 @@ namespace server
 
         static void Main(string[] args)
         {
-            XmlConfigurator.Configure(new FileInfo("log4net.config"));
+            XmlConfigurator.ConfigureAndWatch(new FileInfo("log4net.config"));
 
             Thread.CurrentThread.CurrentCulture = CultureInfo.InvariantCulture;
             Thread.CurrentThread.Name = "Entry";
@@ -57,6 +56,7 @@ namespace server
                 terminating = true;
                 listener.Stop();
                 queueReady.Set();
+                GameData.Dispose();
                 while (contextQueue.Count > 0)
                     Thread.Sleep(100);
             }

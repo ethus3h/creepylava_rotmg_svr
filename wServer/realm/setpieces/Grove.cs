@@ -50,20 +50,20 @@ namespace wServer.realm.setpieces
                     if (t[x, y] == 1)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = (byte)dat.IdToType[Floor]; tile.ObjType = 0;
+                        tile.TileId = dat.IdToTileType[Floor]; tile.ObjType = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (t[x, y] == 2)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = (byte)dat.IdToType[Floor];
-                        tile.ObjType = dat.IdToType[Tree]; tile.Name = "size:" + (rand.Next() % 2 == 0 ? 120 : 140);
+                        tile.TileId = dat.IdToTileType[Floor];
+                        tile.ObjType = dat.IdToObjectType[Tree]; tile.Name = "size:" + (rand.Next() % 2 == 0 ? 120 : 140);
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                 }
 
-            Entity ent = Entity.Resolve(world.Manager, 0x091f);
+            Entity ent = Entity.Resolve(world.Manager, "Ent Ancient");
             ent.Size = 140;
             ent.Move(pos.X + Size / 2 + 1, pos.Y + Size / 2 + 1);
             world.EnterWorld(ent);

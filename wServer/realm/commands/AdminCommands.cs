@@ -25,8 +25,8 @@ namespace wServer.realm.commands
             else
                 num = 1;
 
-            short objType;
-            if (!player.Manager.GameData.IdToType.TryGetValue(name, out objType) ||
+            ushort objType;
+            if (!player.Manager.GameData.IdToObjectType.TryGetValue(name, out objType) ||
                 !player.Manager.GameData.ObjectDescs.ContainsKey(objType))
             {
                 player.SendError("Unknown entity!");
@@ -45,7 +45,7 @@ namespace wServer.realm.commands
 
     class ToggleEffCommand : Command
     {
-        public ToggleEffCommand() : base("toggleEff", permLevel: 1) { }
+        public ToggleEffCommand() : base("eff", permLevel: 1) { }
 
         protected override bool Process(Player player, RealmTime time, string args)
         {
@@ -83,8 +83,8 @@ namespace wServer.realm.commands
 
         protected override bool Process(Player player, RealmTime time, string args)
         {
-            short objType;
-            if (!player.Manager.GameData.IdToType.TryGetValue(args, out objType))
+            ushort objType;
+            if (!player.Manager.GameData.IdToObjectType.TryGetValue(args, out objType))
             {
                 player.SendError("Unknown item type!");
                 return false;
@@ -145,7 +145,7 @@ namespace wServer.realm.commands
         protected override bool Process(Player player, RealmTime time, string args)
         {
             ISetPiece piece = (ISetPiece)Activator.CreateInstance(Type.GetType(
-                "wServer.realm.setpieces." + args[0]));
+                "wServer.realm.setpieces." + args, true, true));
             piece.RenderSetPiece(player.Owner, new IntPoint((int)player.X + 1, (int)player.Y + 1));
             return true;
         }

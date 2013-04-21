@@ -179,17 +179,17 @@ namespace wServer.realm
         }
 
         Random rand = new Random();
-        short GetRandomObjType(Tuple<string, double>[] dat)
+        ushort GetRandomObjType(Tuple<string, double>[] dat)
         {
             double p = rand.NextDouble();
             double n = 0;
-            short objType = 0;
+            ushort objType = 0;
             foreach (var k in dat)
             {
                 n += k.Item2;
                 if (n > p)
                 {
-                    objType = world.Manager.GameData.IdToType[k.Item1];
+                    objType = world.Manager.GameData.IdToObjectType[k.Item1];
                     break;
                 }
             }
@@ -270,7 +270,7 @@ namespace wServer.realm
                 enemyCounts[idx] = 0;
                 for (int j = 0; j < enemyCount; j++)
                 {
-                    short objType = GetRandomObjType(i.Value.Item2);
+                    ushort objType = GetRandomObjType(i.Value.Item2);
                     if (objType == 0) continue;
 
                     enemyCounts[idx] += Spawn(world.Manager.GameData.ObjectDescs[objType], terrain, w, h);
@@ -346,7 +346,7 @@ namespace wServer.realm
                 WmapTerrain t = (WmapTerrain)(i + 1);
                 for (int j = 0; j < x; )
                 {
-                    short objType = GetRandomObjType(spawn[t].Item2);
+                    ushort objType = GetRandomObjType(spawn[t].Item2);
                     if (objType == 0) continue;
 
                     j += Spawn(world.Manager.GameData.ObjectDescs[objType], t, w, h);
@@ -692,7 +692,7 @@ namespace wServer.realm
                 if (rand.NextDouble() < 0.25)
                 {
                     var evt = events[rand.Next(0, events.Count)];
-                    if (world.Manager.GameData.ObjectDescs[world.Manager.GameData.IdToType[evt.Item1]].PerRealmMax == 1)
+                    if (world.Manager.GameData.ObjectDescs[world.Manager.GameData.IdToObjectType[evt.Item1]].PerRealmMax == 1)
                         events.Remove(evt);
                     SpawnEvent(evt.Item1, evt.Item2);
 

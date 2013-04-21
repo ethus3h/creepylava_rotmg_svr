@@ -14,14 +14,14 @@ namespace wServer.logic.behaviors
 
         double range;
         double? angle;
-        short child;
+        ushort child;
         Cooldown coolDown;
         int coolDownOffset;
 
         public TossObject(string child, double range = 5, double? angle = null,
             Cooldown coolDown = new Cooldown(), int coolDownOffset = 0)
         {
-            this.child = BehaviorDb.InitGameData.IdToType[child];
+            this.child = BehaviorDb.InitGameData.IdToObjectType[child];
             this.range = range;
             this.angle = angle * Math.PI / 180;
             this.coolDown = coolDown.Normalize();

@@ -161,7 +161,7 @@ namespace wServer.realm
             AddWorld(World.RAND_REALM, new RandomRealm());
             AddWorld(World.GAUNTLET, new GauntletMap());
 
-            AddWorld(new GameWorld(1, "Medusa", true));
+            //AddWorld(new GameWorld(1, "Medusa", true));
 
             Chat = new ChatManager(this);
             Commands = new CommandManager(this);
@@ -198,6 +198,7 @@ namespace wServer.realm
             log.Info("Stopping Realm Manager...");
 
             Terminating = true;
+            GameData.Dispose();
             logic.Join();
             network.Join();
 

@@ -105,18 +105,12 @@ namespace wServer.realm.entities
             { "Oryx the Mad God 2",         Tuple.Create(15,1, 20) },
         };
 
-        float Dist(Entity a, Entity b)
-        {
-            var dx = a.X - b.X;
-            var dy = a.Y - b.Y;
-            return (float)Math.Sqrt(dx * dx + dy * dy);
-        }
         Entity FindQuest()
         {
             Entity ret = null;
-            float bestScore = 0;
+            double bestScore = 0;
             foreach (var i in Owner.Quests.Values
-                .OrderBy(quest => DistanceSquared(quest.X, quest.Y, X, Y)))
+                .OrderBy(quest => MathsUtils.DistSqr(quest.X, quest.Y, X, Y)))
             {
                 if (i.ObjectDesc == null || !i.ObjectDesc.Quest) continue;
 
@@ -126,7 +120,7 @@ namespace wServer.realm.entities
                 if ((Level >= x.Item2 && Level <= x.Item3))
                 {
                     var score = (20 - Math.Abs((i.ObjectDesc.Level ?? 0) - Level)) * x.Item1 -   //priority * level diff
-                            Dist(this, i) / 100;    //minus 1 for every 100 tile distance
+                            this.Dist(i) / 100;    //minus 1 for every 100 tile distance
                     if (score > bestScore)
                     {
                         bestScore = score;
@@ -193,12 +187,12 @@ namespace wServer.realm.entities
             {
                 Level++;
                 ExperienceGoal = GetExpGoal(Level);
-                foreach (XElement i in Manager.GameData.TypeToElement[ObjectType].Elements("LevelIncrease"))
+                foreach (XElement i in Manager.GameData.ObjectTypeToElement[ObjectType].Elements("LevelIncrease"))
                 {
                     Random rand = new System.Random();
                     int min = int.Parse(i.Attribute("min").Value);
                     int max = int.Parse(i.Attribute("max").Value) + 1;
-                    int limit = int.Parse(Manager.GameData.TypeToElement[ObjectType].Element(i.Value).Attribute("max").Value);
+                    int limit = int.Parse(Manager.GameData.ObjectTypeToElement[ObjectType].Element(i.Value).Attribute("max").Value);
                     int idx = StatsManager.StatsNameToIndex(i.Value);
                     Stats[idx] += rand.Next(min, max);
                     if (Stats[idx] > limit) Stats[idx] = limit;

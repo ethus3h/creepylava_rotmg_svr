@@ -61,7 +61,7 @@ namespace terrain
                         idxs.Add(tile, idx = (short)dict.Count);
                         dict.Add(new loc()
                         {
-                            ground = data.TypeToId[tile.TileId],
+                            ground = data.TileTypeToId[tile.TileId],
                             objs = tile.TileObj == null ? null : new obj[]
                             {
                                 new obj()

@@ -49,13 +49,13 @@ namespace wServer.realm.setpieces
                     if (t[x, y] == 1)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = (byte)data.IdToType[Floor]; tile.ObjType = 0;
+                        tile.TileId = data.IdToTileType[Floor]; tile.ObjType = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (t[x, y] == 2)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = (byte)data.IdToType[Floor]; tile.ObjType = 0;
+                        tile.TileId = data.IdToTileType[Floor]; tile.ObjType = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
 
                         Entity penta = Entity.Resolve(world.Manager, 0x0d5e);
@@ -64,7 +64,7 @@ namespace wServer.realm.setpieces
                     }
                     else if (t[x, y] == 3)
                     {
-                        Entity penta = Entity.Resolve(world.Manager, 0x0d5f);
+                        Entity penta = Entity.Resolve(world.Manager, "Pentaract");
                         penta.Move(pos.X + x + .5f, pos.Y + y + .5f);
                         world.EnterWorld(penta);
                     }

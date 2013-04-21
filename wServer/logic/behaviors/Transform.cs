@@ -10,10 +10,10 @@ namespace wServer.logic.behaviors
     {
         //State storage: none
 
-        short target;
+        ushort target;
         public Transform(string target)
         {
-            this.target = BehaviorDb.InitGameData.IdToType[target];
+            this.target = BehaviorDb.InitGameData.IdToObjectType[target];
         }
 
         protected override void TickCore(Entity host, RealmTime time, ref object state)

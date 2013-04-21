@@ -29,6 +29,7 @@ namespace server
             { "/credits/getoffers", new credits.getoffers() },
             { "/credits/add", new credits.add() },
             { "/fame/list", new fame.list() },
+            { "/picture/get", new picture.get() },
         };
     }
 }

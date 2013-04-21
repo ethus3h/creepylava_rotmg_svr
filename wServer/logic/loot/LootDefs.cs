@@ -28,7 +28,7 @@ namespace wServer.logic.loot
         {
             if (playerDat != null) return;
             var dat = manager.GameData;
-            lootDefs.Add(new LootDef(dat.Items[dat.IdToType[item]], probability));
+            lootDefs.Add(new LootDef(dat.Items[dat.IdToObjectType[item]], probability));
         }
     }
 

@@ -127,7 +127,7 @@ namespace wServer.logic.loot
 
         private static void ShowBag(Enemy enemy, int[] owners, int bagType, Item[] items)
         {
-            short bag = 0x0500;
+            ushort bag = 0x0500;
             switch (bagType)
             {
                 case 0: bag = 0x0500; break;

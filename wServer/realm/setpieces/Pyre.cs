@@ -16,7 +16,7 @@ namespace wServer.realm.setpieces
 
         static readonly string Floor = "Scorch Blend";
 
-        protected static readonly Loot chest = new Loot(
+        static readonly Loot chest = new Loot(
                 new TierLoot(5, ItemType.Weapon, 0.3),
                 new TierLoot(6, ItemType.Weapon, 0.2),
                 new TierLoot(7, ItemType.Weapon, 0.1),
@@ -47,12 +47,12 @@ namespace wServer.realm.setpieces
                     if (r <= 10)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = (byte)dat.IdToType[Floor]; tile.ObjType = 0;
+                        tile.TileId = dat.IdToTileType[Floor]; tile.ObjType = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                 }
 
-            Entity lord = Entity.Resolve(world.Manager, 0x675);
+            Entity lord = Entity.Resolve(world.Manager, "Phoenix Lord");
             lord.Move(pos.X + 15.5f, pos.Y + 15.5f);
             world.EnterWorld(lord);
 

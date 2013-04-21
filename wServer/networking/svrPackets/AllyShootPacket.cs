@@ -9,7 +9,7 @@ namespace wServer.networking.svrPackets
     {
         public byte BulletId { get; set; }
         public int OwnerId { get; set; }
-        public short ContainerType { get; set; }
+        public ushort ContainerType { get; set; }
         public float Angle { get; set; }
 
         public override PacketID ID { get { return PacketID.AllyShoot; } }
@@ -19,7 +19,7 @@ namespace wServer.networking.svrPackets
         {
             BulletId = rdr.ReadByte();
             OwnerId = rdr.ReadInt32();
-            ContainerType = rdr.ReadInt16();
+            ContainerType = rdr.ReadUInt16();
             Angle = rdr.ReadSingle();
         }
         protected override void Write(NWriter wtr)

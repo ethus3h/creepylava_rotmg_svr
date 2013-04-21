@@ -9,7 +9,7 @@ namespace wServer.networking.svrPackets
     {
         public byte BulletId { get; set; }
         public int OwnerId { get; set; }
-        public short ContainerType { get; set; }
+        public ushort ContainerType { get; set; }
         public Position Position { get; set; }
         public float Angle { get; set; }
         public short Damage { get; set; }
@@ -21,7 +21,7 @@ namespace wServer.networking.svrPackets
         {
             BulletId = rdr.ReadByte();
             OwnerId = rdr.ReadInt32();
-            ContainerType = rdr.ReadInt16();
+            ContainerType = rdr.ReadUInt16();
             Position = Position.Read(rdr);
             Angle = rdr.ReadSingle();
             Damage = rdr.ReadInt16();

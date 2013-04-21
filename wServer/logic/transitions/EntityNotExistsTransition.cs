@@ -12,13 +12,13 @@ namespace wServer.logic.transitions
         //State storage: none
 
         double dist;
-        short target;
+        ushort target;
 
         public EntityNotExistsTransition(string target, double dist, string targetState)
             : base(targetState)
         {
             this.dist = dist;
-            this.target = BehaviorDb.InitGameData.IdToType[target];
+            this.target = BehaviorDb.InitGameData.IdToObjectType[target];
         }
 
         protected override bool TickCore(Entity host, RealmTime time, ref object state)

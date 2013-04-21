@@ -17,7 +17,7 @@ namespace wServer.realm.setpieces
         static readonly string Lava = "Lava Blend";
         static readonly string Floor = "Partial Red Floor";
 
-        protected static readonly Loot chest = new Loot(
+        static readonly Loot chest = new Loot(
                 new TierLoot(7, ItemType.Weapon, 0.3),
                 new TierLoot(8, ItemType.Weapon, 0.2),
                 new TierLoot(9, ItemType.Weapon, 0.1),
@@ -75,13 +75,13 @@ namespace wServer.realm.setpieces
                     if (p[x, y] == 1)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = (byte)dat.IdToType[Lava]; tile.ObjType = 0;
+                        tile.TileId = dat.IdToTileType[Lava]; tile.ObjType = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (p[x, y] == 2)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = (byte)dat.IdToType[Lava]; tile.ObjType = dat.IdToType[Floor];
+                        tile.TileId = dat.IdToTileType[Lava]; tile.ObjType = dat.IdToObjectType[Floor];
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
@@ -89,7 +89,7 @@ namespace wServer.realm.setpieces
 
 
 
-            Entity demon = Entity.Resolve(world.Manager, 0x668);
+            Entity demon = Entity.Resolve(world.Manager, "Red Demon");
             demon.Move(pos.X + 20.5f, pos.Y + 20.5f);
             world.EnterWorld(demon);
 

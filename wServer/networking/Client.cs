@@ -71,7 +71,8 @@ namespace wServer.networking
         {
             try
             {
-                log.DebugFormat("Handling packet '{0}'...", pkt.ID);
+                log.Logger.Log(typeof(Client), log4net.Core.Level.Verbose,
+                    string.Format("Handling packet '{0}'...", pkt.ID), null);
                 if (pkt.ID == PacketID.Packet) return;
                 IPacketHandler handler;
                 if (!PacketHandlers.Handlers.TryGetValue(pkt.ID, out handler))
@@ -81,7 +82,7 @@ namespace wServer.networking
             }
             catch (Exception e)
             {
-                log.ErrorFormat(string.Format("Error when handling packet '{0}'...", pkt.ToString()), e);
+                log.Error(string.Format("Error when handling packet '{0}'...", pkt.ToString()), e);
                 Disconnect();
             }
         }

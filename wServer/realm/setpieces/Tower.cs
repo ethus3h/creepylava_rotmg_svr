@@ -36,8 +36,8 @@ namespace wServer.realm.setpieces
 
         public int Size { get { return 27; } }
 
-        protected static readonly string Floor = "Rock";
-        protected static readonly string Wall = "Grey Wall";
+        static readonly string Floor = "Rock";
+        static readonly string Wall = "Grey Wall";
 
         Random rand = new Random();
         public void RenderSetPiece(World world, IntPoint pos)
@@ -84,15 +84,15 @@ namespace wServer.realm.setpieces
                     if (t[x, y] == 1)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = (byte)dat.IdToType[Floor];
-                        tile.ObjType = dat.IdToType[Wall];
+                        tile.TileId = dat.IdToTileType[Floor];
+                        tile.ObjType = dat.IdToObjectType[Wall];
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (t[x, y] == 2)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = (byte)dat.IdToType[Floor];
+                        tile.TileId = dat.IdToTileType[Floor];
                         tile.ObjType = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }

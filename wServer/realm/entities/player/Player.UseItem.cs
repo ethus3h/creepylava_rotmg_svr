@@ -93,7 +93,7 @@ namespace wServer.realm.entities
             if (item.Consumable)
             {
                 if (item.SuccessorId != null)
-                    container.Inventory[slot] = Manager.GameData.Items[Manager.GameData.IdToType[item.SuccessorId]];
+                    container.Inventory[slot] = Manager.GameData.Items[Manager.GameData.IdToObjectType[item.SuccessorId]];
                 else
                     container.Inventory[slot] = null;
                 UpdateCount++;
@@ -670,15 +670,15 @@ namespace wServer.realm.entities
                                 case StatsType.Dexterity: idx = 7; break;
                             }
                             Stats[idx] += eff.Amount;
-                            int limit = int.Parse(Manager.GameData.TypeToElement[ObjectType].Element(StatsManager.StatsIndexToName(idx)).Attribute("max").Value);
+                            int limit = int.Parse(Manager.GameData.ObjectTypeToElement[ObjectType].Element(StatsManager.StatsIndexToName(idx)).Attribute("max").Value);
                             if (Stats[idx] > limit)
                                 Stats[idx] = limit;
                             UpdateCount++;
                         } break;
                     case ActivateEffects.Create: //this is a portal
                         {
-                            short objType;
-                            if (!Manager.GameData.IdToType.TryGetValue(eff.Id, out objType) ||
+                            ushort objType;
+                            if (!Manager.GameData.IdToObjectType.TryGetValue(eff.Id, out objType) ||
                                 !Manager.GameData.Portals.ContainsKey(objType))
                                 break;// object not found, ignore
                             var entity = Entity.Resolve(Manager, objType);

@@ -42,11 +42,11 @@ namespace wServer
             return false;
         }
 
-        public static Entity GetNearestEntity(this Entity entity, double dist, short? objType)   //Null for player
+        public static Entity GetNearestEntity(this Entity entity, double dist, ushort? objType)   //Null for player
         {
             return entity.GetNearestEntities(dist, objType).FirstOrDefault();
         }
-        public static IEnumerable<Entity> GetNearestEntities(this Entity entity, double dist, short? objType)   //Null for player
+        public static IEnumerable<Entity> GetNearestEntities(this Entity entity, double dist, ushort? objType)   //Null for player
         {
             if (entity.Owner == null) yield break;
             if (objType == null)
@@ -117,7 +117,7 @@ namespace wServer
             }
         }
 
-        public static int CountEntity(this Entity entity, double dist, short? objType)
+        public static int CountEntity(this Entity entity, double dist, ushort? objType)
         {
             if (entity.Owner == null) return 0;
             int ret = 0;
@@ -184,7 +184,7 @@ namespace wServer
             return true;
         }
 
-        public static void AOE(this Entity entity, float radius, short? objType, Action<Entity> callback)   //Null for player
+        public static void AOE(this Entity entity, float radius, ushort? objType, Action<Entity> callback)   //Null for player
         {
             if (objType == null)
                 foreach (var i in entity.Owner.PlayersCollision.HitTest(entity.X, entity.Y, radius))

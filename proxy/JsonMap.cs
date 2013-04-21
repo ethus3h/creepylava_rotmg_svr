@@ -67,7 +67,7 @@ namespace wServer.realm
                     {
                         var loc = obj.dict[rdr.ReadInt16()];
                         if (loc.ground != null)
-                            Tiles[x][y] = (Tile)this.dat.IdToType[loc.ground];
+                            Tiles[x][y] = (Tile)this.dat.IdToTileType[loc.ground];
                         else
                             Tiles[x][y] = (Tile)0xff;
                         if (loc.objs != null)
@@ -93,14 +93,14 @@ namespace wServer.realm
                     for (int x = 0; x < obj.width; x++)
                     {
                         var loc = new loc();
-                        loc.ground = dat.TypeToId[(short)Tiles[x][y]];
+                        loc.ground = dat.TileTypeToId[(byte)Tiles[x][y]];
                         loc.objs = new obj[Entities[x][y].Length];
                         for (int i = 0; i < loc.objs.Length; i++)
                         {
                             var en = Entities[x][y][i];
                             obj o = new obj()
                             {
-                                id = dat.TypeToId[(short)en.ObjectType]
+                                id = dat.ObjectTypeToId[en.ObjectType]
                             };
                             string s = "";
                             Dictionary<StatsType, object> vals = new Dictionary<StatsType, object>();

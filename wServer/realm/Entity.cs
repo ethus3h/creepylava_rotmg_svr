@@ -15,7 +15,7 @@ namespace wServer.realm
         static ILog log = LogManager.GetLogger(typeof(Entity));
 
         public RealmManager Manager { get; private set; }
-        protected Entity(RealmManager manager, short objType)
+        protected Entity(RealmManager manager, ushort objType)
         {
             this.ObjectType = objType;
             Name = "";
@@ -40,7 +40,7 @@ namespace wServer.realm
 
         public int UpdateCount { get; set; }
 
-        public short ObjectType { get; private set; }
+        public ushort ObjectType { get; private set; }
         public int Id { get; internal set; }
         public float X { get; private set; }
         public float Y { get; private set; }
@@ -254,9 +254,17 @@ namespace wServer.realm
          * GameObject
          * Character
          */
-        public static Entity Resolve(RealmManager manager, short id)
+        public static Entity Resolve(RealmManager manager, string name)
         {
-            var node = manager.GameData.TypeToElement[id];
+            ushort id;
+            if (!manager.GameData.IdToObjectType.TryGetValue(name, out id))
+                return null;
+            else
+                return Resolve(manager, id);
+        }
+        public static Entity Resolve(RealmManager manager, ushort id)
+        {
+            var node = manager.GameData.ObjectTypeToElement[id];
             string type = node.Element("Class").Value;
             switch (type)
             {
@@ -300,7 +308,7 @@ namespace wServer.realm
         Projectile[] projectiles;
         Projectile[] IProjectileOwner.Projectiles { get { return projectiles; } }
         protected byte projectileId;
-        public Projectile CreateProjectile(ProjectileDesc desc, short container, int dmg, long time, Position pos, float angle)
+        public Projectile CreateProjectile(ProjectileDesc desc, ushort container, int dmg, long time, Position pos, float angle)
         {
             var ret = new Projectile(Manager, desc) //Assume only one
             {

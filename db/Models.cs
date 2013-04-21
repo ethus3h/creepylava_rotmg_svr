@@ -175,7 +175,7 @@ public class Char
     [XmlElement("Equipment")]
     public string _Equipment { get; set; }
     [XmlIgnore]
-    public short[] Equipment
+    public ushort[] Equipment
     {
         get { return Utils.FromCommaSepString16(_Equipment); }
         set { _Equipment = Utils.GetCommaSepString(value); }

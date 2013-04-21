@@ -8,13 +8,13 @@ namespace wServer.logic.behaviors
 {
     class TransformOnDeath : Behavior
     {
-        short target;
+        ushort target;
         int min;
         int max;
         float probability;
         public TransformOnDeath(string target, int min = 1, int max = 1, double probability = 1)
         {
-            this.target = BehaviorDb.InitGameData.IdToType[target];
+            this.target = BehaviorDb.InitGameData.IdToObjectType[target];
             this.min = min;
             this.max = max;
             this.probability = (float)probability;

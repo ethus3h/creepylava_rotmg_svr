@@ -8,7 +8,7 @@ namespace wServer.realm.entities
     public abstract class Character : Entity
     {
         public wRandom Random { get; private set; }
-        protected Character(RealmManager manager, short objType, wRandom rand)
+        protected Character(RealmManager manager, ushort objType, wRandom rand)
             : base(manager, objType)
         {
             this.Random = rand;

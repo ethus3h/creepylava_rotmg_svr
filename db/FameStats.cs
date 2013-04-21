@@ -208,7 +208,7 @@ public class FameStats
         }
         for (int i = 0; i < 4; i++)         //Well Equipped
         {
-            if (chr.Equipment[i] == -1) continue;
+            if (chr.Equipment[i] == 0xffff) continue;
             var b = data.Items[chr.Equipment[i]].FameBonus;
             if (b > 0)
                 bonus += baseFame * b / 100;
@@ -455,8 +455,8 @@ public class FameStats
         double bo = 0;
         for (int i = 0; i < 4; i++)         //Well Equipped
         {
-            if (chr.Equipment[i] == -1) continue;
-            var b = dat.Items[chr.Equipment[i]].FameBonus;
+            if (chr.Equipment[i] == 0xffff) continue;
+            var b = dat.Items[(ushort)chr.Equipment[i]].FameBonus;
             if (b > 0)
                 bo += baseFame * b / 100;
         }

@@ -25,7 +25,7 @@ namespace wServer.realm.entities
                 return null;
         }
 
-        public StaticObject(RealmManager manager, short objType, int? life, bool stat, bool dying, bool hittestable)
+        public StaticObject(RealmManager manager, ushort objType, int? life, bool stat, bool dying, bool hittestable)
             : base(manager, objType)
         {
             if (Vulnerable = life.HasValue)

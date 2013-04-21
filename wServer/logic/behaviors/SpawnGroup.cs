@@ -19,7 +19,7 @@ namespace wServer.logic.behaviors
         int maxChildren;
         int initialSpawn;
         Cooldown coolDown;
-        short[] children;
+        ushort[] children;
 
         public SpawnGroup(string group, int maxChildren = 5, double initialSpawn = 0.5, Cooldown coolDown = new Cooldown())
         {

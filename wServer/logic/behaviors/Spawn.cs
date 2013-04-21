@@ -19,11 +19,11 @@ namespace wServer.logic.behaviors
         int maxChildren;
         int initialSpawn;
         Cooldown coolDown;
-        short children;
+        ushort children;
 
         public Spawn(string children, int maxChildren = 5, double initialSpawn = 0.5, Cooldown coolDown = new Cooldown())
         {
-            this.children = (short)BehaviorDb.InitGameData.IdToType[children];
+            this.children = BehaviorDb.InitGameData.IdToObjectType[children];
             this.maxChildren = maxChildren;
             this.initialSpawn = (int)(maxChildren * initialSpawn);
             this.coolDown = coolDown.Normalize(0);

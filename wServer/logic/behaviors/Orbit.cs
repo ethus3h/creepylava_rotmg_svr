@@ -20,7 +20,7 @@ namespace wServer.logic.behaviors
         float speed;
         float acquireRange;
         float radius;
-        short? target;
+        ushort? target;
         float speedVariance;
         float radiusVariance;
         public Orbit(double speed, double radius, double acquireRange = 10,
@@ -29,7 +29,7 @@ namespace wServer.logic.behaviors
             this.speed = (float)speed;
             this.radius = (float)radius;
             this.acquireRange = (float)acquireRange;
-            this.target = target == null ? null : (short?)BehaviorDb.InitGameData.IdToType[target];
+            this.target = target == null ? null : (ushort?)BehaviorDb.InitGameData.IdToObjectType[target];
             this.speedVariance = (float)(speedVariance ?? speed * 0.1);
             this.radiusVariance = (float)(radiusVariance ?? speed * 0.1);
         }

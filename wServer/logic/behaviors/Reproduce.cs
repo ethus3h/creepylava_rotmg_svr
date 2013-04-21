@@ -14,11 +14,11 @@ namespace wServer.logic.behaviors
         double densityRadius;
         int densityMax;
         Cooldown coolDown;
-        short? children;
+        ushort? children;
 
         public Reproduce(string children = null, double densityRadius = 10, int densityMax = 5, Cooldown coolDown = new Cooldown())
         {
-            this.children = children == null ? null : (short?)BehaviorDb.InitGameData.IdToType[children];
+            this.children = children == null ? null : (ushort?)BehaviorDb.InitGameData.IdToObjectType[children];
             this.densityRadius = densityRadius;
             this.densityMax = densityMax;
             this.coolDown = coolDown.Normalize(60000);

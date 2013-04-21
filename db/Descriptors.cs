@@ -260,17 +260,17 @@ public class ActivateEffect
 }
 public class PortalDesc
 {
-	public short ObjectType { get; private set; }
-	public string ObjectId { get; private set; }
-	public string DungeonName { get; private set; }
+    public ushort ObjectType { get; private set; }
+    public string ObjectId { get; private set; }
+    public string DungeonName { get; private set; }
     public int TimeoutTime { get; private set; }
     public bool NexusPortal { get; private set; }
 
-	public PortalDesc(XElement elem)
-	{
-		XElement n;
-		ObjectType = (short)Utils.FromString(elem.Attribute("type").Value);
-		ObjectId = elem.Attribute("id").Value;
+    public PortalDesc(ushort type, XElement elem)
+    {
+        XElement n;
+        ObjectType = type;
+        ObjectId = elem.Attribute("id").Value;
         if ((n = elem.Element("NexusPortal")) != null) //<NexusPortal/>
         {
             NexusPortal = true;
@@ -278,13 +278,13 @@ public class PortalDesc
         if ((n = elem.Element("DungeonName")) != null) //<NexusPortal/>
         {
             DungeonName = elem.Element("DungeonName").Value;
-        }		
-        TimeoutTime = 30;        
-	}
+        }
+        TimeoutTime = 30;
+    }
 }
 public class Item
 {
-    public short ObjectType { get; private set; }
+    public ushort ObjectType { get; private set; }
     public string ObjectId { get; private set; }
     public int SlotType { get; private set; }
     public int Tier { get; private set; }
@@ -309,10 +309,10 @@ public class Item
     public ActivateEffect[] ActivateEffects { get; private set; }
     public ProjectileDesc[] Projectiles { get; private set; }
 
-    public Item(XElement elem)
+    public Item(ushort type, XElement elem)
     {
         XElement n;
-        ObjectType = (short)Utils.FromString(elem.Attribute(XName.Get("type")).Value);
+        ObjectType = type;
         ObjectId = elem.Attribute(XName.Get("id")).Value;
         SlotType = Utils.FromString(elem.Element("SlotType").Value);
         if ((n = elem.Element("Tier")) != null)
@@ -400,7 +400,7 @@ public class SpawnCount
 }
 public class ObjectDesc
 {
-    public short ObjectType { get; private set; }
+    public ushort ObjectType { get; private set; }
     public string ObjectId { get; private set; }
     public string DisplayId { get; private set; }
     public string Group { get; private set; }
@@ -438,10 +438,10 @@ public class ObjectDesc
     public int? PerRealmMax { get; private set; }
     public float? ExpMultiplier { get; private set; }    //Exp gained = level total / 10 * multi
 
-    public ObjectDesc(XElement elem)
+    public ObjectDesc(ushort type, XElement elem)
     {
         XElement n;
-        ObjectType = (short)Utils.FromString(elem.Attribute("type").Value);
+        ObjectType = type;
         ObjectId = elem.Attribute("id").Value;
         Class = elem.Element("Class").Value;
         if ((n = elem.Element("Group")) != null)
@@ -527,7 +527,7 @@ public class ObjectDesc
 
 public class TileDesc
 {
-    public short ObjectType { get; private set; }
+    public ushort ObjectType { get; private set; }
     public string ObjectId { get; private set; }
     public bool NoWalk { get; private set; }
     public bool Damaging { get; private set; }
@@ -538,10 +538,10 @@ public class TileDesc
     public float PushX { get; private set; }
     public float PushY { get; private set; }
 
-    public TileDesc(XElement elem)
+    public TileDesc(ushort type, XElement elem)
     {
         XElement n;
-        ObjectType = (short)Utils.FromString(elem.Attribute("type").Value);
+        ObjectType = type;
         ObjectId = elem.Attribute("id").Value;
         NoWalk = elem.Element("NoWalk") != null;
         if ((n = elem.Element("MinDamage")) != null)

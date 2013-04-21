@@ -65,12 +65,16 @@ namespace wServer.networking.handlers
 
             if (ok)
             {
-                client.SendPacket(new CreateSuccessPacket()
+                var target = client.Manager.Worlds[client.targetWorld];
+                //Delay to let client load remote texture
+                target.Timers.Add(new WorldTimer(500, (w, t) =>
                 {
-                    CharacterID = client.Character.CharacterId,
-                    ObjectID = client.Manager.Worlds[client.targetWorld]
-                               .EnterWorld(client.Player = new Player(client))
-                });
+                    client.SendPacket(new CreateSuccessPacket()
+                    {
+                        CharacterID = client.Character.CharacterId,
+                        ObjectID = target.EnterWorld(client.Player = new Player(client))
+                    });
+                }));
                 client.Stage = ProtocalStage.Ready;
             }
             else

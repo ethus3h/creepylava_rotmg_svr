@@ -69,7 +69,7 @@ AND characters.charId=death.chrId;";
                         {
                             Icon = "fame",
                             Title = string.Format("Your {0} died at level {1}",
-                                dat.TypeToId[(short)rdr.GetInt32("charType")],
+                                dat.ObjectTypeToId[(ushort)rdr.GetInt32("charType")],
                                 rdr.GetInt32("level")),
                             TagLine = string.Format("You earned {0} glorious Fame",
                                 rdr.GetInt32("totalFame")),
@@ -418,9 +418,9 @@ SELECT MAX(chestId) FROM vaults WHERE accId = @accId;";
             }
         }
 
-        public static Char CreateCharacter(XmlData dat, short type, int chrId)
+        public static Char CreateCharacter(XmlData dat, ushort type, int chrId)
         {
-            XElement cls = dat.TypeToElement[type];
+            XElement cls = dat.ObjectTypeToElement[type];
             if (cls == null) return null;
             return new Char()
             {

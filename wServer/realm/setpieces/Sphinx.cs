@@ -73,20 +73,20 @@ namespace wServer.realm.setpieces
                     if (t[x, y] == 1)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = (byte)dat.IdToType[Floor]; tile.ObjType = 0;
+                        tile.TileId = dat.IdToTileType[Floor]; tile.ObjType = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (t[x, y] == 2)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = (byte)dat.IdToType[Central]; tile.ObjType = 0;
+                        tile.TileId = dat.IdToTileType[Central]; tile.ObjType = 0;
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
                     else if (t[x, y] == 3)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = (byte)dat.IdToType[Central];
-                        tile.ObjType = dat.IdToType[Pillar];
+                        tile.TileId = dat.IdToTileType[Central];
+                        tile.ObjType = dat.IdToObjectType[Pillar];
                         tile.Name = ConnectionComputer.GetConnString((_x, _y) => t[x + _x, y + _y] == 3);
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
                         world.Map[x + pos.X, y + pos.Y] = tile;
@@ -94,14 +94,14 @@ namespace wServer.realm.setpieces
                     else if (t[x, y] == 4)
                     {
                         var tile = world.Map[x + pos.X, y + pos.Y].Clone();
-                        tile.TileId = (byte)dat.IdToType[Floor];
-                        tile.ObjType = dat.IdToType[Pillar];
+                        tile.TileId = dat.IdToTileType[Floor];
+                        tile.ObjType = dat.IdToObjectType[Pillar];
                         tile.Name = ConnectionComputer.GetConnString((_x, _y) => t[x + _x, y + _y] == 4);
                         if (tile.ObjId == 0) tile.ObjId = world.GetNextEntityId();
                         world.Map[x + pos.X, y + pos.Y] = tile;
                     }
 
-            Entity sphinx = Entity.Resolve(world.Manager, 0x0d54);
+            Entity sphinx = Entity.Resolve(world.Manager, "Grand Sphinx");
             sphinx.Move(pos.X + 40.5f, pos.Y + 40.5f);
             world.EnterWorld(sphinx);
         }

@@ -50,9 +50,9 @@ namespace wServer.realm.terrain
     public struct WmapTile
     {
         public byte UpdateCount;
-        public byte TileId;
+        public ushort TileId;
         public string Name;
-        public short ObjType;
+        public ushort ObjType;
         public WmapTerrain Terrain;
         public TileRegion Region;
         public byte Elevation;
@@ -133,7 +133,7 @@ namespace wServer.realm.terrain
             set { tiles[x, y] = value; }
         }
 
-        Tuple<IntPoint, short, string>[] entities;
+        Tuple<IntPoint, ushort, string>[] entities;
         public int Load(Stream stream, int idBase)
         {
             int ver = stream.ReadByte();
@@ -153,9 +153,9 @@ namespace wServer.realm.terrain
             for (short i = 0; i < c; i++)
             {
                 WmapTile tile = new WmapTile();
-                tile.TileId = (byte)reader.ReadInt16();
+                tile.TileId = reader.ReadUInt16();
                 string obj = reader.ReadString();
-                tile.ObjType = string.IsNullOrEmpty(obj) ? (short)0 : dat.IdToType[obj];
+                tile.ObjType = string.IsNullOrEmpty(obj) ? (ushort)0 : dat.IdToObjectType[obj];
                 tile.Name = reader.ReadString();
                 tile.Terrain = (WmapTerrain)reader.ReadByte();
                 tile.Region = (TileRegion)reader.ReadByte();
@@ -165,7 +165,7 @@ namespace wServer.realm.terrain
             Height = reader.ReadInt32();
             tiles = new WmapTile[Width, Height];
             int enCount = 0;
-            List<Tuple<IntPoint, short, string>> entities = new List<Tuple<IntPoint, short, string>>();
+            List<Tuple<IntPoint, ushort, string>> entities = new List<Tuple<IntPoint, ushort, string>>();
             for (int y = 0; y < Height; y++)
                 for (int x = 0; x < Width; x++)
                 {
@@ -177,7 +177,7 @@ namespace wServer.realm.terrain
                         (!dat.ObjectDescs.TryGetValue(tile.ObjType, out desc) ||
                         !desc.Static || desc.Enemy))
                     {
-                        entities.Add(new Tuple<IntPoint, short, string>(new IntPoint(x, y), tile.ObjType, tile.Name));
+                        entities.Add(new Tuple<IntPoint, ushort, string>(new IntPoint(x, y), tile.ObjType, tile.Name));
                         tile.ObjType = 0;
                     }
 
@@ -201,9 +201,9 @@ namespace wServer.realm.terrain
             for (short i = 0; i < c; i++)
             {
                 WmapTile tile = new WmapTile();
-                tile.TileId = (byte)reader.ReadInt16();
+                tile.TileId = reader.ReadUInt16();
                 string obj = reader.ReadString();
-                tile.ObjType = string.IsNullOrEmpty(obj) ? (short)0 : dat.IdToType[obj];
+                tile.ObjType = string.IsNullOrEmpty(obj) ? (ushort)0 : dat.IdToObjectType[obj];
                 tile.Name = reader.ReadString();
                 tile.Terrain = (WmapTerrain)reader.ReadByte();
                 tile.Region = (TileRegion)reader.ReadByte();
@@ -214,7 +214,7 @@ namespace wServer.realm.terrain
             Height = reader.ReadInt32();
             tiles = new WmapTile[Width, Height];
             int enCount = 0;
-            List<Tuple<IntPoint, short, string>> entities = new List<Tuple<IntPoint, short, string>>();
+            List<Tuple<IntPoint, ushort, string>> entities = new List<Tuple<IntPoint, ushort, string>>();
             for (int y = 0; y < Height; y++)
                 for (int x = 0; x < Width; x++)
                 {
@@ -226,7 +226,7 @@ namespace wServer.realm.terrain
                         (!dat.ObjectDescs.TryGetValue(tile.ObjType, out desc) ||
                         !desc.Static || desc.Enemy))
                     {
-                        entities.Add(new Tuple<IntPoint, short, string>(new IntPoint(x, y), tile.ObjType, tile.Name));
+                        entities.Add(new Tuple<IntPoint, ushort, string>(new IntPoint(x, y), tile.ObjType, tile.Name));
                         tile.ObjType = 0;
                     }
 
@@ -250,9 +250,9 @@ namespace wServer.realm.terrain
             for (short i = 0; i < c; i++)
             {
                 WmapTile tile = new WmapTile();
-                tile.TileId = (byte)reader.ReadInt16();
+                tile.TileId = reader.ReadUInt16();
                 string obj = reader.ReadString();
-                tile.ObjType = string.IsNullOrEmpty(obj) ? (short)0 : dat.IdToType[obj];
+                tile.ObjType = string.IsNullOrEmpty(obj) ? (ushort)0 : dat.IdToObjectType[obj];
                 tile.Name = reader.ReadString();
                 tile.Terrain = (WmapTerrain)reader.ReadByte();
                 tile.Region = (TileRegion)reader.ReadByte();
@@ -262,7 +262,7 @@ namespace wServer.realm.terrain
             Height = reader.ReadInt32();
             tiles = new WmapTile[Width, Height];
             int enCount = 0;
-            List<Tuple<IntPoint, short, string>> entities = new List<Tuple<IntPoint, short, string>>();
+            List<Tuple<IntPoint, ushort, string>> entities = new List<Tuple<IntPoint, ushort, string>>();
             for (int y = 0; y < Height; y++)
                 for (int x = 0; x < Width; x++)
                 {
@@ -275,7 +275,7 @@ namespace wServer.realm.terrain
                         (!dat.ObjectDescs.TryGetValue(tile.ObjType, out desc) ||
                         !desc.Static || desc.Enemy))
                     {
-                        entities.Add(new Tuple<IntPoint, short, string>(new IntPoint(x, y), tile.ObjType, tile.Name));
+                        entities.Add(new Tuple<IntPoint, ushort, string>(new IntPoint(x, y), tile.ObjType, tile.Name));
                         tile.ObjType = 0;
                     }
 

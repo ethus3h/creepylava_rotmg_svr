@@ -13,14 +13,14 @@ namespace wServer.logic.behaviors
         //State storage: none
 
         double range;
-        short children;
+        ushort children;
         string targetStateName;
         State targetState;
 
         public Order(double range, string children, string targetState)
         {
             this.range = range;
-            this.children = BehaviorDb.InitGameData.IdToType[children];
+            this.children = BehaviorDb.InitGameData.IdToObjectType[children];
             this.targetStateName = targetState;
         }
 

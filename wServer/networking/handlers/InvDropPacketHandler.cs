@@ -27,8 +27,8 @@ namespace wServer.networking.handlers
         static Random invRand = new Random();
         void Handle(Player player, int slot)
         {
-            const short NORM_BAG = 0x0500;
-            const short SOUL_BAG = 0x0503;
+            const ushort NORM_BAG = 0x0500;
+            const ushort SOUL_BAG = 0x0503;
 
             IContainer con = player as IContainer;
             if (con.Inventory[slot] == null)

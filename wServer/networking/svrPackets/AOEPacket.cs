@@ -12,7 +12,7 @@ namespace wServer.networking.svrPackets
         public ushort Damage { get; set; }
         public ConditionEffectIndex Effects { get; set; }
         public float EffectDuration { get; set; }
-        public short OriginType { get; set; }
+        public ushort OriginType { get; set; }
 
         public override PacketID ID { get { return PacketID.AOE; } }
         public override Packet CreateInstance() { return new AOEPacket(); }
@@ -24,7 +24,7 @@ namespace wServer.networking.svrPackets
             Damage = rdr.ReadUInt16();
             Effects = (ConditionEffectIndex)rdr.ReadByte();
             EffectDuration = rdr.ReadSingle();
-            OriginType = rdr.ReadInt16();
+            OriginType = rdr.ReadUInt16();
         }
         protected override void Write(NWriter wtr)
         {

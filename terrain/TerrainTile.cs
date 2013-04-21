@@ -50,7 +50,7 @@ namespace terrain
         public float Elevation;
         public float Moisture;
         public string Biome;
-        public short TileId;
+        public ushort TileId;
         public string Name;
         public string TileObj;
         public TerrainType Terrain;

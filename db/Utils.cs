@@ -31,8 +31,8 @@ public static class Utils
         return x.Split(',').Select(_ => FromString(_.Trim())).ToArray();
     }
 
-    public static short[] FromCommaSepString16(string x)
+    public static ushort[] FromCommaSepString16(string x)
     {
-        return x.Split(',').Select(_ => (short)FromString(_.Trim())).ToArray();
+        return x.Split(',').Select(_ => (ushort)FromString(_.Trim())).ToArray();
     }
 }

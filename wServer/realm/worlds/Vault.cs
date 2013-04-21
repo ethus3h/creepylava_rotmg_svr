@@ -58,7 +58,7 @@ namespace wServer.realm.worlds
             for (int i = 0; i < chests.Count; i++)
             {
                 Container con = new Container(client.Manager, 0x0504, null, false);
-                var inv = chests[i].Items.Select(_ => _ == -1 ? null : client.Manager.GameData.Items[(short)_]).ToArray();
+                var inv = chests[i].Items.Select(_ => _ == -1 ? null : client.Manager.GameData.Items[(ushort)_]).ToArray();
                 for (int j = 0; j < 8; j++)
                     con.Inventory[j] = inv[j];
                 con.Move(vaultChestPosition[0].X + 0.5f, vaultChestPosition[0].Y + 0.5f);
@@ -78,7 +78,7 @@ namespace wServer.realm.worlds
         public void AddChest(VaultChest chest, Entity original)
         {
             Container con = new Container(client.Manager, 0x0504, null, false);
-            var inv = chest.Items.Select(_ => _ == -1 ? null : Manager.GameData.Items[(short)_]).ToArray();
+            var inv = chest.Items.Select(_ => _ == -1 ? null : Manager.GameData.Items[(ushort)_]).ToArray();
             for (int j = 0; j < 8; j++)
                 con.Inventory[j] = inv[j];
             con.Move(original.X, original.Y);

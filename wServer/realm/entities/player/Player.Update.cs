@@ -12,11 +12,6 @@ namespace wServer.realm.entities
         public const int RADIUS = 15;
         const int APPOX_AREA_OF_SIGHT = (int)(Math.PI * RADIUS * RADIUS + 1);
 
-        double DistanceSquared(float x, float y, float oX, float oY)
-        {
-            return (x - 0.5 - (int)oX) * (x - 0.5 - (int)oX) + (y - 0.5 - (int)oY) * (y - 0.5 - (int)oY);
-        }
-
         int mapWidth, mapHeight;
 
         HashSet<Entity> clientEntities = new HashSet<Entity>();
@@ -44,7 +39,7 @@ namespace wServer.realm.entities
                     int[] owners = (i as Container).BagOwners;
                     if (owners.Length > 0 && Array.IndexOf(owners, AccountId) == -1) continue;
                 }
-                if (DistanceSquared(i.X, i.Y, X, Y) <= RADIUS * RADIUS)
+                if (MathsUtils.DistSqr(i.X, i.Y, X, Y) <= RADIUS * RADIUS)
                 {
                     if (clientEntities.Add(i))
                         yield return i;
@@ -58,7 +53,7 @@ namespace wServer.realm.entities
             foreach (var i in clientEntities)
             {
                 if (i is Player && i.Owner != null) continue;
-                if (DistanceSquared(i.X, i.Y, X, Y) > RADIUS * RADIUS &&
+                if (MathsUtils.DistSqr(i.X, i.Y, X, Y) > RADIUS * RADIUS &&
                     !(i is StaticObject && (i as StaticObject).Static) &&
                     i != questEntity)
                     yield return i.Id;

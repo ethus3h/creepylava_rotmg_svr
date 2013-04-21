@@ -3,71 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using wServer.realm;
-using wServer.logic.attack;
-using wServer.logic.movement;
+using wServer.logic.behaviors;
 using wServer.logic.loot;
-using wServer.logic.taunt;
-using wServer.logic.cond;
+using wServer.logic.transitions;
 
 namespace wServer.logic
 {
     partial class BehaviorDb
     {
-        static _ Misc = Behav()
-            .Init(0x01c7, Behaves("White Fountain",
-                    MagicEye.Instance,
-                    Cooldown.Instance(250,
-                        IfNot.Instance(
-                            new NexusHealHp(),
-                            new NexusHealMp()
-                        )
-                    )
-                ))
-            .Init(0x6d2, Behaves("Red Satellite",
-                    StrictCirclingGroup.Instance(3, 5, "Golems"),
-                    GolemSatellites.Instance
-                ))
-            .Init(0x6d3, Behaves("Green Satellite",
-                    StrictCirclingGroup.Instance(3, 5, "Golems"),
-                    GolemSatellites.Instance
-                ))
-            .Init(0x6d4, Behaves("Blue Satellite",
-                    StrictCirclingGroup.Instance(3, 5, "Golems"),
-                    GolemSatellites.Instance
-                ))
-
-            .Init(0x6d5, Behaves("Gray Satellite 1",
-                    StrictCirclingGroup.Instance(1f, 10, "Golem Satellites"),
-                    new RunBehaviors(
-                        Cooldown.Instance(500, SimpleAttack.Instance(5)),
-                        GolemSatellites.Instance
-                    )
-                ))
-            .Init(0x6d6, Behaves("Gray Satellite 2",
-                    StrictCirclingGroup.Instance(1f, 10, "Golem Satellites"),
-                    new RunBehaviors(
-                        Cooldown.Instance(500, SimpleAttack.Instance(5)),
-                        GolemSatellites.Instance
-                    )
-                ))
-            .Init(0x6d7, Behaves("Gray Satellite 3",
-                    StrictCirclingGroup.Instance(1f, 10, "Golem Satellites"),
-                    new RunBehaviors(
-                        Cooldown.Instance(500, SimpleAttack.Instance(5)),
-                        GolemSatellites.Instance
-                    )
-                ))
-            .Init(0x01ff, Behaves("Sheep",
-                    new QueuedBehavior(
-                        RandomDelay.Instance(2500, 7500),
-                        SimpleWandering.Instance(2, 2)
+        _ Misc = () => Behav()
+            .Init("Forgotten Archmage of Flame",
+                    new State(
+                        new Prioritize(
+                            new Wander(0.1)
+                        ),
+                        new Shoot(10, count: 6, shootAngle: 60, fixedAngle: 0, coolDown: 1200, coolDownOffset: 0),
+                        new Shoot(10, count: 6, shootAngle: 60, fixedAngle: 10, coolDown: 1200, coolDownOffset: 200),
+                        new Shoot(10, count: 6, shootAngle: 60, fixedAngle: 20, coolDown: 1200, coolDownOffset: 400),
+                        new Shoot(10, count: 6, shootAngle: 60, fixedAngle: 30, coolDown: 1200, coolDownOffset: 600),
+                        new Shoot(10, count: 6, shootAngle: 60, fixedAngle: 40, coolDown: 1200, coolDownOffset: 800),
+                        new Shoot(10, count: 6, shootAngle: 60, fixedAngle: 50, coolDown: 1200, coolDownOffset: 1000)
                     ),
-                    Cooldown.Instance(1000,
-                        Rand.Instance(
-                            new RandomTaunt(0.001, "baa"),
-                            new RandomTaunt(0.001, "baa baa")
-                        )
-                    )
-                ));
+                    new ItemLoot("Staff of the Abyss", 0.8)
+                )
+                ;
     }
 }

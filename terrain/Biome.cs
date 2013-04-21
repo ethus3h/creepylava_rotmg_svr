@@ -124,7 +124,7 @@ namespace terrain
             return ret;
         }
 
-        short GetBiomeGround(string biome)
+        ushort GetBiomeGround(string biome)
         {
             switch (biome)
             {

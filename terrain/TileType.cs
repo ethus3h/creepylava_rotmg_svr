@@ -7,24 +7,24 @@ namespace terrain
 {
     class TileTypes
     {
-        public const short DeepWater = 0xbc;
-        public const short Water = 0x73;
-        public const short MovingWater = 0x72;
-        public const short Beach = 0xbe;
-        public const short Sand = 0xbd;
-        public const short Grass = 0x48;
-        public const short BrightGrass = 0x23;
-        public const short LightGrass = 0x46;
-        public const short YellowGrass = 0x47;
-        public const short DarkGrass = 0x56;
-        public const short BlueGrass = 0x57;
-        public const short Snow = 0x6b;
-        public const short SnowRock = 0x6a;
-        public const short Rock = 0x60;
+        public const ushort DeepWater = 0xbc;
+        public const ushort Water = 0x73;
+        public const ushort MovingWater = 0x72;
+        public const ushort Beach = 0xbe;
+        public const ushort Sand = 0xbd;
+        public const ushort Grass = 0x48;
+        public const ushort BrightGrass = 0x23;
+        public const ushort LightGrass = 0x46;
+        public const ushort YellowGrass = 0x47;
+        public const ushort DarkGrass = 0x56;
+        public const ushort BlueGrass = 0x57;
+        public const ushort Snow = 0x6b;
+        public const ushort SnowRock = 0x6a;
+        public const ushort Rock = 0x60;
 
-        public const short Road = 0xd0;
+        public const ushort Road = 0xd0;
 
-        public static readonly Dictionary<short, string> id = new Dictionary<short, string>()
+        public static readonly Dictionary<ushort, string> id = new Dictionary<ushort, string>()
         {
             { 0xbc, "Dark Water" },
             { 0x72, "Water" },
@@ -43,7 +43,7 @@ namespace terrain
             { 0xd0, "Road" },
         };
 
-        public static readonly Dictionary<short, uint> color = new Dictionary<short, uint>()
+        public static readonly Dictionary<ushort, uint> color = new Dictionary<ushort, uint>()
         {
             { 0xbc, 0xFF000080 },
             { 0x72, 0xFF0000FF },

@@ -16,7 +16,7 @@ namespace wServer.realm.entities
     {
         public IProjectileOwner ProjectileOwner { get; set; }
         public byte ProjectileId { get; set; }
-        public short Container { get; set; }
+        public ushort Container { get; set; }
         public int Damage { get; set; }
 
         public long BeginTime { get; set; }
@@ -26,7 +26,7 @@ namespace wServer.realm.entities
         public ProjectileDesc Descriptor { get; set; }
 
         public Projectile(RealmManager manager, ProjectileDesc desc)
-            : base(manager, manager.GameData.IdToType[desc.ObjectId])
+            : base(manager, manager.GameData.IdToObjectType[desc.ObjectId])
         {
             this.Descriptor = desc;
         }

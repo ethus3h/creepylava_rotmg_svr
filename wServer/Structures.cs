@@ -176,12 +176,12 @@ namespace wServer
     }
     public struct ObjectDef
     {
-        public short ObjectType;
+        public ushort ObjectType;
         public ObjectStats Stats;
         public static ObjectDef Read(NReader rdr)
         {
             ObjectDef ret = new ObjectDef();
-            ret.ObjectType = rdr.ReadInt16();
+            ret.ObjectType = rdr.ReadUInt16();
             ret.Stats = ObjectStats.Read(rdr);
             return ret;
         }
