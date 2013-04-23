@@ -91,6 +91,7 @@
     <Compile Include="credits\getoffers.cs" />
     <Compile Include="fame\list.cs" />
     <Compile Include="crossdomain.cs" />
+    <Compile Include="ISManager.cs" />
     <Compile Include="RequestHandler.cs" />
     <Compile Include="picture\get.cs" />
     <Compile Include="Program.cs">

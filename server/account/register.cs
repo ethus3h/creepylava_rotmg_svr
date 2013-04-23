@@ -69,14 +69,10 @@ namespace server.account
                     var status = Database.Verify(query["guid"], "", out acc);
                     if (status == LoginStatus.OK)
                     {
-                        using (var l = Database.Lock(acc))
-                            if (Database.LockOk(l) && Database.RenameUUID(acc, query["newGUID"], lockToken))
-                            {
-                                Database.ChangePassword(acc.UUID, query["newPassword"]);
-                                Write(context, "<Success />");
-                            }
-                            else
-                                Write(context, "<Error>Account in Use</Error>");
+                        //what? can register in game? kill the account lock
+                        Database.RenameUUID(acc, query["newGUID"], lockToken);
+                        Database.ChangePassword(acc.UUID, query["newPassword"]);
+                        Write(context, "<Success />");
                     }
                     else
                     {

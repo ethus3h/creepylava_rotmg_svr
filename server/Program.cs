@@ -20,6 +20,7 @@ namespace server
         internal static SimpleSettings Settings;
         internal static XmlData GameData;
         internal static Database Database;
+        internal static string InstanceId;
 
         static ILog log = LogManager.GetLogger("Server");
 
@@ -31,12 +32,14 @@ namespace server
             Thread.CurrentThread.Name = "Entry";
 
             using (Settings = new SimpleSettings("server"))
+            using (Database = new Database(
+                    Settings.GetValue<string>("db_host", "127.0.0.1"),
+                    Settings.GetValue<int>("db_port", "6379"),
+                    Settings.GetValue<string>("db_auth", "")))
             {
-                Database = new Database(
-                        Settings.GetValue<string>("db_host", "127.0.0.1"),
-                        Settings.GetValue<int>("db_port", "6379"),
-                        Settings.GetValue<string>("db_auth", ""));
                 GameData = new XmlData();
+                InstanceId = Guid.NewGuid().ToString();
+
                 int port = Settings.GetValue<int>("port", "8888");
 
                 listener = new HttpListener();
@@ -47,9 +50,13 @@ namespace server
                 Console.CancelKeyPress += (sender, e) => e.Cancel = true;
                 log.Info("Listening at port " + port + "...");
 
+                ISManager manager = new ISManager();
+                manager.Run();
+
                 while (Console.ReadKey(true).Key != ConsoleKey.Escape) ;
 
                 log.Info("Terminating...");
+                manager.Dispose();
                 listener.Stop();
                 GameData.Dispose();
             }
@@ -62,7 +69,7 @@ namespace server
             listener.BeginGetContext(ListenerCallback, null);
             ProcessRequest(context);
         }
-        
+
         static void ProcessRequest(HttpListenerContext context)
         {
             try

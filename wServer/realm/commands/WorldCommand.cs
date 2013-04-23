@@ -155,31 +155,8 @@ namespace wServer.realm.commands
                 return false;
             }
 
-            foreach (var i in player.Manager.Clients.Values)
-            {
-                if (i.Account.NameChosen && i.Account.Name.EqualsIgnoreCase(playername))
-                {
-                    player.Client.SendPacket(new TextPacket() //echo to self
-                    {
-                        BubbleTime = 10,
-                        Stars = player.Stars,
-                        Name = player.Name,
-                        Recipient = i.Account.Name,
-                        Text = msg
-                    });
-
-                    i.SendPacket(new TextPacket() //echo to /tell player
-                    {
-                        BubbleTime = 10,
-                        Stars = player.Stars,
-                        Name = player.Name,
-                        Recipient = i.Account.Name,
-                        Text = msg
-                    });
-                    return true;
-                }
-            }
-            player.SendError(string.Format("{0} not found.", playername));
+            if (!player.Manager.Chat.Tell(player, playername, msg))
+                player.SendError(string.Format("{0} not found.", playername));
             return false;
         }
     }

@@ -96,6 +96,10 @@ namespace common
         {
             return (int)Keys.TimeToLive(1, "lock." + acc.AccountId).Exec();
         }
+        public int GetLockTime(int id)
+        {
+            return (int)Keys.TimeToLive(1, "lock." + id).Exec();
+        }
 
         public bool RenewLock(DbAccount acc)
         {
@@ -173,14 +177,12 @@ namespace common
 
         public bool RenameUUID(DbAccount acc, string newUuid, string lockToken)
         {
-            string p = Hashes.GetString(0, "login", acc.UUID).Exec();
+            string p = Hashes.GetString(0, "login", acc.UUID.ToUpperInvariant()).Exec();
             using (var trans = CreateTransaction())
             {
                 trans.AddCondition(Condition.KeyEquals(1, REG_LOCK, lockToken));
-                trans.Sets.Remove(0, "uuids", acc.UUID);
-                trans.Sets.Add(0, "uuids", newUuid);
-                trans.Hashes.Remove(0, "login", acc.UUID);
-                trans.Hashes.Set(0, "login", newUuid, p);
+                trans.Hashes.Remove(0, "login", acc.UUID.ToUpperInvariant());
+                trans.Hashes.Set(0, "login", newUuid.ToUpperInvariant(), p);
                 if (!trans.Execute().Exec()) return false;
             }
             acc.UUID = newUuid;
@@ -189,11 +191,13 @@ namespace common
         }
         public bool RenameIGN(DbAccount acc, string newName, string lockToken)
         {
+            if (names.Contains(newName, StringComparer.InvariantCultureIgnoreCase))
+                return false;
             using (var trans = CreateTransaction())
             {
                 trans.AddCondition(Condition.KeyEquals(1, NAME_LOCK, lockToken));
-                Sets.Remove(0, "names", acc.Name);
-                Sets.Add(0, "names", newName);
+                Hashes.Remove(0, "names", acc.Name.ToUpperInvariant());
+                Hashes.Set(0, "names", newName.ToUpperInvariant(), acc.AccountId.ToString());
                 if (!trans.Execute().Exec()) return false;
             }
             acc.Name = newName;
@@ -220,7 +224,7 @@ namespace common
         public RegisterStatus Register(string uuid, string password, bool isGuest, out DbAccount acc)
         {
             acc = null;
-            if (!Sets.Add(0, "uuids", uuid).Exec())
+            if (!Hashes.SetIfNotExists(0, "logins", uuid.ToUpperInvariant(), "{}").Exec())
                 return RegisterStatus.UsedName;
 
             int newAccId = (int)Strings.Increment(0, "nextAccId").Exec();
@@ -269,7 +273,7 @@ namespace common
 
         public bool HasUUID(string uuid)
         {
-            return Sets.Contains(0, "uuids", uuid).Exec();
+            return Hashes.Exists(0, "login", uuid.ToUpperInvariant()).Exec();
         }
         public DbAccount GetAccount(int id)
         {
@@ -286,6 +290,17 @@ namespace common
             if (ret.IsNull)
                 return null;
             return ret;
+        }
+
+        public int ResolveId(string ign)
+        {
+            string val = Hashes.GetString(0, "names", ign.ToUpperInvariant()).Exec();
+            if (val == null) return 0;
+            else return int.Parse(val);
+        }
+        public string ResolveIgn(int accId)
+        {
+            return Hashes.GetString(0, "account." + accId, "name").Exec();
         }
 
         public void UpdateCredit(DbAccount acc, int amount)
@@ -456,5 +471,6 @@ namespace common
             };
             DbLegend.Insert(this, death.DeathTime, entry);
         }
+
     }
 }

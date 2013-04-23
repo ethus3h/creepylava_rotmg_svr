@@ -44,11 +44,13 @@ namespace wServer.realm
     {
         static ILog log = LogManager.GetLogger(typeof(RealmManager));
 
+        public string InstanceId { get; private set; }
         public int MaxClient { get; private set; }
         public int TPS { get; private set; }
         public Database Database { get; private set; }
         public RealmManager(int maxClient, int tps, Database db)
         {
+            this.InstanceId = Guid.NewGuid().ToString();
             this.MaxClient = maxClient;
             this.TPS = tps;
             this.Database = db;
@@ -145,6 +147,7 @@ namespace wServer.realm
         public BehaviorDb Behaviors { get; private set; }
 
 
+        public ISManager InterServer { get; private set; }
         public ChatManager Chat { get; private set; }
         public CommandManager Commands { get; private set; }
 
@@ -168,6 +171,7 @@ namespace wServer.realm
 
             //AddWorld(new GameWorld(1, "Medusa", true));
 
+            InterServer = new ISManager(this);
             Chat = new ChatManager(this);
             Commands = new CommandManager(this);
 
@@ -202,6 +206,7 @@ namespace wServer.realm
         {
             log.Info("Stopping Realm Manager...");
 
+            InterServer.Dispose();
             Terminating = true;
             GameData.Dispose();
             logic.Join();

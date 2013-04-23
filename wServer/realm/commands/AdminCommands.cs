@@ -282,8 +282,7 @@ namespace wServer.realm.commands
 
         protected override bool Process(Player player, RealmTime time, string args)
         {
-            foreach (var client in player.Manager.Clients.Values)
-                client.Player.SendText("@Announcement", args);
+            player.Manager.Chat.Announce(args);
             return true;
         }
     }

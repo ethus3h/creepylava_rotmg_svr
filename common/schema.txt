@@ -2,11 +2,8 @@
 login : {
     uuid : salt + SHA1(password + salt) + accId
 }
-uuids {
-	uuid
-}
 names {
-	name
+	name : accId
 }
 account.(accId) {
     uuid
@@ -18,7 +15,7 @@ account.(accId) {
 	guildRank
 	vaultCount
 	maxCharSlot
-	regTime,
+	regTime
 	guest
 	fame
 	totalFame

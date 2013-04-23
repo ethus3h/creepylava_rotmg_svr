@@ -30,11 +30,11 @@ namespace wServer
             Thread.CurrentThread.Name = "Entry";
 
             using (Settings = new SimpleSettings("wServer"))
-            {
-                var db = new Database(
+            using (var db = new Database(
                         Settings.GetValue<string>("db_host", "127.0.0.1"),
                         Settings.GetValue<int>("db_port", "6379"),
-                        Settings.GetValue<string>("db_auth", ""));
+                        Settings.GetValue<string>("db_auth", "")))
+            {
                 RealmManager manager = new RealmManager(
                     Settings.GetValue<int>("maxClient", "100"),
                     Settings.GetValue<int>("tps", "20"),

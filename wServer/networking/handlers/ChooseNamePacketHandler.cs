@@ -31,7 +31,7 @@ namespace wServer.networking.handlers
                 {
                     while ((lockToken = client.Manager.Database.AcquireLock(key)) == null) ;
 
-                    if (client.Manager.Database.Sets.Contains(0, "names", name).Exec())
+                    if (client.Manager.Database.Hashes.Exists(0, "names", name.ToUpperInvariant()).Exec())
                     {
                         client.SendPacket(new NameResultPacket()
                         {
@@ -52,6 +52,8 @@ namespace wServer.networking.handlers
                         if (client.Account.NameChosen)
                             client.Manager.Database.UpdateCredit(client.Account, -1000);
                         while (!client.Manager.Database.RenameIGN(client.Account, name, lockToken)) ;
+                        client.Player.Name = client.Account.Name;
+                        client.Player.UpdateCount++;
                         client.SendPacket(new NameResultPacket()
                         {
                             Success = true,

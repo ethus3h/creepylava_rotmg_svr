@@ -71,5 +71,35 @@ namespace wServer.realm.entities
                 Text = text
             });
         }
+
+        internal void TellReceived(int objId, int stars, string from, string to, string text)
+        {
+            Client.SendPacket(new TextPacket()
+            {
+                BubbleTime = 10,
+                Stars = stars,
+                Name = from,
+                Recipient = to,
+                Text = text
+            });
+        }
+
+        internal void AnnouncementReceived(string text)
+        {
+            client.Player.SendText("@Announcement", text);
+        }
+
+        internal void GuildReceived(int objId, int stars, string from, string text)
+        {
+            //untested
+            Client.SendPacket(new TextPacket()
+            {
+                BubbleTime = 10,
+                Stars = stars,
+                Name = "*Guild*",
+                Recipient = from,
+                Text = text
+            });
+        }
     }
 }

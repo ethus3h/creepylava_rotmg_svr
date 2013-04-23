@@ -83,6 +83,7 @@ namespace wServer.realm
                     }
                 }
                 TickWorlds1(t);
+                Manager.InterServer.Tick(t);
 
                 Thread.Sleep(MsPT);
                 dt += Math.Max(0, watch.ElapsedMilliseconds - b - MsPT);

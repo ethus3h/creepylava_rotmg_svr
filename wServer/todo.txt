@@ -2,7 +2,7 @@
 V	remote texture
 V	move to a better db
 V	make client independent of account
-	inter-server talk
+V	inter-server talk
 	load testing
 	events
 	dungeon

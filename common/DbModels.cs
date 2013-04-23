@@ -141,7 +141,7 @@ namespace common
         {
             this.db = db;
             UUID = uuid;
-            var json = db.Hashes.GetString(0, "logins", uuid).Exec();
+            var json = db.Hashes.GetString(0, "logins", uuid.ToUpperInvariant()).Exec();
             if (json == null)
                 IsNull = true;
             else
@@ -159,7 +159,7 @@ namespace common
 
         public void Flush()
         {
-            db.Hashes.Set(0, "logins", UUID, JsonConvert.SerializeObject(this));
+            db.Hashes.Set(0, "logins", UUID.ToUpperInvariant(), JsonConvert.SerializeObject(this));
         }
     }
 

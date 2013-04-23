@@ -186,6 +186,7 @@
     <Compile Include="networking\IPacketHandler.cs" />
     <Compile Include="realm\ChatManager.cs" />
     <Compile Include="realm\Inventory.cs" />
+    <Compile Include="realm\ISManager.cs" />
     <Compile Include="realm\setpieces\ArchMage.cs" />
     <Compile Include="realm\Utils.cs" />
     <Compile Include="logic\Cooldown.cs" />

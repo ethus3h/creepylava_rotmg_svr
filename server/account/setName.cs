@@ -32,7 +32,7 @@ namespace server.account
                 {
                     while ((lockToken = Database.AcquireLock(key)) == null) ;
 
-                    if (Database.Sets.Contains(0, "names", name).Exec())
+                    if (Database.Hashes.Exists(0, "names", name.ToUpperInvariant()).Exec())
                     {
                         Write(context, "<Error>Duplicated name</Error>");
                         return;

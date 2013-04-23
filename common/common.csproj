@@ -85,6 +85,7 @@
     <Compile Include="DbModels.cs" />
     <Compile Include="Descriptors.cs" />
     <Compile Include="Database.cs" />
+    <Compile Include="InterServerChannel.cs" />
     <Compile Include="ReadonlyDictionary.cs" />
     <Compile Include="XmlData.cs" />
     <Compile Include="FameStats.cs" />
