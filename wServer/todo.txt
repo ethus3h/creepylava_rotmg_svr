@@ -1,7 +1,9 @@
 ﻿V	central chat broadcast
 V	remote texture
-	move to a better db
-	make client independent of account
+V	move to a better db
+V	make client independent of account
+	inter-server talk
+	load testing
 	events
 	dungeon
 	pets/dye
