@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using wServer.networking.cliPackets;
 using wServer.realm;
+using common;
 using wServer.networking.svrPackets;
-using db;
 using wServer.realm.entities;
 
 namespace wServer.networking.handlers
@@ -22,7 +22,7 @@ namespace wServer.networking.handlers
             {
                 if (client.Character.Dead)
                 {
-                    SendFailure(client, "Character is dead.");
+                    SendFailure(client, "Character is dead");
                     client.Disconnect();
                 }
                 else
@@ -33,7 +33,7 @@ namespace wServer.networking.handlers
                     {
                         client.SendPacket(new CreateSuccessPacket()
                         {
-                            CharacterID = client.Character.CharacterId,
+                            CharacterID = client.Character.CharId,
                             ObjectID = target.EnterWorld(client.Player = new Player(client))
                         });
                     }));
@@ -42,7 +42,7 @@ namespace wServer.networking.handlers
             }
             else
             {
-                SendFailure(client, "Failed to load character.");
+                SendFailure(client, "Failed to load character");
                 client.Disconnect();
             }
         }

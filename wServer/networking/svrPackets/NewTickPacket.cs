@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using wServer.realm;
+using common;
 
 namespace wServer.networking.svrPackets
 {

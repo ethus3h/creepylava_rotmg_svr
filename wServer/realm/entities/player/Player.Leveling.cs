@@ -33,13 +33,14 @@ namespace wServer.realm.entities
         public int GetStars()
         {
             int ret = 0;
-            foreach (var i in client.Account.Stats.ClassStates)
+            foreach (var i in FameCounter.ClassStats.AllKeys)
             {
-                if (i.BestFame >= 2000) ret += 5;
-                else if (i.BestFame >= 800) ret += 4;
-                else if (i.BestFame >= 400) ret += 3;
-                else if (i.BestFame >= 150) ret += 2;
-                else if (i.BestFame >= 20) ret += 1;
+                var entry = FameCounter.ClassStats[ushort.Parse(i)];
+                if (entry.BestFame >= 2000) ret += 5;
+                else if (entry.BestFame >= 800) ret += 4;
+                else if (entry.BestFame >= 400) ret += 3;
+                else if (entry.BestFame >= 150) ret += 2;
+                else if (entry.BestFame >= 20) ret += 1;
             }
             return ret;
         }
@@ -161,9 +162,9 @@ namespace wServer.realm.entities
             {
                 Fame = newFame;
                 int newGoal;
-                var state = client.Account.Stats.ClassStates.SingleOrDefault(_ => _.ObjectType == ObjectType);
-                if (state != null && state.BestFame > Fame)
-                    newGoal = GetFameGoal(state.BestFame);
+                var stats = FameCounter.ClassStats[ObjectType];
+                if (stats.BestFame > Fame)
+                    newGoal = GetFameGoal(stats.BestFame);
                 else
                     newGoal = GetFameGoal(Fame);
                 if (newGoal > FameGoal)
@@ -226,7 +227,7 @@ namespace wServer.realm.entities
                 Experience += exp;
                 UpdateCount++;
             }
-            fames.Killed(enemy, killer);
+            FameCounter.Killed(enemy, killer);
             return CheckLevelUp();
         }
     }

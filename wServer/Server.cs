@@ -5,6 +5,7 @@ using System.Text;
 using System.Net.Sockets;
 using System.Net;
 using wServer.realm;
+using common;
 using wServer.networking;
 using log4net;
 

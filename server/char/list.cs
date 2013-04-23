@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Net;
 using System.Xml;
-using db;
+using common;
 using System.Xml.Serialization;
 using System.IO;
 using MySql.Data.MySqlClient;
@@ -13,7 +13,7 @@ using System.Collections.Specialized;
 
 namespace server.@char
 {
-    class list : IRequestHandler
+    class list : RequestHandler
     {
         Lazy<List<ServerItem>> svrList;
         public list()
@@ -37,44 +37,24 @@ namespace server.@char
             return ret;
         }
 
-        public void HandleRequest(HttpListenerContext context)
+        public override void HandleRequest(HttpListenerContext context)
         {
             NameValueCollection query;
             using (StreamReader rdr = new StreamReader(context.Request.InputStream))
                 query = HttpUtility.ParseQueryString(rdr.ReadToEnd());
 
-            using (var db = new Database(Program.Settings.GetValue("conn")))
+            DbAccount acc;
+            var status = Database.Verify(query["guid"], query["password"], out acc);
+            if (status == LoginStatus.OK||status== LoginStatus.AccountNotExists)
             {
-
-                Chars chrs = new Chars()
-                {
-                    Characters = new List<Char>() { },
-                    NextCharId = 2,
-                    MaxNumChars = 1,
-                    Account = db.Verify(query["guid"], query["password"]),
-                    Servers = GetServerList()
-                };
-                if (chrs.Account != null)
-                {
-                    db.GetCharData(chrs.Account, chrs);
-                    db.LoadCharacters(chrs.Account, chrs);
-                    chrs.News = db.GetNews(Program.GameData, chrs.Account);
-                }
-                else
-                {
-                    chrs.Account = Database.CreateGuestAccount(query["guid"]);
-                    chrs.News = db.GetNews(Program.GameData, null);
-                }
-
-                MemoryStream ms = new MemoryStream();
-                XmlSerializer serializer = new XmlSerializer(chrs.GetType(), new XmlRootAttribute(chrs.GetType().Name) { Namespace = "" });
-
-                XmlWriterSettings xws = new XmlWriterSettings();
-                xws.OmitXmlDeclaration = true;
-                xws.Encoding = Encoding.UTF8;
-                XmlWriter xtw = XmlWriter.Create(context.Response.OutputStream, xws);
-                serializer.Serialize(xtw, chrs, chrs.Namespaces);
+                if (status == LoginStatus.AccountNotExists)
+                    acc = Database.CreateGuestAccount(query["guid"]);
+                var list = CharList.FromDb(Database, acc);
+                list.Servers = GetServerList();
+                Write(context, list.ToXml().ToString());
             }
+            else
+                Write(context, "<Error>" + status.GetInfo() + "</Error>");
         }
     }
 }

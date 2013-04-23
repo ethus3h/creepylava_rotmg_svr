@@ -8,6 +8,7 @@ using System.Collections.Concurrent;
 using System.Threading;
 using System.Net;
 using wServer.realm;
+using common;
 using log4net;
 
 namespace wServer.networking
@@ -178,6 +179,8 @@ namespace wServer.networking
 
                         sendState = SendState.Sending;
                         e.SetBuffer(0, len);
+
+                        if (!skt.Connected) return;
                         skt.SendAsync(e);
                         break;
                     case SendState.Sending:
@@ -189,6 +192,8 @@ namespace wServer.networking
 
                             sendState = SendState.Sending;
                             e.SetBuffer(0, len);
+
+                            if (!skt.Connected) return;
                             skt.SendAsync(e);
                         }
                         break;

@@ -10,6 +10,7 @@ using wServer.networking.cliPackets;
 using wServer.networking;
 using wServer.realm.terrain;
 using log4net;
+using common;
 
 namespace wServer.realm.entities
 {
@@ -167,22 +168,17 @@ namespace wServer.realm.entities
         public void SaveToCharacter()
         {
             var chr = client.Character;
-            chr.Exp = Experience;
             chr.Level = Level;
+            chr.Experience = Experience;
+            chr.Fame = Fame;
+            chr.Items = Inventory.Select(_ => _ == null ? (ushort)0xffff : _.ObjectType).ToArray();
+            chr.HP = HP;
+            chr.MP = MP;
+            chr.Stats = Stats;
             chr.Tex1 = Texture1;
             chr.Tex2 = Texture2;
-            chr.CurrentFame = Fame;
-            chr.HitPoints = HP;
-            chr.MagicPoints = MP;
-            chr.Equipment = Inventory.Select(_ => _ == null ? (ushort)0xffff : _.ObjectType).ToArray();
-            chr.MaxHitPoints = Stats[0];
-            chr.MaxMagicPoints = Stats[1];
-            chr.Attack = Stats[2];
-            chr.Defense = Stats[3];
-            chr.Speed = Stats[4];
-            chr.HpRegen = Stats[5];
-            chr.MpRegen = Stats[6];
-            chr.Dexterity = Stats[7];
+            chr.FameStats = FameCounter.Stats.Write();
+            chr.LastSeen = DateTime.Now;
         }
 
         void CalculateBoost()
@@ -221,49 +217,32 @@ namespace wServer.realm.entities
             AccountId = client.Account.AccountId;
 
             Level = client.Character.Level;
-            Experience = client.Character.Exp;
-            ExperienceGoal = GetExpGoal(client.Character.Level);
-            Stars = GetStars();
+            Experience = client.Character.Experience;
             Texture1 = client.Character.Tex1;
             Texture2 = client.Character.Tex2;
             Credits = client.Account.Credits;
             NameChosen = client.Account.NameChosen;
-            CurrentFame = client.Account.Stats.Fame;
-            Fame = client.Character.CurrentFame;
-            var state = client.Account.Stats.ClassStates.SingleOrDefault(_ => _.ObjectType == ObjectType);
-            if (state != null)
-                FameGoal = GetFameGoal(state.BestFame);
-            else
-                FameGoal = GetFameGoal(0);
+            CurrentFame = client.Account.Fame;
+            Fame = client.Character.Fame;
             Glowing = true;
             Guild = "";
             GuildRank = -1;
-            HP = client.Character.HitPoints;
-            MP = client.Character.MagicPoints;
+            HP = client.Character.HP;
+            MP = client.Character.MP;
             ConditionEffects = 0;
 
             Inventory = new Inventory(this,
-                client.Character.Equipment
+                client.Character.Items
                     .Select(_ => _ == 0xffff ? null : client.Manager.GameData.Items[_])
                     .ToArray());
             Inventory.InventoryChanged += (sender, e) => CalculateBoost();
-            SlotTypes = Utils.FromCommaSepString32(client.Manager.GameData.ObjectTypeToElement[ObjectType].Element("SlotTypes").Value);
-            Stats = new int[]
-            {
-                client.Character.MaxHitPoints,
-                client.Character.MaxMagicPoints,
-                client.Character.Attack,
-                client.Character.Defense,
-                client.Character.Speed,
-                client.Character.HpRegen,
-                client.Character.MpRegen,
-                client.Character.Dexterity,
-            };
+            SlotTypes = client.Manager.GameData.ObjectTypeToElement[ObjectType]
+                .Element("SlotTypes").Value.CommaToArray<int>();
+            Stats = (int[])client.Character.Stats.Clone();
         }
 
         byte[,] tiles;
-        FameCounter fames;
-        public FameCounter FameCounter { get { return fames; } }
+        public FameCounter FameCounter { get; private set; }
 
         public override void Init(World owner)
         {
@@ -276,7 +255,12 @@ namespace wServer.realm.entities
             } while (owner.Map[x, y].Region != TileRegion.Spawn);
             Move(x + 0.5f, y + 0.5f);
             tiles = new byte[owner.Map.Width, owner.Map.Height];
-            fames = new FameCounter(this);
+
+            FameCounter = new FameCounter(this);
+            FameGoal = GetFameGoal(FameCounter.ClassStats[ObjectType].BestFame);
+            ExperienceGoal = GetExpGoal(client.Character.Level);
+            Stars = GetStars();
+
             SetNewbiePeriod();
             base.Init(owner);
         }
@@ -297,7 +281,7 @@ namespace wServer.realm.entities
             HandleQuest(time);
             HandleGround(time);
             HandleEffects(time);
-            fames.Tick(time);
+            FameCounter.Tick(time);
 
             SendUpdate(time);
 
@@ -354,7 +338,7 @@ namespace wServer.realm.entities
             var obj = Owner.GetEntity(objId);
             if (obj == null) return;
             Move(obj.X, obj.Y);
-            fames.Teleport();
+            FameCounter.Teleport();
             SetNewbiePeriod();
             UpdateCount++;
             Owner.BroadcastPacket(new GotoPacket()
@@ -530,25 +514,18 @@ namespace wServer.realm.entities
             if (CheckResurrection())
                 return;
 
-
-            if (client.Character.Dead)
-            {
-                client.Disconnect();
-                return;
-            }
-
             GenerateGravestone();
             foreach (var i in Owner.Players.Values)
                 i.SendInfo(Name + " died at Level " + Level + ", with " + Fame + " Fame" +/* " and " + Experience + " Experience " + */", killed by " + killer); //removed XP as max packet length reached!
 
-            client.Character.Dead = true;
             SaveToCharacter();
-            Manager.Database.SaveCharacter(client.Account, client.Character);
-            Manager.Database.Death(Manager.GameData, client.Account, client.Character, killer);
+            Manager.Database.SaveCharacter(client.Account, client.Character, true);
+            Manager.Database.Death(Manager.GameData, client.Account,
+                client.Character, FameCounter.Stats, killer);
             client.SendPacket(new DeathPacket()
             {
                 AccountId = AccountId,
-                CharId = client.Character.CharacterId,
+                CharId = client.Character.CharId,
                 Killer = killer
             });
             Owner.Timers.Add(new WorldTimer(1000, (w, t) => client.Disconnect()));

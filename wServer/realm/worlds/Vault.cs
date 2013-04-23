@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
-using db;
+using common;
 using wServer.realm.entities;
 using System.Collections.Concurrent;
 using wServer.networking;
@@ -33,7 +33,8 @@ namespace wServer.realm.worlds
             }
         }
 
-        ConcurrentDictionary<Tuple<Container, VaultChest>, int> vaultChests = new ConcurrentDictionary<Tuple<Container, VaultChest>, int>();
+        DbVault dbVault;
+        ConcurrentDictionary<Tuple<Container, int>, int> vaultChests = new ConcurrentDictionary<Tuple<Container, int>, int>();
         void InitVault()
         {
             List<IntPoint> vaultChestPosition = new List<IntPoint>();
@@ -54,18 +55,18 @@ namespace wServer.realm.worlds
                 (x.X - spawn.X) * (x.X - spawn.X) + (x.Y - spawn.Y) * (x.Y - spawn.Y),
                 (y.X - spawn.X) * (y.X - spawn.X) + (y.Y - spawn.Y) * (y.Y - spawn.Y)));
 
-            var chests = client.Account.Vault.Chests;
-            for (int i = 0; i < chests.Count; i++)
+            dbVault = new DbVault(client.Account);
+            for (int i = 0; i < client.Account.VaultCount; i++)
             {
                 Container con = new Container(client.Manager, 0x0504, null, false);
-                var inv = chests[i].Items.Select(_ => _ == -1 ? null : client.Manager.GameData.Items[(ushort)_]).ToArray();
+                var inv = dbVault[i].Select(x => x == 0xffff ? null : client.Manager.GameData.Items[x]).ToArray();
                 for (int j = 0; j < 8; j++)
                     con.Inventory[j] = inv[j];
                 con.Move(vaultChestPosition[0].X + 0.5f, vaultChestPosition[0].Y + 0.5f);
                 EnterWorld(con);
                 vaultChestPosition.RemoveAt(0);
 
-                vaultChests[new Tuple<Container, VaultChest>(con, chests[i])] = con.UpdateCount;
+                vaultChests[Tuple.Create(con, i)] = con.UpdateCount;
             }
             foreach (var i in vaultChestPosition)
             {
@@ -75,17 +76,18 @@ namespace wServer.realm.worlds
             }
         }
 
-        public void AddChest(VaultChest chest, Entity original)
+        public void AddChest(Entity original)
         {
             Container con = new Container(client.Manager, 0x0504, null, false);
-            var inv = chest.Items.Select(_ => _ == -1 ? null : Manager.GameData.Items[(ushort)_]).ToArray();
+            int index = Manager.Database.CreateChest(dbVault);
+            var inv = dbVault[index].Select(x => x == 0xffff ? null : client.Manager.GameData.Items[x]).ToArray();
             for (int j = 0; j < 8; j++)
                 con.Inventory[j] = inv[j];
             con.Move(original.X, original.Y);
             LeaveWorld(original);
             EnterWorld(con);
 
-            vaultChests[new Tuple<Container, VaultChest>(con, chest)] = con.UpdateCount;
+            vaultChests[Tuple.Create(con, index)] = con.UpdateCount;
         }
 
         public override World GetInstance(Client client)
@@ -101,8 +103,8 @@ namespace wServer.realm.worlds
             {
                 if (i.Key.Item1.UpdateCount > i.Value)
                 {
-                    i.Key.Item2._Items = Utils.GetCommaSepString(i.Key.Item1.Inventory.Take(8).Select(_ => _ == null ? -1 : _.ObjectType).ToArray());
-                    Manager.Database.SaveChest(client.Account, i.Key.Item2);
+                    dbVault[i.Key.Item2] = i.Key.Item1.Inventory.Take(8).Select(_ => _ == null ? (ushort)0xffff : _.ObjectType).ToArray();
+                    dbVault.Flush();
                     vaultChests[i.Key] = i.Key.Item1.UpdateCount;
                 }
             }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.Linq;
+using common;
 
 namespace wServer.realm.entities
 {
@@ -17,11 +18,11 @@ namespace wServer.realm.entities
             BagOwners = new int[0];
 
             var node = manager.GameData.ObjectTypeToElement[ObjectType];
-            SlotTypes = Utils.FromCommaSepString32(node.Element("SlotTypes").Value);
+            SlotTypes = node.Element("SlotTypes").Value.CommaToArray<int>();
             XElement eq = node.Element("Equipment");
             if (eq != null)
             {
-                var inv = Utils.FromCommaSepString16(eq.Value).Select(_ => _ == 0xffff ? null : manager.GameData.Items[_]).ToArray();
+                var inv = eq.Value.CommaToArray<ushort>().Select(_ => _ == 0xffff ? null : manager.GameData.Items[_]).ToArray();
                 Array.Resize(ref inv, 12);
                 Inventory.SetItems(inv);
             }

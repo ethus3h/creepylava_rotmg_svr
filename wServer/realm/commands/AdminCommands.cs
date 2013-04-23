@@ -7,6 +7,7 @@ using wServer.realm.worlds;
 using wServer.networking.svrPackets;
 using wServer.networking;
 using wServer.realm.entities;
+using common;
 
 namespace wServer.realm.commands
 {

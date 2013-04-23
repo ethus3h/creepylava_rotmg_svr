@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using wServer.networking.svrPackets;
 using wServer.logic;
+using common;
 
 namespace wServer.realm.entities
 {

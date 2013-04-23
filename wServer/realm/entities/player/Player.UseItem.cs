@@ -6,6 +6,7 @@ using wServer.networking.cliPackets;
 using wServer.networking.svrPackets;
 using wServer.logic;
 using wServer.networking;
+using common;
 
 namespace wServer.realm.entities
 {
@@ -99,7 +100,7 @@ namespace wServer.realm.entities
                 UpdateCount++;
             }
             if (container.SlotTypes[slot] != -1)
-                fames.UseAbility();
+                FameCounter.UseAbility();
         }
 
         static void ActivateHealHp(Player player, int amount, List<Packet> pkts)
@@ -158,7 +159,7 @@ namespace wServer.realm.entities
                     (int)statsMgr.GetAttackDamage(prjDesc.MinDamage, prjDesc.MaxDamage),
                     time.tickTimes, new Position() { X = X, Y = Y }, (float)(startAngle + arcGap * i));
                 Owner.EnterWorld(proj);
-                fames.Shoot(proj);
+                FameCounter.Shoot(proj);
             }
         }
         void PoisonEnemy(Enemy enemy, ActivateEffect eff)
@@ -215,7 +216,7 @@ namespace wServer.realm.entities
                                     (int)statsMgr.GetAttackDamage(prjDesc.MinDamage, prjDesc.MaxDamage),
                                     time.tickTimes, target, (float)(i * (Math.PI * 2) / 20));
                                 Owner.EnterWorld(proj);
-                                fames.Shoot(proj);
+                                FameCounter.Shoot(proj);
                                 batch[i] = new ShootPacket()
                                 {
                                     BulletId = proj.ProjectileId,

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using db;
+using common;
 using System.Threading;
 using System.Diagnostics;
 using System.IO;
@@ -55,6 +55,7 @@ namespace wServer.realm
         }
 
         int nextWorldId = 0;
+        int nextClientId = 0;
         public readonly ConcurrentDictionary<int, World> Worlds = new ConcurrentDictionary<int, World>();
         public readonly ConcurrentDictionary<int, Client> Clients = new ConcurrentDictionary<int, Client>();
         public ConcurrentDictionary<int, World> PlayerWorldMapping = new ConcurrentDictionary<int, World>();
@@ -66,11 +67,15 @@ namespace wServer.realm
             if (Clients.Count >= MaxClient)
                 return false;
             else
-                return Clients.TryAdd(client.Account.AccountId, client);
+            {
+                client.Id = Interlocked.Increment(ref nextClientId);
+                Clients[client.Id] = client;
+                return true;
+            }
         }
         public void Disconnect(Client client)
         {
-            Clients.TryRemove(client.Account.AccountId, out client);
+            Clients.TryRemove(client.Id, out client);
         }
 
         public World AddWorld(int id, World world)

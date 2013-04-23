@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using wServer.logic.loot;
+using common;
 using wServer.logic;
 
 namespace wServer.realm.setpieces

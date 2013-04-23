@@ -8,7 +8,7 @@ using System.IO;
 using wServer.networking.svrPackets;
 using wServer.networking.cliPackets;
 using System.Xml;
-using db;
+using common;
 using wServer.realm;
 using wServer.realm.entities;
 using log4net;
@@ -30,6 +30,7 @@ namespace wServer.networking
         public RC4 ReceiveKey { get; private set; }
         public RC4 SendKey { get; private set; }
 
+        public int Id { get; internal set; }
         public RealmManager Manager { get; private set; }
         public Socket Socket { get { return skt; } }
 
@@ -97,18 +98,19 @@ namespace wServer.networking
                 DisconnectFromRealm();
             skt.Close();
         }
-        void Save()
+        void Save() //Only when disconnect
         {
-            if (Character != null)
+            if (Character != null && Player != null)
             {
                 log.DebugFormat("Saving character...");
                 Player.SaveToCharacter();
-                Manager.Database.SaveCharacter(Account, Character);
+                bool x = Manager.Database.SaveCharacter(Account, Character, true);
             }
+            Manager.Database.ReleaseLock(Account);
         }
 
-        public Char Character { get; internal set; }
-        public Account Account { get; internal set; }
+        public DbChar Character { get; internal set; }
+        public DbAccount Account { get; internal set; }
         public ProtocalStage Stage { get; internal set; }
         public Player Player { get; internal set; }
         public wRandom Random { get; internal set; }

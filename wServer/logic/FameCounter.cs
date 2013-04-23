@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using wServer.realm.entities;
 using wServer.realm;
+using common;
 
 namespace wServer.logic
 {
@@ -12,17 +13,19 @@ namespace wServer.logic
         Player player;
         public Player Host { get { return player; } }
 
-        FameStats stats;
+        public FameStats Stats { get; private set; }
+        public DbClassStats ClassStats { get; private set; }
         public FameCounter(Player player)
         {
             this.player = player;
-            this.stats = player.Client.Character.FameStats;
+            this.Stats = FameStats.Read(player.Client.Character.FameStats);
+            this.ClassStats = new DbClassStats(player.Client.Account);
         }
 
         HashSet<Projectile> projs = new HashSet<Projectile>();
         public void Shoot(Projectile proj)
         {
-            stats.Shots++;
+            Stats.Shots++;
             projs.Add(proj);
         }
 
@@ -31,54 +34,54 @@ namespace wServer.logic
             if (projs.Contains(proj))
             {
                 projs.Remove(proj);
-                stats.ShotsThatDamage++;
+                Stats.ShotsThatDamage++;
             }
         }
 
         public void Killed(Enemy enemy, bool killer)
         {
             if (enemy.ObjectDesc.God)
-                stats.GodAssists++;
+                Stats.GodAssists++;
             else
-                stats.MonsterAssists++;
+                Stats.MonsterAssists++;
             if (player.Quest == enemy)
-                stats.QuestsCompleted++;
+                Stats.QuestsCompleted++;
             if (killer)
             {
                 if (enemy.ObjectDesc.God)
-                    stats.GodKills++;
+                    Stats.GodKills++;
                 else
-                    stats.MonsterKills++;
+                    Stats.MonsterKills++;
 
                 if (enemy.ObjectDesc.Cube)
-                    stats.CubeKills++;
+                    Stats.CubeKills++;
                 if (enemy.ObjectDesc.Oryx)
-                    stats.OryxKills++;
+                    Stats.OryxKills++;
             }
         }
         public void LevelUpAssist(int count)
         {
-            stats.LevelUpAssists += count;
+            Stats.LevelUpAssists += count;
         }
 
         public void TileSent(int num)
         {
-            stats.TilesUncovered += num;
+            Stats.TilesUncovered += num;
         }
 
         public void Teleport()
         {
-            stats.Teleports++;
+            Stats.Teleports++;
         }
 
         public void UseAbility()
         {
-            stats.SpecialAbilityUses++;
+            Stats.SpecialAbilityUses++;
         }
 
         public void DrinkPot()
         {
-            stats.PotionsDrunk++;
+            Stats.PotionsDrunk++;
         }
 
         int elapsed = 0;
@@ -88,7 +91,7 @@ namespace wServer.logic
             if (elapsed > 1000 * 60)
             {
                 elapsed -= 1000 * 60;
-                stats.MinutesActive++;
+                Stats.MinutesActive++;
             }
         }
     }

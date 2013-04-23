@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Net;
-using db;
+using common;
 using System.Collections.Specialized;
 using System.IO;
 using System.Web;
@@ -12,7 +12,7 @@ using System.Globalization;
 
 namespace server.account
 {
-    class register : IRequestHandler
+    class register : RequestHandler
     {
         public bool IsValidEmail(string strIn)
         {
@@ -49,46 +49,49 @@ namespace server.account
                       RegexOptions.IgnoreCase);
         }
 
-        public void HandleRequest(HttpListenerContext context)
+        public override void HandleRequest(HttpListenerContext context)
         {
             NameValueCollection query;
             using (StreamReader rdr = new StreamReader(context.Request.InputStream))
                 query = HttpUtility.ParseQueryString(rdr.ReadToEnd());
 
-            using (var db = new Database(Program.Settings.GetValue("conn")))
+            if (!IsValidEmail(query["newGUID"]))
+                Write(context, "<Error>Invalid email</Error>");
+            else
             {
-                byte[] status;
-                if (!IsValidEmail(query["newGUID"]))
-                    status = Encoding.UTF8.GetBytes("<Error>Invalid email</Error>");
-                else
+                string key = Database.REG_LOCK;
+                string lockToken = null;
+                try
                 {
-                    if (db.HasUuid(query["guid"]) &&
-                        db.Verify(query["guid"], "") != null)
+                    while ((lockToken = Database.AcquireLock(key)) == null) ;
+
+                    DbAccount acc;
+                    var status = Database.Verify(query["guid"], "", out acc);
+                    if (status == LoginStatus.OK)
                     {
-                        if (db.HasUuid(query["newGUID"]))
-                            status = Encoding.UTF8.GetBytes("<Error>Duplicated email</Error>");
-                        else
-                        {
-                            var cmd = db.CreateQuery();
-                            cmd.CommandText = "UPDATE accounts SET uuid=@newUuid, password=SHA1(@password), guest=FALSE WHERE uuid=@uuid;";
-                            cmd.Parameters.AddWithValue("@uuid", query["guid"]);
-                            cmd.Parameters.AddWithValue("@newUuid", query["newGUID"]);
-                            cmd.Parameters.AddWithValue("@password", query["newPassword"]);
-                            if (cmd.ExecuteNonQuery() > 0)
-                                status = Encoding.UTF8.GetBytes("<Success />");
+                        using (var l = Database.Lock(acc))
+                            if (Database.LockOk(l) && Database.RenameUUID(acc, query["newGUID"], lockToken))
+                            {
+                                Database.ChangePassword(acc.UUID, query["newPassword"]);
+                                Write(context, "<Success />");
+                            }
                             else
-                                status = Encoding.UTF8.GetBytes("<Error>Internal Error</Error>");
-                        }
+                                Write(context, "<Error>Account in Use</Error>");
                     }
                     else
                     {
-                        if (db.Register(query["newGUID"], query["newPassword"], false) != null)
-                            status = Encoding.UTF8.GetBytes("<Success />");
+                        var s = Database.Register(query["newGUID"], query["newPassword"], false, out acc);
+                        if (s == RegisterStatus.OK)
+                            Write(context, "<Success />");
                         else
-                            status = Encoding.UTF8.GetBytes("<Error>Internal Error</Error>");
+                            Write(context, "<Error>" + s.GetInfo() + "</Error>");
                     }
                 }
-                context.Response.OutputStream.Write(status, 0, status.Length);
+                finally
+                {
+                    if (lockToken != null)
+                        Database.ReleaseLock(key, lockToken);
+                }
             }
         }
     }

@@ -28,18 +28,6 @@ namespace wServer
         }
     }
 
-    static class StringUtils
-    {
-        public static bool ContainsIgnoreCase(this string self, string val)
-        {
-            return self.IndexOf(val, StringComparison.InvariantCultureIgnoreCase) != -1;
-        }
-        public static bool EqualsIgnoreCase(this string self, string val)
-        {
-            return self.Equals(val, StringComparison.InvariantCultureIgnoreCase);
-        }
-    }
-
     static class MathsUtils
     {
         public static double Dist(double x1, double y1, double x2, double y2)

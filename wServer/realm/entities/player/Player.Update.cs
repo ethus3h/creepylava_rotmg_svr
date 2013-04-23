@@ -122,7 +122,7 @@ namespace wServer.realm.entities
                 tiles[x, y] = tile.UpdateCount;
                 sent++;
             }
-            fames.TileSent(sent);
+            FameCounter.TileSent(sent);
 
             var dropEntities = GetRemovedEntities().Distinct().ToArray();
             clientEntities.RemoveWhere(_ => Array.IndexOf(dropEntities, _.Id) != -1);

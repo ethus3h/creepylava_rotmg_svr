@@ -14,17 +14,20 @@ namespace wServer.realm.entities
         long tickMapping = 0;
         Queue<long> ts = new Queue<long>();
 
+        const int PING_PERIOD = 5000;
+        const int DC_THRESOLD = 10000;
+
         bool sentPing = false;
         bool KeepAlive(RealmTime time)
         {
-            if (lastPong == -1) lastPong = time.tickTimes - 1500;
-            if (time.tickTimes - lastPong > 1500 && !sentPing)
+            if (lastPong == -1) lastPong = time.tickTimes - PING_PERIOD;
+            if (time.tickTimes - lastPong > PING_PERIOD && !sentPing)
             {
                 sentPing = true;
                 ts.Enqueue(time.tickTimes);
                 client.SendPacket(new PingPacket());
             }
-            else if (time.tickTimes - lastPong > 3000)
+            else if (time.tickTimes - lastPong > DC_THRESOLD)
             {
                 //client.Disconnect();
                 return false;
@@ -33,13 +36,15 @@ namespace wServer.realm.entities
         }
         internal void Pong(int time)
         {
-            if (lastTime != null && (time - lastTime.Value > 3000 || time - lastTime.Value < 0))
+            if (lastTime != null && (time - lastTime.Value > DC_THRESOLD || time - lastTime.Value < 0))
                 ;//client.Disconnect();
             else
                 lastTime = time;
             tickMapping = ts.Dequeue() - time;
             lastPong = time + tickMapping;
             sentPing = false;
+            if (!Manager.Database.RenewLock(client.Account))
+                client.Disconnect();
         }
     }
 }

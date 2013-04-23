@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using db;
+using common;
 using wServer.realm.entities;
 using wServer.logic;
 using wServer.networking.svrPackets;

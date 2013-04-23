@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using wServer.networking.cliPackets;
 using wServer.realm;
+using common;
 using wServer.networking.svrPackets;
-using db;
 using wServer.realm.entities;
 
 namespace wServer.networking.handlers
@@ -16,58 +16,53 @@ namespace wServer.networking.handlers
 
         protected override void HandlePacket(Client client, ChooseNamePacket packet)
         {
-            if (string.IsNullOrEmpty(packet.Name) ||
-                packet.Name.Length > 10)
-            {
+            string name = packet.Name;
+            if (name.Length < 3 || name.Length > 15 || !name.All(x => char.IsLetter(x) || char.IsNumber(x)))
                 client.SendPacket(new NameResultPacket()
                 {
                     Success = false,
                     Message = "Invalid name"
                 });
-            }
-
-            var db = client.Manager.Database;
-            var cmd = db.CreateQuery();
-            cmd.CommandText = "SELECT COUNT(name) FROM accounts WHERE name=@name;";
-            cmd.Parameters.AddWithValue("@name", packet.Name);
-            if ((int)(long)cmd.ExecuteScalar() > 0)
-                client.SendPacket(new NameResultPacket()
-                {
-                    Success = false,
-                    Message = "Duplicated name"
-                });
             else
             {
-                db.ReadStats(client.Account);
-                if (client.Account.NameChosen && client.Account.Credits < 1000)
-                    client.SendPacket(new NameResultPacket()
-                    {
-                        Success = false,
-                        Message = "Not enough credits"
-                    });
-                else
+                string key = Database.NAME_LOCK;
+                string lockToken = null;
+                try
                 {
-                    cmd = db.CreateQuery();
-                    cmd.CommandText = "UPDATE accounts SET name=@name, namechosen=TRUE WHERE id=@accId;";
-                    cmd.Parameters.AddWithValue("@accId", client.Account.AccountId);
-                    cmd.Parameters.AddWithValue("@name", packet.Name);
-                    if (cmd.ExecuteNonQuery() > 0)
+                    while ((lockToken = client.Manager.Database.AcquireLock(key)) == null) ;
+
+                    if (client.Manager.Database.Sets.Contains(0, "names", name).Exec())
                     {
-                        client.Account.Credits = db.UpdateCredit(client.Account, -1000);
-                        client.Account.Name = packet.Name;
-                        client.Manager.Logic.AddPendingAction(t => Handle(client.Player));
+                        client.SendPacket(new NameResultPacket()
+                        {
+                            Success = false,
+                            Message = "Duplicated name"
+                        });
+                        return;
+                    }
+
+                    if (client.Account.NameChosen && client.Account.Credits < 1000)
+                        client.SendPacket(new NameResultPacket()
+                        {
+                            Success = false,
+                            Message = "Not enough credits"
+                        });
+                    else
+                    {
+                        if (client.Account.NameChosen)
+                            client.Manager.Database.UpdateCredit(client.Account, -1000);
+                        while (!client.Manager.Database.RenameIGN(client.Account, name, lockToken)) ;
                         client.SendPacket(new NameResultPacket()
                         {
                             Success = true,
                             Message = ""
                         });
                     }
-                    else
-                        client.SendPacket(new NameResultPacket()
-                        {
-                            Success = false,
-                            Message = "Internal Error"
-                        });
+                }
+                finally
+                {
+                    if (lockToken != null)
+                        client.Manager.Database.ReleaseLock(key, lockToken);
                 }
             }
         }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Net;
-using db;
+using common;
 using System.Collections.Specialized;
 using System.IO;
 using System.Web;
@@ -13,50 +13,38 @@ using System.Xml;
 
 namespace server.account
 {
-    class purchaseCharSlot : IRequestHandler
+    class purchaseCharSlot : RequestHandler
     {
-        public void HandleRequest(HttpListenerContext context)
+        public override void HandleRequest(HttpListenerContext context)
         {
             NameValueCollection query;
             using (StreamReader rdr = new StreamReader(context.Request.InputStream))
                 query = HttpUtility.ParseQueryString(rdr.ReadToEnd());
 
-            using (var db = new Database(Program.Settings.GetValue("conn")))
+            DbAccount acc;
+            var status = Database.Verify(query["guid"], query["password"], out acc);
+            if (status == LoginStatus.OK)
             {
-                var acc = db.Verify(query["guid"], query["password"]);
-                byte[] status;
-                if (acc == null)
+                using (var l = Database.Lock(acc))
                 {
-                    status = Encoding.UTF8.GetBytes("<Error>Bad login</Error>");
-                }
-                else
-                {
-                    var cmd = db.CreateQuery();
-                    cmd.CommandText = "SELECT credits FROM stats WHERE accId=@accId;";
-                    cmd.Parameters.AddWithValue("@accId", acc.AccountId);
-                    if ((int)cmd.ExecuteScalar() < 100)
-                        status = Encoding.UTF8.GetBytes("<Error>Not enough credits</Error>");
-                    else
+                    if (!Database.LockOk(l))
                     {
-                        cmd = db.CreateQuery();
-                        cmd.CommandText = "UPDATE stats SET credits = credits - 100 WHERE accId=@accId";
-                        cmd.Parameters.AddWithValue("@accId", acc.AccountId);
-                        if ((int)cmd.ExecuteNonQuery() > 0)
-                        {
-                            cmd = db.CreateQuery();
-                            cmd.CommandText = "UPDATE accounts SET maxCharSlot = maxCharSlot + 1 WHERE id=@accId";
-                            cmd.Parameters.AddWithValue("@accId", acc.AccountId);
-                            if ((int)cmd.ExecuteNonQuery() > 0)
-                                status = Encoding.UTF8.GetBytes("<Success/>");
-                            else
-                                status = Encoding.UTF8.GetBytes("<Error>Internal Error</Error>");
-                        }
-                        else
-                            status = Encoding.UTF8.GetBytes("<Error>Internal Error</Error>");
+                        Write(context, "<Error>Account in Use</Error>");
+                        return;
                     }
+                    else if (acc.Credits < 100)
+                    {
+                        Write(context, "<Error>Not enough credits</Error>");
+                        return;
+                    }
+                    Database.UpdateCredit(acc, -100);
+                    acc.MaxCharSlot++;
+                    acc.Flush();
                 }
-                context.Response.OutputStream.Write(status, 0, status.Length);
+                Write(context, "<Success />");
             }
+            else
+                Write(context, "<Error>" + status.GetInfo() + "</Error>");
         }
     }
 }

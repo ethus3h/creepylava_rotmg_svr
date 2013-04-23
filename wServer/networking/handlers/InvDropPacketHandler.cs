@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using wServer.networking.cliPackets;
 using wServer.realm;
+using common;
 using wServer.networking.svrPackets;
-using db;
 using wServer.realm.entities;
 
 namespace wServer.networking.handlers

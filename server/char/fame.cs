@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Net;
-using db;
+using common;
 using System.Collections.Specialized;
 using System.IO;
 using System.Web;
@@ -13,36 +13,28 @@ using System.Xml;
 
 namespace server.@char
 {
-    class fame : IRequestHandler
+    class fame : RequestHandler
     {
-        public void HandleRequest(HttpListenerContext context)
+        public override void HandleRequest(HttpListenerContext context)
         {
             NameValueCollection query;
             using (StreamReader rdr = new StreamReader(context.Request.InputStream))
                 query = HttpUtility.ParseQueryString(rdr.ReadToEnd());
-            using (var db = new Database(Program.Settings.GetValue("conn")))
+
+            DbChar character = Database.LoadCharacter(int.Parse(query["accountId"]), int.Parse(query["charId"]));
+            if (character == null)
             {
-                var acc = db.GetAccount(int.Parse(query["accountId"]));
-                var chr = db.LoadCharacter(acc, int.Parse(query["charId"]));
-
-                var cmd = db.CreateQuery();
-                cmd.CommandText = @"SELECT time, killer, firstBorn FROM death WHERE accId=@accId AND chrId=@charId;";
-                cmd.Parameters.AddWithValue("@accId", query["accountId"]);
-                cmd.Parameters.AddWithValue("@charId", query["charId"]);
-                int time;
-                string killer;
-                bool firstBorn;
-                using (var rdr = cmd.ExecuteReader())
-                {
-                    rdr.Read();
-                    time = Database.DateTimeToUnixTimestamp(rdr.GetDateTime("time"));
-                    killer = rdr.GetString("killer");
-                    firstBorn = rdr.GetBoolean("firstBorn");
-                }
-
-                using (StreamWriter wtr = new StreamWriter(context.Response.OutputStream))
-                    wtr.Write(chr.FameStats.Serialize(Program.GameData, acc, chr, time, killer, firstBorn));
+                Write(context, "<Error>Invalid character</Error>");
+                return;
             }
+
+            Fame fame = Fame.FromDb(character);
+            if (fame == null)
+            {
+                Write(context, "<Error>Character not dead</Error>");
+                return;
+            }
+            Write(context, fame.ToXml().ToString());
         }
     }
 }

@@ -7,6 +7,7 @@ using wServer.networking.cliPackets;
 using wServer.networking.svrPackets;
 using System.Net.Sockets;
 using System.Net;
+using common;
 
 namespace wServer.networking
 {

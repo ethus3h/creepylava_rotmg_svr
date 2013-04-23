@@ -5,6 +5,7 @@ using System.Text;
 using System.Net.Sockets;
 using System.Net;
 using log4net;
+using common;
 
 namespace wServer.networking
 {

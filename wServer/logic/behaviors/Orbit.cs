@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using wServer.realm.entities;
 using wServer.realm;
+using common;
 using Mono.Game;
 
 namespace wServer.logic.behaviors

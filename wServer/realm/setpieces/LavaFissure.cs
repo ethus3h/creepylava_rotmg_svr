@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using wServer.realm.entities;
 using wServer.logic.loot;
+using common;
 
 namespace wServer.realm.setpieces
 {

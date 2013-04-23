@@ -4,8 +4,8 @@ using System.Linq;
 using System.Text;
 using wServer.networking.cliPackets;
 using wServer.realm;
+using common;
 using wServer.networking.svrPackets;
-using db;
 using wServer.realm.entities;
 
 namespace wServer.networking.handlers
@@ -16,7 +16,8 @@ namespace wServer.networking.handlers
 
         protected override void HandlePacket(Client client, CheckCreditsPacket packet)
         {
-            client.Manager.Database.ReadStats(client.Account);
+            client.Account.Flush();
+            client.Account.Reload();
             client.Manager.Logic.AddPendingAction(t => Handle(client.Player));
         }
 

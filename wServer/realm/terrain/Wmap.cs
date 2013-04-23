@@ -5,6 +5,7 @@ using System.Text;
 using System.IO;
 using Ionic.Zlib;
 using wServer.realm.entities;
+using common;
 
 namespace wServer.realm.terrain
 {

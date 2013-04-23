@@ -5,23 +5,21 @@ using System.Text;
 using System.Net;
 using System.Threading;
 using System.IO;
-using db;
+using common;
 using log4net;
 using log4net.Config;
 using System.Globalization;
+using System.Collections.Concurrent;
 
 namespace server
 {
     class Program
     {
         static HttpListener listener;
-        static readonly Thread[] workers = new Thread[5];
-        static readonly Queue<HttpListenerContext> contextQueue = new Queue<HttpListenerContext>();
-        static readonly object queueLock = new object();
-        static readonly ManualResetEvent queueReady = new ManualResetEvent(false);
 
         internal static SimpleSettings Settings;
         internal static XmlData GameData;
+        internal static Database Database;
 
         static ILog log = LogManager.GetLogger("Server");
 
@@ -34,6 +32,10 @@ namespace server
 
             using (Settings = new SimpleSettings("server"))
             {
+                Database = new Database(
+                        Settings.GetValue<string>("db_host", "127.0.0.1"),
+                        Settings.GetValue<int>("db_port", "6379"),
+                        Settings.GetValue<string>("db_auth", ""));
                 GameData = new XmlData();
                 int port = Settings.GetValue<int>("port", "8888");
 
@@ -42,23 +44,14 @@ namespace server
                 listener.Start();
 
                 listener.BeginGetContext(ListenerCallback, null);
-                for (var i = 0; i < workers.Length; i++)
-                {
-                    workers[i] = new Thread(Worker) { Name = "Worker " + i };
-                    workers[i].Start();
-                }
                 Console.CancelKeyPress += (sender, e) => e.Cancel = true;
                 log.Info("Listening at port " + port + "...");
 
                 while (Console.ReadKey(true).Key != ConsoleKey.Escape) ;
 
                 log.Info("Terminating...");
-                terminating = true;
                 listener.Stop();
-                queueReady.Set();
                 GameData.Dispose();
-                while (contextQueue.Count > 0)
-                    Thread.Sleep(100);
             }
         }
 
@@ -67,46 +60,16 @@ namespace server
             if (!listener.IsListening) return;
             var context = listener.EndGetContext(ar);
             listener.BeginGetContext(ListenerCallback, null);
-            lock (queueLock)
-            {
-                contextQueue.Enqueue(context);
-                queueReady.Set();
-            }
+            ProcessRequest(context);
         }
-
-        static bool terminating = false;
-        static void Worker()
-        {
-            while (queueReady.WaitOne())
-            {
-                if (terminating) return;
-                HttpListenerContext context;
-                lock (queueLock)
-                {
-                    if (contextQueue.Count > 0)
-                        context = contextQueue.Dequeue();
-                    else
-                    {
-                        queueReady.Reset();
-                        continue;
-                    }
-                }
-
-                try
-                {
-                    ProcessRequest(context);
-                }
-                catch { }
-            }
-        }
-
+        
         static void ProcessRequest(HttpListenerContext context)
         {
             try
             {
                 log.InfoFormat("Dispatching request '{0}'@{1}",
                     context.Request.Url.LocalPath, context.Request.RemoteEndPoint);
-                IRequestHandler handler;
+                RequestHandler handler;
 
                 if (!RequestHandlers.Handlers.TryGetValue(context.Request.Url.LocalPath, out handler))
                 {

@@ -10,12 +10,11 @@ using System.Text.RegularExpressions;
 
 namespace server.account
 {
-    class forgotPassword : IRequestHandler
+    class forgotPassword : RequestHandler
     {
-        public void HandleRequest(HttpListenerContext context)
+        public override void HandleRequest(HttpListenerContext context)
         {
-            byte[] status = Encoding.UTF8.GetBytes("<Error>Nope.</Error>");
-            context.Response.OutputStream.Write(status, 0, status.Length);
+            Write(context, "<Error>Nope.</Error>");
         }
     }
 }

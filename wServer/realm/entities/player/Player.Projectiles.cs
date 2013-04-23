@@ -5,6 +5,7 @@ using System.Text;
 using wServer.networking.svrPackets;
 using wServer.networking.cliPackets;
 using wServer.logic;
+using common;
 
 namespace wServer.realm.entities
 {

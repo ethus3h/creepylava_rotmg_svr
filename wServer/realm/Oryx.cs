@@ -9,6 +9,7 @@ using wServer.networking.svrPackets;
 using wServer.realm.setpieces;
 using wServer.realm.terrain;
 using log4net;
+using common;
 
 namespace wServer.realm
 {

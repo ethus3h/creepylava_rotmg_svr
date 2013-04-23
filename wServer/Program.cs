@@ -6,10 +6,10 @@ using System.Net.Sockets;
 using System.Net;
 using System.Threading;
 using wServer.realm;
+using common;
 using System.Net.NetworkInformation;
 using wServer.networking;
 using System.Globalization;
-using db;
 using log4net;
 using log4net.Config;
 using System.IO;
@@ -31,7 +31,10 @@ namespace wServer
 
             using (Settings = new SimpleSettings("wServer"))
             {
-                var db = new Database(Settings.GetValue("conn"));
+                var db = new Database(
+                        Settings.GetValue<string>("db_host", "127.0.0.1"),
+                        Settings.GetValue<int>("db_port", "6379"),
+                        Settings.GetValue<string>("db_auth", ""));
                 RealmManager manager = new RealmManager(
                     Settings.GetValue<int>("maxClient", "100"),
                     Settings.GetValue<int>("tps", "20"),

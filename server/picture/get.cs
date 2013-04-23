@@ -9,10 +9,10 @@ using System.Web;
 
 namespace server.picture
 {
-    class get : IRequestHandler
+    class get : RequestHandler
     {
         byte[] buff = new byte[0x10000];
-        public void HandleRequest(HttpListenerContext context)
+        public override void HandleRequest(HttpListenerContext context)
         {
             NameValueCollection query;
             using (StreamReader rdr = new StreamReader(context.Request.InputStream))

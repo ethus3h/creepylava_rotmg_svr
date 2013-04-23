@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "wServer", "wServer\wServer.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "proxy", "proxy\proxy.csproj", "{980E5168-4843-4D08-AC6D-1640A1071188}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "db", "db\db.csproj", "{D5D0743E-5120-4D35-8EBE-9B063C7A73CE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "common", "common\common.csproj", "{D5D0743E-5120-4D35-8EBE-9B063C7A73CE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "terrain", "terrain\terrain.csproj", "{C400FDD3-6250-4F9B-9516-B3463D6761F5}"
 EndProject

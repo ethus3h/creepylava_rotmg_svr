@@ -24,6 +24,13 @@ namespace wServer.networking
 
         protected void SendFailure(Client cli, string text)
         {
+            cli.SendPacket(new svrPackets.TextPacket()
+            {
+                BubbleTime = 0,
+                Stars = -1,
+                Name = "*Error*",
+                Text = text
+            });
             cli.SendPacket(new svrPackets.FailurePacket() { Message = text });
         }
     }
